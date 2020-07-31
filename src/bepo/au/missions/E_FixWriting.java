@@ -25,8 +25,8 @@ import bepo.au.Mission.MissionType;
 
 public class E_FixWriting extends Mission implements Listener {
 	
-	public E_FixWriting(MissionType mt, String name, String korean, int clear, Location loc) {
-		super(mt, name, korean, clear, loc);
+	public E_FixWriting(MissionType mt2, String name, String korean, int clear, Location loc) {
+		super(mt2, name, korean, clear, loc);
 	}
 									
 		static int[] wirecolorArray;											
