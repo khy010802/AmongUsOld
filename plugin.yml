@@ -1,0 +1,9 @@
+name: AmongUs
+version: 1.0
+main: bepo.au.Main
+author: JonJAr
+softdepend: [NetherBoard]
+api-version: 1.13
+commands:
+  au:
+    description: AmongUs Command.
