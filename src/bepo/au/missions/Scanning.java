@@ -14,10 +14,11 @@ import org.bukkit.inventory.ItemStack;
 import amongyours.Main;
 import amongyours.TimerBase;
 import amongyours.Util;
+import bepo.au.Mission;
 
 
 
-public class Scanning implements Listener{
+public class Scanning extends Mission implements Listener{
 	public   class Timer extends TimerBase{
 		double radius= 0.8;
 		@Override
