@@ -15,6 +15,8 @@ import bepo.au.Util;
 //Cur_route가 4되면 끝
 public class ChartCourse extends Mission{
 	
+	
+	// test
 	public static int Cur_route;
 	static Player p;
 	static Inventory inv;
