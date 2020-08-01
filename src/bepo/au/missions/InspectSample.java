@@ -22,7 +22,7 @@ public class InspectSample implements Listener {
 	public   class Timer extends TimerBase{
 		
 		@Override
-		public void EventStartTimer() { //타이머 시작
+		public void EventStartTimer() { // 타이머 시작
 			Util.debugMessage(" 타이머 시작됨");
 			P_timer.StartTimer(45,false,1);
 		}
