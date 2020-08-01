@@ -70,16 +70,18 @@ public abstract class Mission implements Listener{
 		main = m;
 	}
 	
+	protected String playername;
+	
 	protected String name;
 	protected String korean;
 	protected Location[] loc;
 	protected MissionType type;
 	
-	protected Inventory gui;
-	protected String gui_title;
+	protected List<Inventory> gui = new ArrayList<Inventory>();
+	protected List<String> gui_title = new ArrayList<String>();
 	
 	protected int required_clear = 0;
-	protected int clear = 0;
+	protected List<Integer> cleared = new ArrayList<Integer>();
 	
 	public Mission(MissionType mt, String name, String korean, int required_clear, Location... loc) {
 		this.name = name;
@@ -92,24 +94,28 @@ public abstract class Mission implements Listener{
 	public String getMissionName() { return this.name; }
 	public String getKoreanName() { return this.korean; }
 	public Location[] getLocations() { return this.loc; }
-	public String getTitle() { return gui_title; }
+	public List<String> getTitles() { return gui_title; }
 	public int getRequiredClear() { return this.required_clear; }
 	
 	public final void uploadInventory(InventoryHolder owner, int slot, String name) {
 		Inventory inv = Bukkit.createInventory(owner, slot, name);
-		this.gui = inv;
-		this.gui_title = name;
+		gui.add(inv);
+		gui_title.add(name);
 	}
 	
 	public final void reset() {
-		clear = 0;
+		cleared.clear();
 		gui = null;
 		gui_title = null;
 	}
 	
+	public final void assign(Player p) {
+		this.playername = p.getName();
+	}
 	
-	public final void generalClear(Player p) {
-		clear++;
+	
+	public final void generalClear(Player p, int code) {
+		cleared.add(code);
 		p.closeInventory();
 		p.sendMessage(Main.PREFIX + "§a임무 완료!");
 		PlayerData pd = PlayerData.getPlayerData(p.getName());
@@ -137,13 +143,17 @@ public abstract class Mission implements Listener{
 		return -1;
 	}
 	
+	public final boolean isCleared(int code) {
+		return cleared.contains(code);
+	}
+	
 	public final boolean isCleared() {
-		return clear >= required_clear;
+		return cleared.size() >= required_clear;
 	}
 	
 	public final boolean checkPlayer(Event event) {
 		if(event instanceof InventoryEvent) {
-			boolean bool = ((InventoryEvent) event).getView().getTitle().equalsIgnoreCase(gui_title);
+			boolean bool = gui_title.contains(((InventoryEvent) event).getView().getTitle());
 			boolean bool2 = false;
 			if(event instanceof InventoryCloseEvent) bool2 = ((InventoryCloseEvent) event).getPlayer() instanceof Player;
 			else if(event instanceof InventoryClickEvent) bool2 = ((InventoryClickEvent) event).getWhoClicked() instanceof Player;
