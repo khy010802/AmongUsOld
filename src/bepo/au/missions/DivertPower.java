@@ -17,7 +17,8 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 
-
+import bepo.au.Mission;
+import bepo.au.Util;
 
 public class DivertPower implements Listener {
 	 Main main;
