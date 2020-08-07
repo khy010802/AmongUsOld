@@ -40,11 +40,11 @@ public class LocManager {
 			"StablizeSteering",
 			"Scanning",
 			"InspectSample",
-			"DistributePower","DistributePower",
+			"DistributePower",
 			"DataUpload", "DataDownload",
-			"Sabo_Fingerprint",
+			"Sabo_FingerprintUpper","Sabo_FingerprintLower",
 			"Sabo_FixLights",
-			"Sabo_Oxygen",
+			"Sabo_OxygenAdmin","Sabo_OxygenOxy",
 			"Sabo_Communication",
 			};
 	
