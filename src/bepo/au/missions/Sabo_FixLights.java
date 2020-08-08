@@ -32,7 +32,7 @@ public class Sabo_FixLights implements Listener {
 	/*
 	 * 명령어 쳤을 때 실행됨, gui 열기 시도.
 	 */
-	public void s_fixLights(Player pl, Main m) {
+	public void s_fixLightsOpen(Player pl, Main m) {
 		
 		main = m;
 		p = pl;
