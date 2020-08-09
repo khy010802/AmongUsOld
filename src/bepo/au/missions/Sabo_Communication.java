@@ -55,7 +55,7 @@ public class Sabo_Communication implements Listener {
 		if (started) {
 			Util.debugMessage("통신 사보타주는 이미 시작되었습니다.");
 		} else {
-			initialize_fixLights();
+			initialize_s_communications();
 			Util.debugMessage("통신 사보타주 실행됨");
 		}
 	}
@@ -63,7 +63,7 @@ public class Sabo_Communication implements Listener {
 	/*
 	 * 초기화 ; GUI를 만듦.
 	 */
-	private void initialize_fixLights() {
+	private void initialize_s_communications() {
 		while (true) {
 			for (int i = 0; i < 5; i++) {
 				answerStatus[i] = random.nextInt(maxNum); // 옳은 주파수 만들기, 주파수는 0~4값.
