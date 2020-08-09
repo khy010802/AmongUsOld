@@ -62,6 +62,9 @@ public class LocManager {
 		Location loc = new Location(w,x,y,z);
 		inputALocation(locName, loc);
 	}
+	public void inputLocation(String locName, Location location) {
+		inputALocation(locName, location);
+	}
 	public void saveALoc(String locName) { //
 		saveALocation(locName);
 	}
