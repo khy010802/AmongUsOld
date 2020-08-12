@@ -147,7 +147,7 @@ public class Sabo_Fingerprint implements Listener {
 	
 @EventHandler
 	private void onClose(InventoryCloseEvent e) {
-		if(p.getOpenInventory().getTitle()==guiName) {
+		if(started&&p.getOpenInventory().getTitle()==guiName) {
 			deactivate(e.getPlayer().getUniqueId());
 		}
 	}
