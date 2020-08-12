@@ -56,7 +56,7 @@ public class VentSystem {
 		vents = YamlConfiguration.loadConfiguration(file);
 	    try {
 	        if (!file.exists()) {
-	        	for (String ventName : ventLocations.keySet()) vents.set(ventName,"0,0,0;");
+	        	vents.set("default","0,0,0;");
 	        	vents.save(file);
 	        }
 	        vents.load(file);
