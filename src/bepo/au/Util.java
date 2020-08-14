@@ -37,18 +37,18 @@ public class Util implements Listener{
 								
 	}							
 								
-	public static void fillAround(Inventory inv, int slot, Material item){//gui 관련							
-		int Slot;						
-		for (int i=-1;i<2;i++) {						
-			for(int j=-1;j<2;j++) {					
-			if (i==0&&j==0) continue;					
-			Slot=getCoordinate(slot,i,j);					
-			if(Slot==-1) continue;					
-			inv.setItem(Slot, new ItemStack(item));					
-				}				
-			}					
-		//						
-	}							
+	public static void fillAround(Inventory inv, int slot, Material item){//gui 관련
+		int Slot;
+		for (int i=-1;i<2;i++) {
+			for(int j=-1;j<2;j++) {
+			if (i==0&&j==0) continue;
+			Slot=getCoordinate(slot,i,j);
+			if(Slot==-1) continue;
+			inv.setItem(Slot, createItem(item, 1, " ", null));
+				}
+			}
+		//
+	}						
 								
 	public static int getCoordinate(int slot, int x, int y) {							
 		int idx=slot+x+9*y;						
