@@ -15,6 +15,7 @@ import bepo.au.base.PlayerData;
 
 public class EventManager implements Listener{
 	
+
 	@EventHandler
 	public void onInteract(PlayerInteractEvent event) {
 		Player p = event.getPlayer();
@@ -24,7 +25,7 @@ public class EventManager implements Listener{
 			for(Mission m : pd.getMissions()) {
 				int i = m.getCode(loc);
 				if(i >= 0) {
-					if(m.isCleared()) p.sendMessage(Main.PREFIX + "§c이미 완료한 미션입니다.");
+					if(m.isCleared(i) || m.isCleared()) p.sendMessage(Main.PREFIX + "§c이미 완료한 미션입니다.");
 					else m.onStart(p, i);
 				}
 			}
@@ -37,7 +38,7 @@ public class EventManager implements Listener{
 			Player p = (Player) event.getPlayer();
 			
 			for(Mission m : Mission.MISSIONS) {
-				if(event.getView().getTitle().equalsIgnoreCase(m.getTitle())) {
+				if(m.getTitles().contains(event.getView().getTitle())) {
 					m.onStop(p, 0); // stop 시 어떻게 코드를 받아올 것인가?
 					break;
 				}

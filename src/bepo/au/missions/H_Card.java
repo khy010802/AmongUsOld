@@ -28,27 +28,27 @@ public class H_Card extends Mission{
 
 	@Override
 	public void onAssigned(Player p) {
-		
+		assign(p);
 		uploadInventory(p, 27, "카드키 미션");
 		
 		for(int slot=0;slot<27;slot++) {
 			int temp = slot/9;
-			if(temp != 1) Stack(gui, slot, Material.GRAY_STAINED_GLASS_PANE, 1, "§f" + (temp < 1 ? "하" : "상") + "단 빈 공간 끝까지 카드를 드래그해주세요.", null);
+			if(temp != 1) Stack(gui.get(0), slot, Material.GRAY_STAINED_GLASS_PANE, 1, "§f" + (temp < 1 ? "하" : "상") + "단 빈 공간 끝까지 카드를 드래그해주세요.", null);
 		}
 	}
 
 	@Override
 	public void onStart(Player p, int i) {
-		Stack(gui, 17, Material.BOOK, 1, "§e소유하신 카드를 긁어주세요.", lore);
-		p.openInventory(gui);
+		Stack(gui.get(0), 17, Material.BOOK, 1, "§e소유하신 카드를 긁어주세요.", lore);
+		p.openInventory(gui.get(0));
 		p.playSound(p.getLocation(), Sound.BLOCK_LEVER_CLICK, 1.0F, 1.0F);
 
-		resetInv(p, gui);
+		resetInv(p, gui.get(0));
 	}
 
 	@Override
 	public void onClear(Player p, int i) {
-		generalClear(p);
+		generalClear(p, i);
 	}
 	
 	@Override
@@ -75,10 +75,10 @@ public class H_Card extends Mission{
 			
 			if(timer > 20 + period) {
 				resetInv(p, event.getView().getTopInventory());
-				Stack(gui, 17, Material.BARRIER, 1, "§c§l너무 느리게 긁었습니다!", lore);
+				Stack(gui.get(0), 17, Material.BARRIER, 1, "§c§l너무 느리게 긁었습니다!", lore);
 			} else if(timer < 20 - period) {
 				resetInv(p, event.getView().getTopInventory());
-				Stack(gui, 17, Material.BARRIER, 1, "§c§l너무 빠르게 긁었습니다!", lore);
+				Stack(gui.get(0), 17, Material.BARRIER, 1, "§c§l너무 빠르게 긁었습니다!", lore);
 			} else {
 				onClear(p, 1);
 			}
@@ -86,7 +86,7 @@ public class H_Card extends Mission{
 		} else {
 			
 			resetInv(p, event.getView().getTopInventory());
-			Stack(gui, 17, Material.BARRIER, 1, "§c§l카드를 제대로 긁어주세요!", lore);
+			Stack(gui.get(0), 17, Material.BARRIER, 1, "§c§l카드를 제대로 긁어주세요!", lore);
 		}
 		
 		if(ct != null) {
@@ -122,7 +122,7 @@ public class H_Card extends Mission{
 				ct.cancel();
 				ct = null;
 				resetInv(p, event.getView().getTopInventory());
-				Stack(gui, 17, Material.BARRIER, 1, "§c§l카드를 제대로 긁어주세요!", lore);
+				Stack(gui.get(0), 17, Material.BARRIER, 1, "§c§l카드를 제대로 긁어주세요!", lore);
 				return;
 			}
 			CardTimer ct = new CardTimer(p);

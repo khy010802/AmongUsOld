@@ -216,7 +216,5 @@ public class GameTimer extends BukkitRunnable{
 		
 		if(!pause) timer++;
 	}
-	
-	
 
 }
