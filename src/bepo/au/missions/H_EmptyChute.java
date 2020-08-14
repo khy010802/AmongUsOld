@@ -21,7 +21,7 @@ import bepo.au.Util;
 
 
 
-public class EmptyChute implements Listener {
+public class H_EmptyChute implements Listener {
 	 Main main;
 	 Player p;
 	 Inventory gui;

@@ -1,10 +1,14 @@
-package bepo.au;
+package bepo.au.manager;
 
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+
+import bepo.au.GameTimer;
+import bepo.au.Main;
+import bepo.au.base.Mission;
 
 public class CommandManager implements CommandExecutor{
 

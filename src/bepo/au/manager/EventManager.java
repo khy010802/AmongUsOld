@@ -1,4 +1,4 @@
-package bepo.au;
+package bepo.au.manager;
 
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
@@ -8,6 +8,10 @@ import org.bukkit.event.block.Action;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
+
+import bepo.au.Main;
+import bepo.au.base.Mission;
+import bepo.au.base.PlayerData;
 
 public class EventManager implements Listener{
 	

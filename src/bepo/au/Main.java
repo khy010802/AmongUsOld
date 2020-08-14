@@ -12,6 +12,9 @@ import org.bukkit.scoreboard.Team;
 import org.bukkit.scoreboard.Team.Option;
 import org.bukkit.scoreboard.Team.OptionStatus;
 
+import bepo.au.base.Mission;
+import bepo.au.manager.CommandManager;
+
 public class Main extends JavaPlugin implements Listener{
 	
 	public static String PREFIX = "¡×a[AmongUs] ";

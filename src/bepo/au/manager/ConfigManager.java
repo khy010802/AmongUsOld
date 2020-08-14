@@ -1,9 +1,11 @@
-package bepo.au;
+package bepo.au.manager;
 
 import java.io.File;
 
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
+
+import bepo.au.Main;
 
 
 public class ConfigManager {

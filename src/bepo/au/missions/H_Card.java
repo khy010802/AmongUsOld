@@ -16,7 +16,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import bepo.au.Main;
-import bepo.au.Mission;
+import bepo.au.base.Mission;
 
 public class H_Card extends Mission{
 
@@ -106,10 +106,6 @@ public class H_Card extends Mission{
 				p.updateInventory();
 			}
 		}.runTaskLater(main, 1L);
-		
-		
-	
-		
 	}
 	
 	@EventHandler
@@ -147,7 +143,6 @@ public class H_Card extends Mission{
 		}
 		
 		public void run() {
-			p.sendMessage("" + timer);
 			timer++;
 			if(p == null || !p.isOnline()) cancel();
 		}

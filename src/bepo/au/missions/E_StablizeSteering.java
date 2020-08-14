@@ -19,7 +19,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.Random;
 
-public class StablizeSteering implements Listener {
+public class E_StablizeSteering implements Listener {
 	Main main;
 	Player p;
 	Random random = new Random();

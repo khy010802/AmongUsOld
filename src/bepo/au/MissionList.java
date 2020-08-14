@@ -5,7 +5,8 @@ import java.util.List;
 
 import org.bukkit.Location;
 
-import bepo.au.Mission.MissionType;
+import bepo.au.base.Mission;
+import bepo.au.base.Mission.MissionType;
 import bepo.au.missions.*;
 
 public class MissionList {

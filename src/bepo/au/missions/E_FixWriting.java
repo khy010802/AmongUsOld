@@ -19,9 +19,9 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import bepo.au.Main;
-import bepo.au.Mission;
 import bepo.au.Util;
-import bepo.au.Mission.MissionType;
+import bepo.au.base.Mission;
+import bepo.au.base.Mission.MissionType;
 
 public class E_FixWriting extends Mission implements Listener {
 	

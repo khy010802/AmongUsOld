@@ -18,7 +18,7 @@ import org.bukkit.inventory.ItemStack;
 
 
 //8ƽ -> 2ƽ
-public class InspectSample implements Listener {
+public class H_InspectSample implements Listener {
 	public   class Timer extends TimerBase{
 		
 		@Override

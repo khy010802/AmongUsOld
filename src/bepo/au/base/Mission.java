@@ -1,4 +1,4 @@
-package bepo.au;
+package bepo.au.base;
 
 
 import java.util.ArrayList;
@@ -19,6 +19,11 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+
+import bepo.au.GameTimer;
+import bepo.au.Main;
+import bepo.au.MissionList;
+import bepo.au.manager.EventManager;
 
 public abstract class Mission implements Listener{
 	
