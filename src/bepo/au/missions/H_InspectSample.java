@@ -10,232 +10,229 @@ import org.bukkit.Sound;
 
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
-import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.Inventory;
 
 import org.bukkit.inventory.ItemStack;
 
+import bepo.au.Util;
+import bepo.au.base.Mission;
+import bepo.au.base.TimerBase;
 
 //8틱 -> 2틱
-public class H_InspectSample implements Listener {
-	public   class Timer extends TimerBase{
-		
+public class H_InspectSample extends Mission{
+	public class Timer extends TimerBase {
+
 		@Override
 		public void EventStartTimer() { // 타이머 시작
 			Util.debugMessage(" 타이머 시작됨");
-			P_timer.StartTimer(45,false,1);
+			P_timer.StartTimer(45, false, 1);
 		}
 
 		@Override
 		public void EventRunningTimer(int count) {
 			Util.debugMessage(" 1초 경과");
-			if(p.getOpenInventory().getTitle().split(" ")[0].equals("InspectSample")) {
-				ItemStack[] temp = 	gui.getContents();
-				gui = Bukkit.createInventory(p, 54, "InspectSample " + count);
-				gui.setContents(temp);
-				p.openInventory(gui);
+			if (p.getOpenInventory().getTitle().split(" ")[0].equals("InspectSample")) {
+				ItemStack[] temp = gui.get(0).getContents();
+				gui.get(0) = Bukkit.createInventory(p, 54, "InspectSample " + count);
+				gui.get(0).setContents(temp);
+				p.openInventory(gui.get(0));
 			}
 		}
 
 		@Override
 		public void EventEndTimer() {
-			ItemStack[] temp = 	gui.getContents();
-			gui = Bukkit.createInventory(p, 54, "InspectSample");
-			gui.setContents(temp);
+			ItemStack[] temp = gui.get(0).getContents();
+			gui.get(0) = Bukkit.createInventory(p, 54, "InspectSample");
+			gui.get(0).setContents(temp);
 			status = 4;
-			if(p.getOpenInventory().getTitle().split(" ")[0].equals("InspectSample")) {
+			if (p.getOpenInventory().getTitle().split(" ")[0].equals("InspectSample")) {
 				inspectsampleagain();
 			}
-			
+
 		}
-		
+
 	}
-	public   class PreparingTimer extends TimerBase{//호퍼 옮기는 타이머
+
+	public class PreparingTimer extends TimerBase {// 호퍼 옮기는 타이머
+		private Player p;
 		int hopperidx = 0;
+
 		@Override
 		public void EventStartTimer() {
 			// TODO Auto-generated method stub
-			
+
 		}
 
 		@Override
 		public void EventRunningTimer(int count) {
-			
-			
 
-			
-			if (count==45) {
+			if (count == 45) {
 				Util.debugMessage("호퍼 이동 타입 0");
-				Util.Stack(gui, hopperidx, Material.WHITE_STAINED_GLASS_PANE, 1, " ");
-				hopperidx=0;
-				Util.Stack(gui, hopperidx, Material.HOPPER, 1, " ");
-				
-			}
-			else if (count%10==8&&count<43) {
+				Util.Stack(gui.get(0), hopperidx, Material.WHITE_STAINED_GLASS_PANE, 1, " ");
+				hopperidx = 0;
+				Util.Stack(gui.get(0), hopperidx, Material.HOPPER, 1, " ");
+
+			} else if (count % 10 == 8 && count < 43) {
 				Util.debugMessage("호퍼 이동 타입 1");
 				hopperidx++;
-				Util.Stack(gui, hopperidx-1, Material.WHITE_STAINED_GLASS_PANE, 1, " ");
-				Util.Stack(gui, hopperidx, Material.HOPPER, 1, " ");
-				
-			}
-			else if(count%10==2&&count<43&&count>8) {
+				Util.Stack(gui.get(0), hopperidx - 1, Material.WHITE_STAINED_GLASS_PANE, 1, " ");
+				Util.Stack(gui.get(0), hopperidx, Material.HOPPER, 1, " ");
+
+			} else if (count % 10 == 2 && count < 43 && count > 8) {
 				Util.debugMessage("호퍼 이동 타입 2");
 				hopperidx++;
-				Util.Stack(gui, hopperidx-1, Material.WHITE_STAINED_GLASS_PANE, 1, " ");
-				Util.StackPotion(gui, 18+hopperidx, Color.BLUE, 1, "§f확인되지 않은 시약");
-				if(p.getOpenInventory().getTitle().split(" ")[0].equals("InspectSample")) p.playSound(p.getLocation(), Sound.ITEM_BUCKET_EMPTY, 1.0f, 1.2f);
-				Util.Stack(gui, hopperidx, Material.HOPPER, 1, " ");
-				
-			}else if(count==0) {
-				Util.StackPotion(gui, 18+hopperidx, Color.BLUE, 1, "§f확인되지 않은 시약");
-				if(p.getOpenInventory().getTitle().split(" ")[0].equals("InspectSample")) p.playSound(p.getLocation(), Sound.ITEM_BUCKET_EMPTY, 1.0f, 1.2f);
+				Util.Stack(gui.get(0), hopperidx - 1, Material.WHITE_STAINED_GLASS_PANE, 1, " ");
+				Util.StackPotion(gui.get(0), 18 + hopperidx, Color.BLUE, 1, "§f확인되지 않은 시약");
+				if (p.getOpenInventory().getTitle().split(" ")[0].equals("InspectSample"))
+					p.playSound(p.getLocation(), Sound.ITEM_BUCKET_EMPTY, 1.0f, 1.2f);
+				Util.Stack(gui.get(0), hopperidx, Material.HOPPER, 1, " ");
+
+			} else if (count == 0) {
+				Util.StackPotion(gui.get(0), 18 + hopperidx, Color.BLUE, 1, "§f확인되지 않은 시약");
+				if (p.getOpenInventory().getTitle().split(" ")[0].equals("InspectSample"))
+					p.playSound(p.getLocation(), Sound.ITEM_BUCKET_EMPTY, 1.0f, 1.2f);
 			}
-			if(p.getOpenInventory().getTitle().split(" ")[0].equals("InspectSample")) {
-				p.openInventory(gui);
+			if (p.getOpenInventory().getTitle().split(" ")[0].equals("InspectSample")) {
+				p.openInventory(gui.get(0));
 			}
 		}
 
 		@Override
 		public void EventEndTimer() {
 			// TODO Auto-generated method stub
-			
-		}
-		
-	}
-	  
-	  Timer timer = new Timer();
-	  PreparingTimer P_timer = new PreparingTimer();
-	  Main main;
-	  Player p;
-	  Inventory gui;
-	  int status = 0 ; //0 실행안됨 | 1,2 실행됨 | 3 시약분석중 | 4 분석가능 | 100 클리어 상태
-	  int bad;
-	  final int time = 5; //기다림 시간
 
-	 
-	  private List<String> lore = Arrays.asList("§7", 
-			"§71. 오른쪽 아래 파란색 버튼을 누른다.", 
-			"§72. "+time+"초 동안 기다린다.", 
-			"§73. 이상 표본을 선택한다", 
-			"§7잘못된 표본을 선택하면 다시 시작합니다.",
-			"§7기다리는 동안 다른 곳에 가도 됩니다.");
-	
+		}
+
+	}
+
+	Timer timer = new Timer();
+	PreparingTimer P_timer = new PreparingTimer();
+	int status = 0; // 0 실행안됨 | 1,2 실행됨 | 3 시약분석중 | 4 분석가능 | 100 클리어 상태
+	int bad;
+	final int time = 5; // 기다림 시간
+
+	private List<String> lore = Arrays.asList("§7", "§71. 오른쪽 아래 파란색 버튼을 누른다.", "§72. " + time + "초 동안 기다린다.",
+			"§73. 이상 표본을 선택한다", "§7잘못된 표본을 선택하면 다시 시작합니다.", "§7기다리는 동안 다른 곳에 가도 됩니다.");
+
 	public void inspectsample(Player pl, Main m) {
 		Util.debugMessage("inspctsample 실행");
 		switch (status) {
-		case 0: //실행 됨
-			
-			
-			
+		case 0: // 실행 됨
+
 			Util.debugMessage("status 0 실행");
-			bad=Util.random(0, 4); //이상 표본 만들기
-			main=m;
-			p=pl;
-			gui = Bukkit.createInventory(p, 54, "InspectSample");
-			for(int slot = 0; slot<54;slot ++) {
+			bad = Util.random(0, 4); // 이상 표본 만들기
+			main = m;
+			p = pl;
+			gui.get(0) = Bukkit.createInventory(p, 54, "InspectSample");
+			for (int slot = 0; slot < 54; slot++) {
 				switch (slot) {
-				case 0 :
-					Util.Stack(gui, slot, Material.HOPPER, 1, " ");
+				case 0:
+					Util.Stack(gui.get(0), slot, Material.HOPPER, 1, " ");
 					break;
 				case 18:
 				case 20:
 				case 22:
 				case 24:
 				case 26:
-					Util.Stack(gui, slot, Material.GLASS_BOTTLE, 1, "§f빈 시약 병", "§4클릭불가");
+					Util.Stack(gui.get(0), slot, Material.GLASS_BOTTLE, 1, "§f빈 시약 병", "§4클릭불가");
 					break;
 				case 36:
 				case 38:
 				case 40:
 				case 42:
 				case 44:
-					Util.Stack(gui, slot, Material.GRAY_STAINED_GLASS_PANE, 1, " " ,"§4클릭불가");
+					Util.Stack(gui.get(0), slot, Material.GRAY_STAINED_GLASS_PANE, 1, " ", "§4클릭불가");
 					break;
 				case 49:
-					Util.Stack(gui, slot, Material.BOOK, 1, "§f§l표본 분석",lore);
+					Util.Stack(gui.get(0), slot, Material.BOOK, 1, "§f§l표본 분석", lore);
 					break;
 				case 53:
-					Util.Stack(gui, slot, Material.BLUE_STAINED_GLASS_PANE, 1, "§a§l시약 추가하기");
+					Util.Stack(gui.get(0), slot, Material.BLUE_STAINED_GLASS_PANE, 1, "§a§l시약 추가하기");
 					break;
-				default :
-					Util.Stack(gui, slot, Material.WHITE_STAINED_GLASS_PANE, 1, " "); //배경
+				default:
+					Util.Stack(gui.get(0), slot, Material.WHITE_STAINED_GLASS_PANE, 1, " "); // 배경
 				}
 			}
-			
-			
+
 			status = 1;
 		case 1: // 아래 과정 반복 방지
-			p.openInventory(gui); //gui 열기
+			p.openInventory(gui.get(0)); // gui.get(0) 열기
 			break;
-		case 2: //시약 준비중
+		case 2: // 시약 준비중
 			Util.debugMessage("status 2 실행");
-			Util.Stack(gui, 53, Material.ORANGE_STAINED_GLASS_PANE, 1, " " ,"§4클릭불가");
-			timer.StartTimer(time,true,20);
+			Util.Stack(gui.get(0), 53, Material.ORANGE_STAINED_GLASS_PANE, 1, " ", "§4클릭불가");
+			timer.StartTimer(time, true, 20);
 			status = 3;
-			p.openInventory(gui);
+			p.openInventory(gui.get(0));
 			break;
 		case 4:
 			Util.debugMessage("status 4 실행");
-			prepareSample();//시약 준비 완료
-			p.openInventory(gui);
+			prepareSample();// 시약 준비 완료
+			p.openInventory(gui.get(0));
 			break;
 		}
 		Util.debugMessage("switch문 빠져나옴");
-		p.openInventory(gui); //gui 열기
-		}
-	public   void inspectsampleagain() {
-		inspectsample(p,main);
+		p.openInventory(gui.get(0)); // gui.get(0) 열기
 	}
+
+	public void inspectsampleagain() {
+		inspectsample(p, main);
+	}
+
 	public void prepareSample() {
 		Util.debugMessage("시약 준비완료 단계");
-		
-		for(int slot = 36; slot<=44 ; slot+=2) Util.Stack(gui, slot, Material.GREEN_STAINED_GLASS_PANE, 1,"§f표본을 선택하세요");
-		for (int slot = 18 ; slot<27 ; slot+=2) {
-			if ((slot-18)/2!=bad) Util.StackPotion(gui, slot, Color.BLUE, 1, "§f정상 시약");
-			else Util.StackPotion(gui, slot, Color.RED, 1, "§c이상 시약");
-			}
-		
+
+		for (int slot = 36; slot <= 44; slot += 2)
+			Util.Stack(gui.get(0), slot, Material.GREEN_STAINED_GLASS_PANE, 1, "§f표본을 선택하세요");
+		for (int slot = 18; slot < 27; slot += 2) {
+			if ((slot - 18) / 2 != bad)
+				Util.StackPotion(gui.get(0), slot, Color.BLUE, 1, "§f정상 시약");
+			else
+				Util.StackPotion(gui.get(0), slot, Color.RED, 1, "§c이상 시약");
+		}
+
 	}
+
 	public void setStatus(int num) {
-		status=num;
+		status = num;
 	}
+
 	public void checkSample(int num) {
-		Util.debugMessage(num+"과"+bad+"비교");
-		if (num==bad) {
-			for(int slot = 36; slot<=44 ; slot+=2) Util.Stack(gui, slot, Material.GRAY_STAINED_GLASS_PANE, 1, " " ,"§4클릭불가");
+		Util.debugMessage(num + "과" + bad + "비교");
+		if (num == bad) {
+			for (int slot = 36; slot <= 44; slot += 2)
+				Util.Stack(gui.get(0), slot, Material.GRAY_STAINED_GLASS_PANE, 1, " ", "§4클릭불가");
 			status = 100;
 			Util.debugMessage(" 클리어!");
-		}else {
+		} else {
 			p.playSound(p.getLocation(), Sound.ITEM_SHIELD_BREAK, 1.0f, 0.1f);
 			Util.debugMessage(" 틀림, 재시작");
-			status=0;
+			status = 0;
 			inspectsampleagain();
 		}
-			
+
 	}
-	
-	
-@EventHandler
-public void onClick(InventoryClickEvent e) {
-	
-	//Inventory inv = e.getClickedInventory();
-	//Player p = (Player) e.getWhoClicked();
-	
-	
-	if(e.getView().getTitle().split(" ")[0].equals("InspectSample")&&e.getCurrentItem()!=null) {
-		Material item = e.getCurrentItem().getType();
-		if(item!=Material.GREEN_STAINED_GLASS_PANE && item != Material.BLUE_STAINED_GLASS_PANE) {
-			e.setCancelled(true);
-		}
-		if(item == Material.BLUE_STAINED_GLASS_PANE) {
-			status = 2;
-			inspectsampleagain();
-		}
-		if(item == Material.GREEN_STAINED_GLASS_PANE) {
-			checkSample((e.getRawSlot()%9)/2);
-			e.setCancelled(true);
-		}
+
+	@EventHandler
+	public void onClick(InventoryClickEvent e) {
+
+		// Inventory inv = e.getClickedInventory();
+		// Player p = (Player) e.getWhoClicked();
+
+		if (e.getView().getTitle().split(" ")[0].equals("InspectSample") && e.getCurrentItem() != null) {
+			Material item = e.getCurrentItem().getType();
+			if (item != Material.GREEN_STAINED_GLASS_PANE && item != Material.BLUE_STAINED_GLASS_PANE) {
+				e.setCancelled(true);
+			}
+			if (item == Material.BLUE_STAINED_GLASS_PANE) {
+				status = 2;
+				inspectsampleagain();
+			}
+			if (item == Material.GREEN_STAINED_GLASS_PANE) {
+				checkSample((e.getRawSlot() % 9) / 2);
+				e.setCancelled(true);
+			}
 		}
 	}
 }

@@ -41,6 +41,7 @@ public class E_ChartCourse extends Mission {
 
 
 	private void a_reset() {
+		
 		routeArray = resetRoutes();
 
 		for (int Slot = 0; Slot < 54; Slot++) {

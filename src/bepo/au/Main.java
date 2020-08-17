@@ -20,7 +20,7 @@ public class Main extends JavaPlugin implements Listener{
 	public static String PREFIX = "¡×a[AmongUs] ";
 	
 	public static GameTimer gt = null;
-	public static Main main;
+	private static Main main;
 	public CommandManager cm;
 	
 	public static Scoreboard MAIN_SCOREBOARD;
@@ -38,6 +38,10 @@ public class Main extends JavaPlugin implements Listener{
 	public static int MISSION_AMOUNT = 5;
 	
 	public static List<String> OBSERVER = new ArrayList<String>();
+	
+	public static Main getInstance() {
+		return main;
+	}
 	
 	public void onEnable() {
 		main = this;

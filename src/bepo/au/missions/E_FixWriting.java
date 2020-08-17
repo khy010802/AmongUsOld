@@ -16,8 +16,8 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 
-import bepo.au.base.Mission;
 import bepo.au.Util;
+import bepo.au.base.Mission;
 
 public class E_FixWriting extends Mission {
 
@@ -40,6 +40,7 @@ public class E_FixWriting extends Mission {
 
 	@Override
 	public void onAssigned(Player p) {
+		assign(p);
 		wirecolorArray = new int[][] { Util.difrandom(0, 3, 4), Util.difrandom(0, 3, 4), Util.difrandom(0, 3, 4) };
 		for (int i = 0; i < 3; i++) {
 			uploadInventory(p, 54, "FixWriting" + i);
@@ -145,6 +146,7 @@ public class E_FixWriting extends Mission {
 								Util.debugMessage(i + "가 연결안됨");
 								return;
 							}
+						Util.debugMessage("클리어!"); // 클리어!
 						onClear(p, code);
 					} else {
 						Util.debugMessage("연결안됨" + (slot + 2) + "에 검은 유리");
@@ -159,47 +161,47 @@ public class E_FixWriting extends Mission {
 
 	@EventHandler
 	public void onClick(InventoryClickEvent e) {
+		if (!checkPlayer(e))
+			return;
 
 		String title = e.getView().getTitle();
-		if (title.contains("FixWiring")) {
-			Util.debugMessage("클릭 인식됨");
-			int slot = e.getRawSlot();
-			int code = Integer.parseInt(title.replace("FixWriting", ""));
-			ItemStack itemstack = e.getCurrentItem();
+		Util.debugMessage("클릭 인식됨");
+		int slot = e.getRawSlot();
+		int code = Integer.parseInt(title.replace("FixWriting", ""));
+		ItemStack itemstack = e.getCurrentItem();
 
-			// Inventory gui = e.getClickedInventory();
-			// Player p = (Player) e.getWhoClicked();
+		// Inventory gui = e.getClickedInventory();
+		// Player p = (Player) e.getWhoClicked();
 
-			if (e.isRightClick())
-				Util.debugMessage("우클릭 인식됨");
-			if (e.getCurrentItem() != null) {
-				if (!e.isRightClick() || // 우클릭만 허용
-						(slot % 9 != 2 && slot % 9 != 6) || // 클릭 가능한 x좌표
-						slot / 9 == 1 || slot / 9 == 4 // 클릭 불가인 y좌표
-				) { //
-					Util.debugMessage("클릭 불가");
-					e.setCancelled(true);
-				}
-				if ((e.getCursor().getType() != Material.AIR || itemstack.getAmount() == 1)
-						&& (slot % 9 == 1 || slot % 9 == 2 || slot % 9 == 7)) {// 아이템 하나일시 클릭 불가 &
-					Util.debugMessage("클릭 불가");
-					e.setCancelled(true);
-				}
+		if (e.isRightClick())
+			Util.debugMessage("우클릭 인식됨");
+		if (e.getCurrentItem() != null) {
+			if (!e.isRightClick() || // 우클릭만 허용
+					(slot % 9 != 2 && slot % 9 != 6) || // 클릭 가능한 x좌표
+					slot / 9 == 1 || slot / 9 == 4 // 클릭 불가인 y좌표
+			) { //
+				Util.debugMessage("클릭 불가");
+				e.setCancelled(true);
 			}
-			checkConnection(code, slot);
+			if ((e.getCursor().getType() != Material.AIR || itemstack.getAmount() == 1)
+					&& (slot % 9 == 1 || slot % 9 == 2 || slot % 9 == 7)) {// 아이템 하나일시 클릭 불가 &
+				Util.debugMessage("클릭 불가");
+				e.setCancelled(true);
+			}
 		}
+		checkConnection((Player) e.getWhoClicked(), code, slot);
 	}
 
 	@EventHandler
 	public void onDrag(InventoryDragEvent e) {
-
+		if (!checkPlayer(e)) return;
+		
 		String title = e.getView().getTitle();
-		if (!title.contains("FixWiring"))
-			return;
-		int code = Integer.parseInt(title.replace("FixWriting", ""));
+
+		int code = Integer.parseInt(title.replace("FixWriting ", ""));
 		if (!e.getRawSlots().isEmpty()) {
 			for (int slot : e.getRawSlots()) {
-				checkConnection(code, slot);
+				checkConnection((Player) e.getWhoClicked(), code, slot);
 			}
 		}
 
