@@ -110,6 +110,10 @@ public abstract class Mission implements Listener{
 		return Bukkit.getPlayer(playername);
 	}
 	
+	public final Mission clone() {
+		return this.clone();
+	}
+	
 	public final void uploadInventory(InventoryHolder owner, int slot, String name) {
 		Inventory inv = Bukkit.createInventory(owner, slot, name);
 		gui.add(inv);

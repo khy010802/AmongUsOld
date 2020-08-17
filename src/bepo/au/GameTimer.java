@@ -175,7 +175,7 @@ public class GameTimer extends BukkitRunnable{
 		}
 		
 		for(int i=0;i<Main.EASY_MISSION_AMOUNT;i++) {
-			pd.addMission(Mission.get);
+			pd.addMission(MissionList.EASY.get(missions.get(i)).clone());
 		}
 	}
 	
