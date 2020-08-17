@@ -198,7 +198,7 @@ public class E_FixWriting extends Mission {
 		
 		String title = e.getView().getTitle();
 
-		int code = Integer.parseInt(title.replace("FixWriting ", ""));
+		int code = Integer.parseInt(title.replace("FixWriting", ""));
 		if (!e.getRawSlots().isEmpty()) {
 			for (int slot : e.getRawSlots()) {
 				checkConnection((Player) e.getWhoClicked(), code, slot);

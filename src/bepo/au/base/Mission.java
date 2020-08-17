@@ -15,6 +15,7 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.inventory.InventoryDragEvent;
 import org.bukkit.event.inventory.InventoryEvent;
+import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
@@ -29,7 +30,6 @@ public abstract class Mission implements Listener{
 	
 	public enum MissionType {
 		
-		VERIFY,
 		HARD,
 		EASY;
 		
@@ -93,9 +93,11 @@ public abstract class Mission implements Listener{
 	public Mission(MissionType mt, String name, String korean, int required_clear, Location... loc) {
 		this.name = name;
 		this.type = mt;
+		this.korean = korean;
 		this.required_clear = required_clear;
 		this.loc = loc;
-		MissionList.CARDS.add(this);
+		if(mt == MissionType.EASY) MissionList.EASY.add(this);
+		else MissionList.HARD.add(this);
 	}
 
 	public String getMissionName() { return this.name; }
@@ -103,6 +105,10 @@ public abstract class Mission implements Listener{
 	public Location[] getLocations() { return this.loc; }
 	public List<String> getTitles() { return gui_title; }
 	public int getRequiredClear() { return this.required_clear; }
+	
+	public final Player getPlayer() {
+		return Bukkit.getPlayer(playername);
+	}
 	
 	public final void uploadInventory(InventoryHolder owner, int slot, String name) {
 		Inventory inv = Bukkit.createInventory(owner, slot, name);
@@ -158,13 +164,21 @@ public abstract class Mission implements Listener{
 		return cleared.size() >= required_clear;
 	}
 	
+	
+	
 	public final boolean checkPlayer(Event event) {
 		if(event instanceof InventoryEvent) {
-			boolean bool = gui_title.contains(((InventoryEvent) event).getView().getTitle());
+			InventoryEvent ie = (InventoryEvent) event;
+			boolean bool = false;
+			for(String title : gui_title) if(ie.getView().getTitle().contains(title)) bool = true;
+			if(!bool) bool = gui_title.contains(ie.getView().getTitle());
 			boolean bool2 = false;
 			if(event instanceof InventoryCloseEvent) bool2 = ((InventoryCloseEvent) event).getPlayer() instanceof Player;
-			else if(event instanceof InventoryClickEvent) bool2 = ((InventoryClickEvent) event).getWhoClicked() instanceof Player;
-			else if(event instanceof InventoryDragEvent) bool2 = ((InventoryDragEvent) event).getWhoClicked() instanceof Player;
+			else {
+				if(event instanceof InventoryClickEvent) bool2 = ((InventoryClickEvent) event).getWhoClicked() instanceof Player;
+				if(event instanceof InventoryDragEvent) bool2 = ((InventoryDragEvent) event).getWhoClicked() instanceof Player;
+				if(ie.getInventory().getType() == InventoryType.PLAYER) bool2 = false;
+			}
 			return bool && bool2;
 		}
 		return false;

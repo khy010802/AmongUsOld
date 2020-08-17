@@ -44,7 +44,7 @@ public class H_EmptyChute extends Mission {
 	
 	@Override
 	public void onClear(Player p, int code) {
-		
+		generalClear(p, code);
 	}
 
 	public void a_reset() {

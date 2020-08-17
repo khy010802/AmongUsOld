@@ -5,13 +5,13 @@ import java.util.List;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Color;
+import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Sound;
 
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.inventory.InventoryClickEvent;
-import org.bukkit.inventory.Inventory;
 
 import org.bukkit.inventory.ItemStack;
 
@@ -21,6 +21,27 @@ import bepo.au.base.TimerBase;
 
 //8틱 -> 2틱
 public class H_InspectSample extends Mission{
+	
+	public H_InspectSample(MissionType mt, String name, String korean, int clear, Location loc) {
+		super(mt, name, korean, clear, loc);
+	}
+	
+	public void onAssigned(Player p) {
+		assign(p);
+	}
+	
+	public void onStart(Player p, int code) {
+		uploadInventory(p, 54, "InspectSample");
+	}
+	
+	public void onClear(Player p, int code) {
+		generalClear(p, code);
+	}
+	
+	public void onStop(Player p, int code) {
+		
+	}
+	
 	public class Timer extends TimerBase {
 
 		@Override
@@ -32,9 +53,10 @@ public class H_InspectSample extends Mission{
 		@Override
 		public void EventRunningTimer(int count) {
 			Util.debugMessage(" 1초 경과");
-			if (p.getOpenInventory().getTitle().split(" ")[0].equals("InspectSample")) {
+			Player p = getPlayer();
+			if (p != null && p.getOpenInventory().getTitle().split(" ")[0].equals("InspectSample")) {
 				ItemStack[] temp = gui.get(0).getContents();
-				gui.get(0) = Bukkit.createInventory(p, 54, "InspectSample " + count);
+				gui.set(0, Bukkit.createInventory(p, 54, "InspectSample " + count));
 				gui.get(0).setContents(temp);
 				p.openInventory(gui.get(0));
 			}
@@ -43,19 +65,23 @@ public class H_InspectSample extends Mission{
 		@Override
 		public void EventEndTimer() {
 			ItemStack[] temp = gui.get(0).getContents();
-			gui.get(0) = Bukkit.createInventory(p, 54, "InspectSample");
-			gui.get(0).setContents(temp);
-			status = 4;
-			if (p.getOpenInventory().getTitle().split(" ")[0].equals("InspectSample")) {
-				inspectsampleagain();
+			Player p = getPlayer();
+			if(p != null) {
+				gui.set(0, Bukkit.createInventory(p, 54, "InspectSample"));
+				gui.get(0).setContents(temp);
+				status = 4;
+				
+				if (p.getOpenInventory().getTitle().split(" ")[0].equals("InspectSample")) {
+					inspectsampleagain(p);
+				}
 			}
+			
 
 		}
 
 	}
 
 	public class PreparingTimer extends TimerBase {// 호퍼 옮기는 타이머
-		private Player p;
 		int hopperidx = 0;
 
 		@Override
@@ -66,7 +92,11 @@ public class H_InspectSample extends Mission{
 
 		@Override
 		public void EventRunningTimer(int count) {
-
+			Player p = getPlayer();
+			if(p == null) return;
+			
+			
+			
 			if (count == 45) {
 				Util.debugMessage("호퍼 이동 타입 0");
 				Util.Stack(gui.get(0), hopperidx, Material.WHITE_STAINED_GLASS_PANE, 1, " ");
@@ -84,7 +114,7 @@ public class H_InspectSample extends Mission{
 				hopperidx++;
 				Util.Stack(gui.get(0), hopperidx - 1, Material.WHITE_STAINED_GLASS_PANE, 1, " ");
 				Util.StackPotion(gui.get(0), 18 + hopperidx, Color.BLUE, 1, "§f확인되지 않은 시약");
-				if (p.getOpenInventory().getTitle().split(" ")[0].equals("InspectSample"))
+				if (getPlayer().getOpenInventory().getTitle().split(" ")[0].equals("InspectSample"))
 					p.playSound(p.getLocation(), Sound.ITEM_BUCKET_EMPTY, 1.0f, 1.2f);
 				Util.Stack(gui.get(0), hopperidx, Material.HOPPER, 1, " ");
 
@@ -113,18 +143,17 @@ public class H_InspectSample extends Mission{
 	final int time = 5; // 기다림 시간
 
 	private List<String> lore = Arrays.asList("§7", "§71. 오른쪽 아래 파란색 버튼을 누른다.", "§72. " + time + "초 동안 기다린다.",
-			"§73. 이상 표본을 선택한다", "§7잘못된 표본을 선택하면 다시 시작합니다.", "§7기다리는 동안 다른 곳에 가도 됩니다.");
+			"§73. 이상 표본을 선택한다.", "§7잘못된 표본을 선택하면 다시 시작합니다.", "§7기다리는 동안 다른 곳에 가도 됩니다.");
 
-	public void inspectsample(Player pl, Main m) {
+	
+	public void inspectsample(Player p) {
 		Util.debugMessage("inspctsample 실행");
 		switch (status) {
 		case 0: // 실행 됨
 
 			Util.debugMessage("status 0 실행");
 			bad = Util.random(0, 4); // 이상 표본 만들기
-			main = m;
-			p = pl;
-			gui.get(0) = Bukkit.createInventory(p, 54, "InspectSample");
+			gui.set(0, Bukkit.createInventory(p, 54, "InspectSample"));
 			for (int slot = 0; slot < 54; slot++) {
 				switch (slot) {
 				case 0:
@@ -176,8 +205,8 @@ public class H_InspectSample extends Mission{
 		p.openInventory(gui.get(0)); // gui.get(0) 열기
 	}
 
-	public void inspectsampleagain() {
-		inspectsample(p, main);
+	public void inspectsampleagain(Player p) {
+		inspectsample(p);
 	}
 
 	public void prepareSample() {
@@ -198,7 +227,7 @@ public class H_InspectSample extends Mission{
 		status = num;
 	}
 
-	public void checkSample(int num) {
+	public void checkSample(Player p, int num) {
 		Util.debugMessage(num + "과" + bad + "비교");
 		if (num == bad) {
 			for (int slot = 36; slot <= 44; slot += 2)
@@ -209,7 +238,7 @@ public class H_InspectSample extends Mission{
 			p.playSound(p.getLocation(), Sound.ITEM_SHIELD_BREAK, 1.0f, 0.1f);
 			Util.debugMessage(" 틀림, 재시작");
 			status = 0;
-			inspectsampleagain();
+			inspectsampleagain(p);
 		}
 
 	}
@@ -217,6 +246,10 @@ public class H_InspectSample extends Mission{
 	@EventHandler
 	public void onClick(InventoryClickEvent e) {
 
+		if(!checkPlayer(e)) return;
+		
+		Player p = (Player) e.getWhoClicked();
+		
 		// Inventory inv = e.getClickedInventory();
 		// Player p = (Player) e.getWhoClicked();
 
@@ -227,10 +260,10 @@ public class H_InspectSample extends Mission{
 			}
 			if (item == Material.BLUE_STAINED_GLASS_PANE) {
 				status = 2;
-				inspectsampleagain();
+				inspectsampleagain(p);
 			}
 			if (item == Material.GREEN_STAINED_GLASS_PANE) {
-				checkSample((e.getRawSlot() % 9) / 2);
+				checkSample(p, (e.getRawSlot() % 9) / 2);
 				e.setCancelled(true);
 			}
 		}

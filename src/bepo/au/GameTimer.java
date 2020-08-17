@@ -75,7 +75,7 @@ public class GameTimer extends BukkitRunnable{
 			}
 		}
 
-		REQUIRED_MISSION = Main.MISSION_AMOUNT * (PLAYERS.size() - Main.IMPOSTER_AMOUNT);
+		REQUIRED_MISSION = (Main.COMMON_MISSION_AMOUNT + Main.EASY_MISSION_AMOUNT + Main.HARD_MISSION_AMOUNT) * (PLAYERS.size() - Main.IMPOSTER_AMOUNT);
 	}
 	
 	private void reset() {
@@ -162,7 +162,7 @@ public class GameTimer extends BukkitRunnable{
 		PlayerData pd = PlayerData.getPlayerData(p.getName());
 		
 		List<Integer> missions = new ArrayList<Integer>();
-		for(int id=1;id<Mission.MISSIONS.size();id++) {
+		for(int id=1;id<MissionList.EASY.size();id++) {
 			missions.add(id);
 		}
 		
@@ -174,8 +174,8 @@ public class GameTimer extends BukkitRunnable{
 			pd.addLine("§a");
 		}
 		
-		for(int i=0;i<Main.MISSION_AMOUNT;i++) {
-			pd.addMission(Mission.getMission(missions.get(i)));
+		for(int i=0;i<Main.EASY_MISSION_AMOUNT;i++) {
+			pd.addMission(Mission.get);
 		}
 	}
 	
@@ -195,21 +195,9 @@ public class GameTimer extends BukkitRunnable{
 			Bukkit.broadcastMessage(Main.PREFIX + "§f=====================");
 			break;
 		case 160:
-			Bukkit.broadcastMessage(Main.PREFIX + "§f=====================");
-			Bukkit.broadcastMessage(Main.PREFIX + "§e게임 세팅");
-			Bukkit.broadcastMessage(Main.PREFIX + "§a시야 §f" + Main.SIGHT_BLOCK + "블럭");
-			Bukkit.broadcastMessage(Main.PREFIX + "§a킬 쿨타임 §f" + Main.KILL_COOLTIME_SEC + "초");
-			Bukkit.broadcastMessage(Main.PREFIX + "§a긴급회의 버튼 쿨타임 §f" + Main.EMER_BUTTON_COOL_SEC + "초");
-			Bukkit.broadcastMessage(Main.PREFIX + "§a임포스터 §f" + Main.IMPOSTER_AMOUNT + "명");
-			Bukkit.broadcastMessage(Main.PREFIX + "§a인당 배분 미션 §f" + Main.MISSION_AMOUNT + "개");
-			Bukkit.broadcastMessage(Main.PREFIX + "§a미션 난이도 §f" + Main.MISSION_DIFFICULTY + "/10");
-			Bukkit.broadcastMessage(Main.PREFIX + "§a사보타지 난이도 §f" + Main.SABOTAGE_DIFFICULTY + "/10");
-			Bukkit.broadcastMessage(Main.PREFIX + "§f=====================");
-			break;
-		case 360:
 			Bukkit.broadcastMessage(Main.PREFIX + "§f직업을 분배합니다...");
 			break;
-		case 400:
+		case 200:
 			team_split();
 			break;
 		}

@@ -29,13 +29,22 @@ public class Main extends JavaPlugin implements Listener{
 	public static String WORLD_NAME = "world";
 	public static World w;
 	
-	public static int SIGHT_BLOCK = 16;
-	public static int KILL_COOLTIME_SEC = 20;
-	public static int MISSION_DIFFICULTY = 5;
-	public static int IMPOSTER_AMOUNT = 3;
+	public static int EMER_BUTTON_PER_PLAYER = 1;
 	public static int EMER_BUTTON_COOL_SEC = 60;
-	public static int SABOTAGE_DIFFICULTY = 5;
-	public static int MISSION_AMOUNT = 5;
+	public static int DISCUSS_SEC = 15;
+	public static int VOTE_SEC = 120;
+	public static int CREW_SIGHT_BLOCK = 16;
+	public static int IMPOSTER_SIGHT_BLOCK = 24;
+	public static int KILL_COOLTIME_SEC = 20;
+	
+	public static int COMMON_MISSION_AMOUNT = 1;
+	public static int EASY_MISSION_AMOUNT = 2;
+	public static int HARD_MISSION_AMOUNT = 1;
+	
+	public static float MOVEMENT_SPEED = 1.0F;
+	
+	public static int MISSION_DIFFICULTY = 5;
+	public static int IMPOSTER_AMOUNT = 2;
 	
 	public static List<String> OBSERVER = new ArrayList<String>();
 	
@@ -58,7 +67,12 @@ public class Main extends JavaPlugin implements Listener{
 		}
 		MAIN_TEAM = MAIN_SCOREBOARD.getTeam("amongus");
 		
-		for(Mission m : MissionList.CARDS) {
+		for(Mission m : MissionList.EASY) {
+			Bukkit.getConsoleSender().sendMessage(m.getMissionName());
+			Mission.MISSIONS.add(m);
+		}
+		
+		for(Mission m : MissionList.HARD) {
 			Bukkit.getConsoleSender().sendMessage(m.getMissionName());
 			Mission.MISSIONS.add(m);
 		}
