@@ -19,7 +19,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 
 
 
-public class DivertPower implements Listener {
+public class E_DivertPower implements Listener {
 	 Main main;
 	 Player p;
 	 Inventory gui;
