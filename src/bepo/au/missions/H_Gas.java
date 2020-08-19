@@ -9,13 +9,14 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.PotionMeta;
 
+import Mission.CustomRandom;
 import Mission.TimerBase;
+import Mission.Util;
 
 
-public class Gas implements Listener {
+public class H_Gas implements Listener {
 
 	GasTimer Timer = new GasTimer();
 	Inventory Inv = null;
@@ -28,18 +29,16 @@ public class Gas implements Listener {
 		Inventory inv = Bukkit.createInventory(p, 54, "Gas1");
 		Inv = inv;
 		Case = 1;
-		ItemStack RED_STAINED_GLASS_PANE = new ItemStack(Material.RED_STAINED_GLASS_PANE);
 		for (int i = 1; i < 6; i++) {
-			inv.setItem(getCoordinate(1, i), RED_STAINED_GLASS_PANE);
-			inv.setItem(getCoordinate(5, i), RED_STAINED_GLASS_PANE);
+			Util.Stack(inv, getCoordinate(1, i), Material.RED_STAINED_GLASS_PANE, 1, " ");
+			Util.Stack(inv, getCoordinate(5, i), Material.RED_STAINED_GLASS_PANE, 1, " ");
 		}
-		inv.setItem(getCoordinate(2, 5), RED_STAINED_GLASS_PANE);
-		inv.setItem(getCoordinate(3, 5), RED_STAINED_GLASS_PANE);
-		inv.setItem(getCoordinate(4, 5), RED_STAINED_GLASS_PANE);
-		inv.setItem(getCoordinate(2, 0), RED_STAINED_GLASS_PANE);
-		inv.setItem(getCoordinate(4, 0), RED_STAINED_GLASS_PANE);
-		inv.setItem(getCoordinate(7, 4), new ItemStack(Material.GRAY_CONCRETE));
-
+		Util.Stack(inv, getCoordinate(2, 5), Material.RED_STAINED_GLASS_PANE, 1, " ");
+		Util.Stack(inv, getCoordinate(3, 5), Material.RED_STAINED_GLASS_PANE, 1, " ");
+		Util.Stack(inv, getCoordinate(4, 5), Material.RED_STAINED_GLASS_PANE, 1, " ");
+		Util.Stack(inv, getCoordinate(2, 0), Material.RED_STAINED_GLASS_PANE, 1, " ");
+		Util.Stack(inv, getCoordinate(4, 0), Material.RED_STAINED_GLASS_PANE, 1, " ");
+		Util.Stack(inv, getCoordinate(7, 4), Material.GRAY_CONCRETE, 1, " ");
 		p.openInventory(inv);
 	}
 
@@ -48,13 +47,12 @@ public class Gas implements Listener {
 		Inventory inv = Bukkit.createInventory(p, 54, "Gas2");
 		Inv = inv;
 		Case = 2;
-		ItemStack WHITE_STAINED_GLASS_PANE = new ItemStack(Material.WHITE_STAINED_GLASS_PANE);
 		for (int i = 1; i < 6; i++) {
-			inv.setItem(getCoordinate(3, i), WHITE_STAINED_GLASS_PANE);
-			inv.setItem(getCoordinate(5, i), WHITE_STAINED_GLASS_PANE);
+			Util.Stack(inv, getCoordinate(3, i), Material.WHITE_STAINED_GLASS_PANE, 1, " ");
+			Util.Stack(inv, getCoordinate(5, i), Material.WHITE_STAINED_GLASS_PANE, 1, " ");
 		}
-		inv.setItem(getCoordinate(4, 5), WHITE_STAINED_GLASS_PANE);
-		inv.setItem(getCoordinate(7, 4), new ItemStack(Material.GRAY_CONCRETE));
+		Util.Stack(inv, getCoordinate(4, 5), Material.WHITE_STAINED_GLASS_PANE, 1, " ");
+		Util.Stack(inv, getCoordinate(7, 4), Material.GRAY_CONCRETE, 1, " ");
 		ItemStack potion = new ItemStack(Material.POTION);
 		PotionMeta mateP = (PotionMeta) potion.getItemMeta();
 		mateP.setColor(Color.YELLOW);
@@ -103,16 +101,16 @@ public class Gas implements Listener {
 			if (Case == 1) {
 				if (!(count == 0)) {
 					for (int i = 2; i < 5; i++) {
-						Inv.setItem(getCoordinate(i, count), new ItemStack(Material.YELLOW_STAINED_GLASS_PANE));
+						Util.Stack(Inv, getCoordinate(i, count), Material.YELLOW_STAINED_GLASS_PANE, 1, " ");
 					}
 				}
 			}
 			if (Case == 2) {
 				if (!(count == 0)) {
-					Inv.setItem(getCoordinate(4, count), new ItemStack(Material.YELLOW_STAINED_GLASS_PANE));
+					Util.Stack(Inv, getCoordinate(4, count), Material.YELLOW_STAINED_GLASS_PANE, 1, " ");
 				}
 				if (count == 1) {
-					Inv.setItem(getCoordinate(5, 0), new ItemStack(Material.GLASS_BOTTLE));
+					Util.Stack(Inv, getCoordinate(5, 0), Material.GLASS_BOTTLE, 1, " ");
 				}
 			}
 		}

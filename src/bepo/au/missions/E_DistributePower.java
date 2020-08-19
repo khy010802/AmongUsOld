@@ -3,6 +3,7 @@ package bepo.au.missions;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -12,12 +13,13 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.CompassMeta;
 import org.bukkit.scheduler.BukkitRunnable;
 
+import Mission.CustomRandom;
 import Mission.Main;
 import Mission.TimerBase;
 import Mission.Util;
 
 
-public class DistributePower implements Listener{
+public class E_DistributePower implements Listener{
 	
 	PowerTimer Timer = new PowerTimer();
 	
@@ -94,6 +96,7 @@ public class DistributePower implements Listener{
 							Material M = Material.YELLOW_STAINED_GLASS_PANE;
 							Timer.StopTimer();
 							Timer.StartTimer(2*t, true, 2);
+							P.playSound(P.getLocation(), Sound.BLOCK_NOTE_BLOCK_SNARE, 10, 1);
 							if(Case == 1) {
 								M = Material.YELLOW_STAINED_GLASS_PANE;
 							}
@@ -132,7 +135,6 @@ public class DistributePower implements Listener{
 		@Override
 		public void EventStartTimer() {
 			// TODO Auto-generated method stub
-			P.sendMessage("--------------------");
 			
 		}
 
@@ -173,7 +175,6 @@ public class DistributePower implements Listener{
 		meta.setLodestone(loc);
 		item.setItemMeta(meta);
 		Inv.setItem(2+18*Case, item);
-		P.sendMessage("" + angle + "/" + b);
 		
 	}
 	

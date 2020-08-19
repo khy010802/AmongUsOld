@@ -10,10 +10,11 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
+import Mission.CustomRandom;
 import Mission.TimerBase;
 import Mission.Util;
 
-public class EmptyGarbage implements Listener {
+public class H_EmptyGarbage implements Listener {
 
 	EmptyGarbageTimer Timer = new EmptyGarbageTimer();
 	CustomRandom Random = new CustomRandom();
@@ -120,7 +121,7 @@ public class EmptyGarbage implements Listener {
 			stack = Inv.getContents();
 			for (int i = 4; i > 0; i--) {
 				for (int j = 1; j < 5; j++) {
-					P.playSound(P.getLocation(), Sound.ENTITY_MINECART_RIDING, 1, 1);
+					P.playSound(P.getLocation(), Sound.ENTITY_MINECART_RIDING, 0.05f, 0.1f);
 					Inv.setItem(getCoordinate(i, j), stack[getCoordinate(i, j) - 9]);
 				}
 			}
@@ -130,6 +131,7 @@ public class EmptyGarbage implements Listener {
 		public void EventEndTimer() {
 			// TODO Auto-generated method stub
 			P.closeInventory();
+			P.stopSound(Sound.ENTITY_MINECART_RIDING);
 			P.sendMessage("Clear");
 		}
 

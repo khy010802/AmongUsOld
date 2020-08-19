@@ -8,11 +8,11 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.Inventory;
-import org.bukkit.inventory.ItemStack;
 
+import Mission.CustomRandom;
 import Mission.Util;
 
-public class ActivatingShield implements Listener {
+public class E_ActivatingShield implements Listener {
 	
 	int Shield_score = 0;
 	CustomRandom random = new CustomRandom();
@@ -27,15 +27,15 @@ public class ActivatingShield implements Listener {
 				if(j >= 3 && j <= 5) {
 					a = random.random(0, 1);
 					if(a == 0) {
-			    		Util.Stack(inv, j+9*i, Material.RED_WOOL, 1, " ");
+			    		Util.Stack(inv, j+9*i, Material.RED_STAINED_GLASS_PANE, 1, " ");
 					}
 					else {
-						Util.Stack(inv, j+9*i, Material.WHITE_WOOL, 1, " ");
+						Util.Stack(inv, j+9*i, Material.WHITE_STAINED_GLASS_PANE, 1, " ");
 						Shield_score++;
 					}
 				}
 				else {
-					Util.Stack(inv, j+9*i, Material.BLUE_STAINED_GLASS_PANE, 1, " ");
+					Util.Stack(inv, j+9*i, Material.GRAY_STAINED_GLASS_PANE, 1, " ");
 				}
 			}
 		}
@@ -49,9 +49,9 @@ public class ActivatingShield implements Listener {
 		int dot = e.getSlot();
 		Player p = (Player) e.getWhoClicked();
 		
-		if(e.getView().getTitle().equals("Activating_Shield") && e.getCurrentItem().getType() == Material.RED_WOOL) {  // 빨강 양털을 클릭하면 파란양털로 변경 이후 점수 증가 
+		if(e.getView().getTitle().equals("Activating_Shield") && e.getCurrentItem().getType() == Material.RED_STAINED_GLASS_PANE) {  // 빨강 양털을 클릭하면 파란양털로 변경 이후 점수 증가 
 			e.setCancelled(true);
-			Util.Stack(inv, dot, Material.WHITE_WOOL, 1, " ");
+			Util.Stack(inv, dot, Material.WHITE_STAINED_GLASS_PANE, 1, " ");
 			p.playSound(p.getLocation(), Sound.BLOCK_NOTE_BLOCK_PLING, 10, 1);
 			Shield_score++;
 			if(Shield_score >= 9) {      								//점수가 9점에 도달하면 gui가 닫히고 테스크 성공
@@ -60,9 +60,9 @@ public class ActivatingShield implements Listener {
 				return;
 			}
 		}
-		else if(e.getView().getTitle().equals("Activating_Shield") && e.getCurrentItem().getType() == Material.WHITE_WOOL) {  //파란 양털을 클릭하면 빨강양털로 변경 이후 점수 감소
+		else if(e.getView().getTitle().equals("Activating_Shield") && e.getCurrentItem().getType() == Material.WHITE_STAINED_GLASS_PANE) {  //파란 양털을 클릭하면 빨강양털로 변경 이후 점수 감소
 			e.setCancelled(true);
-			Util.Stack(inv, dot, Material.RED_WOOL, 1, " ");
+			Util.Stack(inv, dot, Material.RED_STAINED_GLASS_PANE, 1, " ");
 			p.playSound(p.getLocation(), Sound.BLOCK_NOTE_BLOCK_PLING, 10, 1);
 			Shield_score--;
 		}
