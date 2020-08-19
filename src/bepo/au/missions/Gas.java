@@ -1,0 +1,128 @@
+package bepo.au.missions;
+
+import org.bukkit.Bukkit;
+import org.bukkit.Color;
+import org.bukkit.Material;
+import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.Listener;
+import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.inventory.meta.PotionMeta;
+
+import Mission.TimerBase;
+
+
+public class Gas implements Listener {
+
+	GasTimer Timer = new GasTimer();
+	Inventory Inv = null;
+	Player P = null;
+	CustomRandom Random = new CustomRandom();
+	int Case = -1;
+
+	public void gas1(Player p) {
+		P = p;
+		Inventory inv = Bukkit.createInventory(p, 54, "Gas1");
+		Inv = inv;
+		Case = 1;
+		ItemStack RED_STAINED_GLASS_PANE = new ItemStack(Material.RED_STAINED_GLASS_PANE);
+		for (int i = 1; i < 6; i++) {
+			inv.setItem(getCoordinate(1, i), RED_STAINED_GLASS_PANE);
+			inv.setItem(getCoordinate(5, i), RED_STAINED_GLASS_PANE);
+		}
+		inv.setItem(getCoordinate(2, 5), RED_STAINED_GLASS_PANE);
+		inv.setItem(getCoordinate(3, 5), RED_STAINED_GLASS_PANE);
+		inv.setItem(getCoordinate(4, 5), RED_STAINED_GLASS_PANE);
+		inv.setItem(getCoordinate(2, 0), RED_STAINED_GLASS_PANE);
+		inv.setItem(getCoordinate(4, 0), RED_STAINED_GLASS_PANE);
+		inv.setItem(getCoordinate(7, 4), new ItemStack(Material.GRAY_CONCRETE));
+
+		p.openInventory(inv);
+	}
+
+	public void gas2(Player p) {
+		P = p;
+		Inventory inv = Bukkit.createInventory(p, 54, "Gas2");
+		Inv = inv;
+		Case = 2;
+		ItemStack WHITE_STAINED_GLASS_PANE = new ItemStack(Material.WHITE_STAINED_GLASS_PANE);
+		for (int i = 1; i < 6; i++) {
+			inv.setItem(getCoordinate(3, i), WHITE_STAINED_GLASS_PANE);
+			inv.setItem(getCoordinate(5, i), WHITE_STAINED_GLASS_PANE);
+		}
+		inv.setItem(getCoordinate(4, 5), WHITE_STAINED_GLASS_PANE);
+		inv.setItem(getCoordinate(7, 4), new ItemStack(Material.GRAY_CONCRETE));
+		ItemStack potion = new ItemStack(Material.POTION);
+		PotionMeta mateP = (PotionMeta) potion.getItemMeta();
+		mateP.setColor(Color.YELLOW);
+		potion.setItemMeta(mateP);
+		inv.setItem(getCoordinate(5, 0), potion);
+		p.openInventory(inv);
+	}
+
+	@EventHandler
+	public void Click(InventoryClickEvent e) {
+		P = (Player) e.getWhoClicked();
+		Inv = e.getClickedInventory();
+		if (e.getView().getTitle() == "Gas1") {
+			if (e.getCurrentItem().getType() == Material.GRAY_CONCRETE) {
+				e.setCancelled(true);
+				Timer.StartTimer(4, true);
+			} else {
+				e.setCancelled(true);
+			}
+		}
+		if (e.getView().getTitle() == "Gas2") {
+			if (e.getCurrentItem().getType() == Material.GRAY_CONCRETE) {
+				e.setCancelled(true);
+				Timer.StartTimer(4, true);
+			} else {
+				e.setCancelled(true);
+			}
+		}
+
+	}
+
+	public int getCoordinate(int x, int y) {
+		return x + 9 * y;
+	}
+
+	public final class GasTimer extends TimerBase {
+
+		@Override
+		public void EventStartTimer() {
+			// TODO Auto-generated method stub
+
+		}
+
+		@Override
+		public void EventRunningTimer(int count) {
+			if (Case == 1) {
+				if (!(count == 0)) {
+					for (int i = 2; i < 5; i++) {
+						Inv.setItem(getCoordinate(i, count), new ItemStack(Material.YELLOW_STAINED_GLASS_PANE));
+					}
+				}
+			}
+			if (Case == 2) {
+				if (!(count == 0)) {
+					Inv.setItem(getCoordinate(4, count), new ItemStack(Material.YELLOW_STAINED_GLASS_PANE));
+				}
+				if (count == 1) {
+					Inv.setItem(getCoordinate(5, 0), new ItemStack(Material.GLASS_BOTTLE));
+				}
+			}
+		}
+
+		@Override
+		public void EventEndTimer() {
+			// TODO Auto-generated method stub
+			P.closeInventory();
+			P.sendMessage("Clear");
+		}
+
+	}
+}
