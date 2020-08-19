@@ -9,8 +9,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.Inventory;
 
-import Mission.CustomRandom;
-import Mission.Util;
+
 
 public class E_ActivatingShield implements Listener {
 	

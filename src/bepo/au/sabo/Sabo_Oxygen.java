@@ -11,8 +11,6 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
-import bepo.au.missions.CustomRandom;
-
 public class Sabo_Oxygen implements Listener {
 	
 	int Oxygen_password = 0;
@@ -38,12 +36,10 @@ public class Sabo_Oxygen implements Listener {
 						number++;
 					}
 					else if(j == 3) {
-						ItemStack item = new ItemStack(Material.BLACK_STAINED_GLASS_PANE);
-						inv.setItem(j+9*i, new ItemStack(item));
+						Util.Stack(inv, j+9*i, Material.BLACK_STAINED_GLASS_PANE, 1, " ");
 					}
 					else if(j <= 4) {
-						ItemStack item = new ItemStack(Material.WHITE_STAINED_GLASS_PANE);
-						inv.setItem(j+9*i, new ItemStack(item));
+						Util.Stack(inv, j+9*i, Material.WHITE_STAINED_GLASS_PANE, 1, " ");
 					}
 				}
 			}
@@ -111,7 +107,7 @@ public class Sabo_Oxygen implements Listener {
 		}
 		if(e.getView().getTitle().equals("Oxygen") && e.getCurrentItem().getType() == Material.RED_WOOL) {
 			e.setCancelled(true);
-			p.playSound(p.getLocation(), Sound.BLOCK_NOTE_BLOCK_PLING, 10, 1);
+			p.playSound(p.getLocation(), Sound.BLOCK_NOTE_BLOCK_PLING, 1, 1);
 			Oxygen_answer = 0;
 			Oxygen_count = 5;
 		}

@@ -13,11 +13,6 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.CompassMeta;
 import org.bukkit.scheduler.BukkitRunnable;
 
-import Mission.CustomRandom;
-import Mission.Main;
-import Mission.TimerBase;
-import Mission.Util;
-
 
 public class E_DistributePower implements Listener{
 	

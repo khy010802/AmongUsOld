@@ -9,9 +9,6 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.Inventory;
 
-import Mission.CustomRandom;
-import Mission.Util;
-
 public class H_Shooting implements Listener {
 
 	int score = 0;

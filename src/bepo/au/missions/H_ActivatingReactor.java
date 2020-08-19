@@ -9,10 +9,6 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.Inventory;
 
-import Mission.CustomRandom;
-import Mission.TimerBase;
-import Mission.Util;
-
 public class H_ActivatingReactor implements Listener {
 
 	Inventory Inv = null;

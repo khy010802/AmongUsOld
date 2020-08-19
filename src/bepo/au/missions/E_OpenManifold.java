@@ -9,11 +9,6 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.Inventory;
 
-import Mission.CustomRandom;
-import Mission.TimerBase;
-import Mission.Util;
-
-
 public class E_OpenManifold implements Listener {
 	int[] PassWord  = new int[10];
 	Player P = null;

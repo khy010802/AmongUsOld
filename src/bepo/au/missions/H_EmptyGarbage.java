@@ -9,11 +9,6 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
-
-import Mission.CustomRandom;
-import Mission.TimerBase;
-import Mission.Util;
-
 public class H_EmptyGarbage implements Listener {
 
 	EmptyGarbageTimer Timer = new EmptyGarbageTimer();
