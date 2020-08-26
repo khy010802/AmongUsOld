@@ -24,10 +24,11 @@ public class E_ChartCourse extends Mission {
 		uploadInventory(p, 54, "ChartCourse");
 		
 		Cur_route = 0;
-		a_reset();
+		
 	}
 	
 	public void onStart(Player p, int i) {
+		a_reset();
 		p.openInventory(gui.get(0));
 	}
 	

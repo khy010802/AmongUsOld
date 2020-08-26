@@ -19,9 +19,9 @@ import org.bukkit.scheduler.BukkitRunnable;
 import bepo.au.Util;
 import bepo.au.base.Mission;
 
-public class E_FixWriting extends Mission {
+public class C_FixWriting extends Mission {
 
-	public E_FixWriting(MissionType mt2, String name, String korean, int clear, Location... locs) {
+	public C_FixWriting(MissionType mt2, String name, String korean, int clear, Location... locs) {
 		super(mt2, name, korean, clear, locs);
 	}
 
@@ -44,32 +44,31 @@ public class E_FixWriting extends Mission {
 		wirecolorArray = new int[][] { Util.difrandom(0, 3, 4), Util.difrandom(0, 3, 4), Util.difrandom(0, 3, 4) };
 		for (int i = 0; i < 3; i++) {
 			uploadInventory(p, 54, "FixWriting" + i);
-
-			for (int slot = 0; slot < 54; slot++) {// gui인벤토리
-				int y = slot / 9, x = slot % 9;
-				if (y == 0 || y == 2 || y == 3 || y == 5) {
-					Util.debugMessage(" wirecolorArray 확인 " + wirecolorArray[i][yToidx(y)]);
-					if (x == 8)
-						Util.Stack(gui.get(i), slot, Material.BLACK_STAINED_GLASS_PANE, 1, " ");// 검정색표시
-					else if (x == 0)
-						Util.Stack(gui.get(i), slot, Material.YELLOW_STAINED_GLASS_PANE, 1, " ");// 노랑 표시
-					else if (x == 1 || x == 2)
-						fillWire(gui.get(i), slot, wirecolorArray[i][yToidx(y)], x, i);// 왼쪽 와이어 채우기(랜덤)
-					else if (x == 7)
-						fillWire(gui.get(i), slot, yToidx(y), i); // 오른쪽 와이어 채우기(고정)
-					else if (x == 6)
-						; // 오른쪽 와이어 빈공간
-					else
-						Util.Stack(gui.get(i), slot, Material.WHITE_STAINED_GLASS_PANE, 1, " "); // 배경
-				} else
-					Util.Stack(gui.get(i), slot, Material.WHITE_STAINED_GLASS_PANE, 1, " "); // 배경
-			}
 		}
 
 	}
 
 	@Override
 	public void onStart(Player p, int i) {
+		for (int slot = 0; slot < 54; slot++) {// gui인벤토리
+			int y = slot / 9, x = slot % 9;
+			if (y == 0 || y == 2 || y == 3 || y == 5) {
+				Util.debugMessage(" wirecolorArray 확인 " + wirecolorArray[i][yToidx(y)]);
+				if (x == 8)
+					Util.Stack(gui.get(i), slot, Material.BLACK_STAINED_GLASS_PANE, 1, " ");// 검정색표시
+				else if (x == 0)
+					Util.Stack(gui.get(i), slot, Material.YELLOW_STAINED_GLASS_PANE, 1, " ");// 노랑 표시
+				else if (x == 1 || x == 2)
+					fillWire(gui.get(i), slot, wirecolorArray[i][yToidx(y)], x, i);// 왼쪽 와이어 채우기(랜덤)
+				else if (x == 7)
+					fillWire(gui.get(i), slot, yToidx(y), i); // 오른쪽 와이어 채우기(고정)
+				else if (x == 6)
+					; // 오른쪽 와이어 빈공간
+				else
+					Util.Stack(gui.get(i), slot, Material.WHITE_STAINED_GLASS_PANE, 1, " "); // 배경
+			} else
+				Util.Stack(gui.get(i), slot, Material.WHITE_STAINED_GLASS_PANE, 1, " "); // 배경
+		}
 		p.openInventory(gui.get(i));
 	}
 

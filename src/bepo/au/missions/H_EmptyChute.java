@@ -29,11 +29,12 @@ public class H_EmptyChute extends Mission {
 	public void onAssigned(Player p) {
 		assign(p);
 		uploadInventory(p, 45, "EmptyChute");
-		a_reset();
+		
 	}
 	
 	@Override
 	public void onStart(Player p, int code) {
+		a_reset();
 		p.openInventory(gui.get(0));
 	}
 	

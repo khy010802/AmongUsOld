@@ -31,7 +31,8 @@ public abstract class Mission implements Listener{
 	public enum MissionType {
 		
 		HARD,
-		EASY;
+		EASY,
+		COMMON;
 		
 	}
 	
@@ -97,6 +98,7 @@ public abstract class Mission implements Listener{
 		this.required_clear = required_clear;
 		this.loc = loc;
 		if(mt == MissionType.EASY) MissionList.EASY.add(this);
+		else if(mt == MissionType.COMMON) MissionList.COMMON.add(this);
 		else MissionList.HARD.add(this);
 	}
 

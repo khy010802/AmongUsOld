@@ -31,6 +31,7 @@ public class ConfigManager {
 		Main.CREW_SIGHT_BLOCK = config.getInt("크루원 시야(블럭)");
 		Main.IMPOSTER_SIGHT_BLOCK = config.getInt("임포스터 시야(블럭)");
 		Main.KILL_COOLTIME_SEC = config.getInt("킬 쿨타임(초)");
+		Main.COMMON_MISSION_AMOUNT = config.getInt("공통 임무");
 		Main.EASY_MISSION_AMOUNT = config.getInt("간단한 임무");
 		Main.HARD_MISSION_AMOUNT = config.getInt("복잡한 임무");
 
@@ -50,6 +51,7 @@ public class ConfigManager {
 		config.set("크루원 시야(블럭)", 16);
 		config.set("임포스터 시야(블럭)", 24);
 		config.set("킬 쿨타임(초)", 45);
+		config.set("공통 임무", 1);
 		config.set("복잡한 임무", 1);
 		config.set("간단한 임무", 2);
 		

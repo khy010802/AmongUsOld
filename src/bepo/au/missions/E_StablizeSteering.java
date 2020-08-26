@@ -37,6 +37,12 @@ public class E_StablizeSteering extends Mission {
 	public void onAssigned(Player p) {
 		assign(p);
 		uploadInventory(p, maxslot, guiName);
+		
+
+	}
+	
+	@Override
+	public void onStart(Player p, int code) {
 		int x, y;
 		while (true) {
 			x = random.nextInt(9);
@@ -46,11 +52,6 @@ public class E_StablizeSteering extends Mission {
 		}
 		int elytraSlot = x + y * 9;
 		setGUI(elytraSlot); // GUI ¸¸µé±â
-
-	}
-	
-	@Override
-	public void onStart(Player p, int code) {
 		p.openInventory(gui.get(0));
 	}
 	

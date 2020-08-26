@@ -1,6 +1,7 @@
 package bepo.au.missions;
 
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
@@ -8,27 +9,47 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.Inventory;
-import org.bukkit.inventory.ItemStack;
 
 import Mission.TimerBase;
 import Mission.Util;
+import bepo.au.base.Mission;
+import bepo.au.base.Mission.MissionType;
 
-public class ActivatingReactor implements Listener {
+public class ActivatingReactor extends Mission {
 
-	Inventory Inv = null;
+	
+	public ActivatingReactor(MissionType mt2, String name, String korean, int clear, Location loc) {
+		super(mt2, name, korean, clear, loc);
+	}
+	
+	public void onAssigned(Player p) {
+		assign(p);
+		uploadInventory(p, 54, "ActivatingReactor");
+	}
+	
+	public void onStart(Player p, int i) {
+		activatingReactor(p);
+		uploadInventory(p, 36, "ActivatingReactor");
+	}
+	
+	public void onStop(Player p, int i) {
+		p.getInventory().remove(Material.ELYTRA);
+	}
+	
+	public void onClear(Player p, int i) {
+		generalClear(p, i);
+	}
+
 	int[] ReactorPassword = new int[5];
 	int Count = 0;
 	int Tmp = 0;
 	int Case = 0;
 	int MaxCount = 1;
-	Player P = null;
 	ActivatingReactorTimer Timer = new ActivatingReactorTimer();
 	CustomRandom Random = new CustomRandom();
 
 	public void activatingReactor(Player p) {
-		Inventory inv = Bukkit.createInventory(p, 36, "Activating_Reactor");
-		Inv = inv;
-		this.P = p;
+		p.openInventory(gui.get(0));
 		for (int i = 0; i < 5; i++) {
 			ReactorPassword[i] = Random.random(1, 9);
 		}
@@ -50,9 +71,12 @@ public class ActivatingReactor implements Listener {
 
 	@EventHandler
 	public void Click(InventoryClickEvent e) {
+		
+		if(!checkPlayer(e)) return;
+		
 		Player p = (Player) e.getWhoClicked();
 		Inventory inv = e.getClickedInventory();
-		if (e.getView().getTitle().equals("Activating_Reactor")) {
+		if (e.getView().getTitle().equals("ActivatingReactor")) {
 			if (e.getCurrentItem().getType() == Material.WHITE_WOOL) {
 				e.setCancelled(true);
 				int x = e.getSlot();

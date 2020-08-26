@@ -18,11 +18,11 @@ import org.bukkit.scheduler.BukkitRunnable;
 import bepo.au.Main;
 import bepo.au.base.Mission;
 
-public class H_Card extends Mission{
+public class C_Card extends Mission{
 
 	private List<String> lore = Arrays.asList("§7", "§71. 카드를 든다.", "§72. 좌측 빈 공간에 마우스를 가져다댄다.", "§73. 우측 빈 공간 끝까지 우클릭을 누른채로 드래그한다.", "§71~3의 동작을 적절한 속도로 진행해주세요.");
 	
-	public H_Card(MissionType mt, String name, String korean, int clear, Location loc) {
+	public C_Card(MissionType mt, String name, String korean, int clear, Location loc) {
 		super(mt, name, korean, clear, loc);
 	}
 
@@ -31,15 +31,16 @@ public class H_Card extends Mission{
 		assign(p);
 		uploadInventory(p, 27, "카드키 미션");
 		
-		for(int slot=0;slot<27;slot++) {
-			int temp = slot/9;
-			if(temp != 1) Stack(gui.get(0), slot, Material.GRAY_STAINED_GLASS_PANE, 1, "§f" + (temp < 1 ? "하" : "상") + "단 빈 공간 끝까지 카드를 드래그해주세요.", null);
-		}
+		
 	}
 
 	@Override
 	public void onStart(Player p, int i) {
 		Stack(gui.get(0), 17, Material.BOOK, 1, "§e소유하신 카드를 긁어주세요.", lore);
+		for(int slot=0;slot<27;slot++) {
+			int temp = slot/9;
+			if(temp != 1) Stack(gui.get(0), slot, Material.GRAY_STAINED_GLASS_PANE, 1, "§f" + (temp < 1 ? "하" : "상") + "단 빈 공간 끝까지 카드를 드래그해주세요.", null);
+		}
 		p.openInventory(gui.get(0));
 		p.playSound(p.getLocation(), Sound.BLOCK_LEVER_CLICK, 1.0F, 1.0F);
 
