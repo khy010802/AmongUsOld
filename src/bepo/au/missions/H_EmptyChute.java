@@ -18,7 +18,7 @@ import bepo.au.base.Mission;
 public class H_EmptyChute extends Mission {
 
 	int maxLeaves = 5; // 해야하는 나뭇잎 개수 HARD EASY 조절 가능. 최대 36개.
-	int remainingLeaves = maxLeaves;
+	int remainingLeaves;
 	int maxslot = 45;
 
 	public H_EmptyChute(MissionType mt, String name, String korean, int clear, Location loc) {
@@ -51,6 +51,7 @@ public class H_EmptyChute extends Mission {
 	public void a_reset() {
 		gui.get(0).setMaxStackSize(1);
 		HashSet<Integer> leafSlots = new HashSet<Integer>();
+		remainingLeaves = maxLeaves;
 		while (true) {
 			int leafslot = Util.random(3, 8) + 9 * Util.random(0, 4);
 			Util.debugMessage(leafslot + "에 나뭇잎");
