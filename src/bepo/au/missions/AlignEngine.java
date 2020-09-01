@@ -8,6 +8,7 @@ import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryDragEvent;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.scheduler.BukkitRunnable;
 
 import bepo.au.Util;
 import bepo.au.base.Mission;
@@ -54,9 +55,12 @@ public class AlignEngine extends Mission {
 
 	}
 
+
+
 	public void onClick(InventoryClickEvent e) {
 
-		if (!checkPlayer(e)) return;
+		if (!checkPlayer(e))
+			return;
 
 		Util.debugMessage("클릭 인식됨");
 		ItemStack itemstack = e.getCurrentItem();
@@ -83,9 +87,26 @@ public class AlignEngine extends Mission {
 
 	@EventHandler
 	public void onDrag(InventoryDragEvent e) {
-		if (e.getView().getTitle().equals(guiName) && !e.getRawSlots().isEmpty()) {
-			;
-		}
+		if (e.getView().getTitle().equals(guiName) && !e.getRawSlots().isEmpty() && e.getCursor().getType() == m) {
+			for (int slot : e.getRawSlots())
+				if (slot == 13) {
+					for (int i = 0; i < 2; i++) {
+						final int c = i;
+						if (e.getView().getTitle().split(" ")[1] == Namelore[i]) {
+							new BukkitRunnable() {
+								public void run() {
+									if(gui.get(0).getItem(22).getType()==m) {
+										Util.debugMessage("클리어!");
+										onClear((Player) e.getWhoClicked(), c);
+									}
+								}
+							}.runTaskLater(main, 0L);
 
+						}
+					}
+
+				}
+
+		}
 	}
 }
