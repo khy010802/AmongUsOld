@@ -30,8 +30,16 @@ public class E_DivertPower extends Mission {
 			Material.WHITE_STAINED_GLASS_PANE, // 하양배경4
 			Material.LIGHT_GRAY_STAINED_GLASS_PANE// 연회색5
 	};
-	final String[] rooms = { "하부 엔진", // 레버
-			"상부 엔진", "무기고", "보호막 제어실", "정의되지 않은 방", "항해실", "통신실", "산소 공급실", "보안실" };// 배경
+
+	final String[] rooms = { "§f하부 엔진", // 레버
+			"상부 엔진", //
+			"무기고", //
+			"보호막 제어실", //
+			"정의되지 않은 방", //
+			"항해실", //
+			"통신실", //
+			"산소 공급실", //
+			"보안실" };// 배경
 
 	public E_DivertPower(MissionType mt2, String name, String korean, int clear, Location loc) {
 		super(mt2, name, korean, clear, loc);
