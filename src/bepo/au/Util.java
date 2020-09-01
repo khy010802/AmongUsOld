@@ -32,7 +32,7 @@ public class Util implements Listener{
 		if (length>max-min+1) return null;						
 		ArrayList<Integer> numbers = new ArrayList<Integer>();						
 		for (int num = min; num<=max ; num++) numbers.add(num);						
-		Collections.shuffle(numbers);						
+		Collections.shuffle(numbers);
 		return Arrays.stream(numbers.toArray(new Integer[numbers.size()])).mapToInt(Integer::intValue).toArray();						
 								
 	}							

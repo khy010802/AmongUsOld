@@ -11,6 +11,7 @@ import org.bukkit.inventory.ItemStack;
 
 import bepo.au.Util;
 import bepo.au.base.Mission;
+import bepo.au.base.PlayerData;
 import bepo.au.base.TimerBase;
 
 public class H_Scanning extends Mission {
@@ -33,7 +34,7 @@ public class H_Scanning extends Mission {
 	}
 	
 	public void onStop(Player p, int code) {
-		
+		if(timer.GetTimerRunning()) timer.StopTimer();
 	}
 	
 	public class Timer extends TimerBase {
@@ -54,21 +55,25 @@ public class H_Scanning extends Mission {
 			if (p.getOpenInventory().getTitle().split(" ")[0].equals("Scanning")) { // gui 열고있는지 확인
 
 				// Location location = p.getLocation().add(0, 1, 0);
-				for (double x = 0 - radius - 0.2; x <= (radius + 0.2); x += 0.05)
-					for (double z = 0 - radius - 0.2; z <= (radius + 0.2); z += 0.05) {
-						if ((x * x + z * z) <= radius && (x * x + z * z) >= (radius - 0.1)) {
-							double y = (count >= 100 ? 200 - count : count); // count는 200 -> 0 ||| y는 0->-100 후 100->0감
-							// Util.debugMessage("count : "+count);
-							y = ((y - 50) * 0.01);
-							// Util.debugMessage("y : "+y);
-							Location location = p.getLocation();
-							location.add(x, 1 + y, z);
-							p.getWorld().spawnParticle(Particle.COMPOSTER, location, 1, 0.0, 0.0, 0.0, 1.0, null, true);
-						}
+				PlayerData pd = PlayerData.getPlayerData(p.getName());
+				if(pd != null && pd.isAlive()) {
+					for (double x = 0 - radius - 0.2; x <= (radius + 0.2); x += 0.05)
+						for (double z = 0 - radius - 0.2; z <= (radius + 0.2); z += 0.05) {
+							if ((x * x + z * z) <= radius && (x * x + z * z) >= (radius - 0.1)) {
+								double y = (count >= 100 ? 200 - count : count); // count는 200 -> 0 ||| y는 0->-100 후 100->0감
+								// Util.debugMessage("count : "+count);
+								y = ((y - 50) * 0.01);
+								// Util.debugMessage("y : "+y);
+								Location location = p.getLocation();
+								location.add(x, 1 + y, z);
+								p.getWorld().spawnParticle(Particle.COMPOSTER, location, 1, 0.0, 0.0, 0.0, 1.0, null, true);
+							}
 
-					}
-				// p.getWorld().spawnParticle(Particle.COMPOSTER, location, 15, 0.7, 1.0, 0.7,
-				// 1.0,null,true);
+						}
+					// p.getWorld().spawnParticle(Particle.COMPOSTER, location, 15, 0.7, 1.0, 0.7,
+					// 1.0,null,true);
+				}
+				
 				if (count % 2 == 0) {
 					Util.debugMessage("gui 인식됨");
 					ItemStack[] temp = gui.get(0).getContents();

@@ -82,7 +82,7 @@ public abstract class Mission implements Listener{
 	
 	protected String name;
 	protected String korean;
-	protected Location[] loc;
+	protected Location[] locs;
 	protected MissionType type;
 	
 	protected List<Inventory> gui = new ArrayList<Inventory>();
@@ -96,7 +96,7 @@ public abstract class Mission implements Listener{
 		this.type = mt;
 		this.korean = korean;
 		this.required_clear = required_clear;
-		this.loc = loc;
+		this.locs = loc;
 		if(mt == MissionType.EASY) MissionList.EASY.add(this);
 		else if(mt == MissionType.COMMON) MissionList.COMMON.add(this);
 		else MissionList.HARD.add(this);
@@ -104,7 +104,7 @@ public abstract class Mission implements Listener{
 
 	public String getMissionName() { return this.name; }
 	public String getKoreanName() { return this.korean; }
-	public Location[] getLocations() { return this.loc; }
+	public Location[] getLocations() { return this.locs; }
 	public List<String> getTitles() { return gui_title; }
 	public int getRequiredClear() { return this.required_clear; }
 	
@@ -156,10 +156,19 @@ public abstract class Mission implements Listener{
 	
 	public final int getCode(Location bloc) {
 		bloc = bloc.getBlock().getLocation();
-		for(int i=0;i<loc.length;i++) {
-			if(bloc.equals(loc[i])) return i;
+		for(int i=0;i<locs.length;i++) {
+			if(bloc.equals(locs[i])) return i;
 		}
 		return -1;
+	}
+	
+	public final int getCode(String title) {
+		try {
+			return Integer.parseInt(title.split(" ")[1]);
+		} catch(Exception io) {
+			return -1;
+		}
+		
 	}
 	
 	public final boolean isCleared(int code) {

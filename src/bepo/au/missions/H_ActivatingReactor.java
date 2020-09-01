@@ -1,35 +1,31 @@
 package bepo.au.missions;
 
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
-import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.Inventory;
 
-import Mission.TimerBase;
-import Mission.Util;
+import bepo.au.Util;
 import bepo.au.base.Mission;
-import bepo.au.base.Mission.MissionType;
+import bepo.au.base.TimerBase;
 
-public class ActivatingReactor extends Mission {
+public class H_ActivatingReactor extends Mission {
 
 	
-	public ActivatingReactor(MissionType mt2, String name, String korean, int clear, Location loc) {
+	public H_ActivatingReactor(MissionType mt2, String name, String korean, int clear, Location loc) {
 		super(mt2, name, korean, clear, loc);
 	}
 	
 	public void onAssigned(Player p) {
 		assign(p);
-		uploadInventory(p, 54, "ActivatingReactor");
+		uploadInventory(p, 36, "ActivatingReactor");
 	}
 	
 	public void onStart(Player p, int i) {
 		activatingReactor(p);
-		uploadInventory(p, 36, "ActivatingReactor");
 	}
 	
 	public void onStop(Player p, int i) {
@@ -46,25 +42,23 @@ public class ActivatingReactor extends Mission {
 	int Case = 0;
 	int MaxCount = 1;
 	ActivatingReactorTimer Timer = new ActivatingReactorTimer();
-	CustomRandom Random = new CustomRandom();
 
 	public void activatingReactor(Player p) {
-		p.openInventory(gui.get(0));
 		for (int i = 0; i < 5; i++) {
-			ReactorPassword[i] = Random.random(1, 9);
+			ReactorPassword[i] = Util.random(1, 9);
 		}
 		for (int i = 2; i < 7; i++) {
-    		Util.Stack(inv, i, Material.WHITE_STAINED_GLASS_PANE, 1, " ");
+    		Util.Stack(gui.get(0), i, Material.WHITE_STAINED_GLASS_PANE, 1, " ");
 		}
 		for (int i = 1; i < 4; i++) {
 			for (int j = 1; j < 4; j++) {
-	    		Util.Stack(inv, j + i * 9, Material.WHITE_CONCRETE, 1, " ");
+	    		Util.Stack(gui.get(0), j + i * 9, Material.WHITE_CONCRETE, 1, " ");
 			}
 			for (int j = 5; j < 8; j++) {
-	    		Util.Stack(inv, j + i * 9, Material.WHITE_WOOL, 1, " ");
+	    		Util.Stack(gui.get(0), j + i * 9, Material.WHITE_WOOL, 1, " ");
 			}
 		}
-		p.openInventory(inv);
+		p.openInventory(gui.get(0));
 		Count = 0;
 		Lighting(1);
 	}
@@ -74,9 +68,8 @@ public class ActivatingReactor extends Mission {
 		
 		if(!checkPlayer(e)) return;
 		
-		Player p = (Player) e.getWhoClicked();
+		Player P = (Player) e.getWhoClicked();
 		Inventory inv = e.getClickedInventory();
-		if (e.getView().getTitle().equals("ActivatingReactor")) {
 			if (e.getCurrentItem().getType() == Material.WHITE_WOOL) {
 				e.setCancelled(true);
 				int x = e.getSlot();
@@ -98,12 +91,11 @@ public class ActivatingReactor extends Mission {
 					}
 				} else {
 					Count = 0;
-					p.closeInventory();
+					P.closeInventory();
 				}
 			} else {
 				e.setCancelled(true);
 			}
-		}
 	}
 
 	public void Lighting(int count) {
@@ -118,7 +110,7 @@ public class ActivatingReactor extends Mission {
 		public void EventStartTimer() {
 			for (int i = 1; i < 4; i++) {
 				for (int j = 5; j < 8; j++) {
-					Util.Stack(Inv, j + i * 9, Material.GRAY_WOOL, 1, " ");
+					Util.Stack(gui.get(0), j + i * 9, Material.GRAY_WOOL, 1, " ");
 				}
 			}
 
@@ -126,28 +118,36 @@ public class ActivatingReactor extends Mission {
 
 		@Override
 		public void EventRunningTimer(int count) {
+			
+			if(getPlayer() == null) {
+				StopTimer();
+				return;
+			}
+			
+			Player P = getPlayer();
+			
 			if (Case == 1) {
 				if (count > 0) {
 					if (Tmp <= 3) {
-						Util.Stack(Inv, Tmp + 9, Material.WHITE_CONCRETE, 1, " ");
+						Util.Stack(gui.get(0), Tmp + 9, Material.WHITE_CONCRETE, 1, " ");
 					} else if (Tmp > 3 && Tmp <= 6) {
-						Util.Stack(Inv, Tmp + 15, Material.WHITE_CONCRETE, 1, " ");
+						Util.Stack(gui.get(0), Tmp + 15, Material.WHITE_CONCRETE, 1, " ");
 					} else if (Tmp > 6 && Tmp <= 9) {
-						Util.Stack(Inv, Tmp + 21, Material.WHITE_CONCRETE, 1, " ");
+						Util.Stack(gui.get(0), Tmp + 21, Material.WHITE_CONCRETE, 1, " ");
 					}
 				}
 				if (count < MaxCount) {
 					Tmp = ReactorPassword[count];
-					Util.Stack(Inv, count + 2, Material.GREEN_STAINED_GLASS_PANE, 1, " ");
+					Util.Stack(gui.get(0), count + 2, Material.GREEN_STAINED_GLASS_PANE, 1, " ");
 					if (Tmp <= 3) {
 						P.playSound(P.getLocation(), Sound.BLOCK_NOTE_BLOCK_SNARE, 10, 1);
-						Util.Stack(Inv, Tmp + 9, Material.BLUE_CONCRETE, 1, " ");
+						Util.Stack(gui.get(0), Tmp + 9, Material.BLUE_CONCRETE, 1, " ");
 					} else if (Tmp > 3 && Tmp <= 6) {
 						P.playSound(P.getLocation(), Sound.BLOCK_NOTE_BLOCK_SNARE, 10, 1);
-						Util.Stack(Inv, Tmp + 15, Material.BLUE_CONCRETE, 1, " ");
+						Util.Stack(gui.get(0), Tmp + 15, Material.BLUE_CONCRETE, 1, " ");
 					} else if (Tmp > 6 && Tmp <= 9) {
 						P.playSound(P.getLocation(), Sound.BLOCK_NOTE_BLOCK_SNARE, 10, 1);
-						Util.Stack(Inv, Tmp + 21, Material.BLUE_CONCRETE, 1, " ");
+						Util.Stack(gui.get(0), Tmp + 21, Material.BLUE_CONCRETE, 1, " ");
 					}
 				}
 			}
@@ -158,11 +158,11 @@ public class ActivatingReactor extends Mission {
 			if (Case == 1) {
 				for (int i = 1; i < 4; i++) {
 					for (int j = 5; j < 8; j++) {
-						Util.Stack(Inv, j + i * 9, Material.WHITE_WOOL, 1, " ");
+						Util.Stack(gui.get(0), j + i * 9, Material.WHITE_WOOL, 1, " ");
 					}
 				}
 				for (int i = 2; i < 7; i++) {
-					Util.Stack(Inv, i, Material.WHITE_STAINED_GLASS_PANE, 1, " ");
+					Util.Stack(gui.get(0), i, Material.WHITE_STAINED_GLASS_PANE, 1, " ");
 				}
 			}
 			if (Case == 2) {

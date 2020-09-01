@@ -7,6 +7,7 @@ import java.util.List;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Color;
+import org.bukkit.entity.Player;
 
 import bepo.au.Main;
 import fr.minuskube.netherboard.Netherboard;
@@ -26,6 +27,8 @@ public class PlayerData {
 	
 	private boolean isImposter = false;
 	
+	private boolean survive = true;
+	
 	private int workID = 0;
 	
 	private List<Mission> missions = new ArrayList<Mission>();
@@ -43,6 +46,7 @@ public class PlayerData {
 	public Color getColor() { return this.color; }
 	public ChatColor getChatColor() { return this.chatcolor; }
 	public int getWorkID() { return this.workID; }
+	public boolean isAlive() { return this.survive; }
 	public BPlayerBoard getBoard() { return this.board; }
 	
 	public List<Mission> getMissions() { return this.getMissions(); }
@@ -68,6 +72,13 @@ public class PlayerData {
 	public void addMission(Mission m) { 
 		addLine(m.getKoreanName() + (m.getRequiredClear() > 1 ? "(0/" + m.getRequiredClear() + ")" : ""));
 		missions.add(m);
+	}
+	
+	public void kill() {
+		survive = false;
+		
+		Player p = Bukkit.getPlayer(name);
+		p.closeInventory();
 	}
 
 }

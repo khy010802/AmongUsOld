@@ -16,7 +16,7 @@ public class CommandManager implements CommandExecutor{
 	public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
 		
 		if(!(sender instanceof Player) || !sender.isOp()) {
-			sender.sendMessage(Main.PREFIX + "§c본 명령어는 오피인 플레이어만 사용 가능합니다.");
+			sender.sendMessage(Main.PREFIX + "§c이 명령어는 오피인 플레이어만 사용 가능합니다.");
 			return true;
 		}
 		

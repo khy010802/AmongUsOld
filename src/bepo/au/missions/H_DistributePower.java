@@ -5,36 +5,49 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
-import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.CompassMeta;
-import org.bukkit.scheduler.BukkitRunnable;
-
-import Mission.Main;
-import Mission.TimerBase;
-import Mission.Util;
+import bepo.au.Util;
+import bepo.au.base.Mission;
+import bepo.au.base.TimerBase;
 
 
-public class DistributePower implements Listener{
+public class H_DistributePower extends Mission{
+	
+	public H_DistributePower(MissionType mt2, String name, String korean, int clear, Location loc) {
+		super(mt2, name, korean, clear, loc);
+	}
+	
+	public void onAssigned(Player p) {
+		assign(p);
+		uploadInventory(p, 45, "DistributePower");
+	}
+	
+	public void onStart(Player p, int i) {
+		distributePower(p);
+	}
+	
+	public void onStop(Player p, int i) {
+		p.getInventory().remove(Material.ELYTRA);
+	}
+	
+	public void onClear(Player p, int i) {
+		generalClear(p, i);
+	}
 	
 	PowerTimer Timer = new PowerTimer();
 	
-	Player P;
-	Inventory Inv;
 	int Case;
 	double Tmp;
 	double angle;
-	CustomRandom Random = new CustomRandom();
 	final int t = 24;
 	double a;
 	double b;
 	
 	public void distributePower(Player p) {
-		P = p;
 		Inventory inv = Bukkit.createInventory(p, 45, "DistributePower");
-		Inv = inv;
 		Case = 0;
 		
 		
@@ -69,12 +82,12 @@ public class DistributePower implements Listener{
 
         }
         
-		Tmp = (Random.random(-6, 6));
-		a = Math.PI + (P.getLocation().getYaw() / 180 * Math.PI);
+		Tmp = (Util.random(-6, 6));
+		a = Math.PI + (p.getLocation().getYaw() / 180 * Math.PI);
 		b = a%(2*Math.PI);
 		for(int i = 0 ; i < 3; i++) {
 			Case = i;
-			SetCompass(0);
+			SetCompass(p, 0);
 		}
 		Case = 0;
 		Timer.StartTimer(2*t, true, 2);
@@ -83,9 +96,11 @@ public class DistributePower implements Listener{
 	
 	@EventHandler
 	public void Click(InventoryClickEvent e) {
-		P = (Player) e.getWhoClicked();
-		Inv = e.getInventory();
-		if(e.getView().getTitle() == "DistributePower") {
+		
+		if(!checkPlayer(e)) return;
+		
+		Player P = (Player) e.getWhoClicked();
+		Inventory Inv = e.getInventory();
 			if(true) {
 				if(e.getCurrentItem().getType() == Material.REDSTONE_BLOCK) {
 					e.setCancelled(true);
@@ -123,7 +138,6 @@ public class DistributePower implements Listener{
 					e.setCancelled(true);
 				}
 			}
-		}
 		
 	}
 	
@@ -132,19 +146,24 @@ public class DistributePower implements Listener{
 		@Override
 		public void EventStartTimer() {
 			// TODO Auto-generated method stub
-			P.sendMessage("--------------------");
-			
 		}
 
 		@Override
 		public void EventRunningTimer(int count) {
-			if(!(P.getOpenInventory().getTitle() == "DistributePower")) {
+			
+			if(getPlayer() == null) {
+				StopTimer();
+				return;
+			}
+			
+			Player P = getPlayer();
+			
+			if(!(P.getOpenInventory().getTitle().equals("DistributePower"))) {
 				Timer.StopTimer();
-				P.sendMessage("Close");
 				Case = 0;
 			}
 			
-			SetCompass(count);
+			SetCompass(P, count);
 			
 			
 		}
@@ -152,17 +171,18 @@ public class DistributePower implements Listener{
 		@Override
 		public void EventEndTimer() {
 			// TODO Auto-generated method stub
+			/*
 			new BukkitRunnable(){
 	            public void run(){
 	            	Timer.StartTimer(2*t, true, 2);
 	            }
 	            
-	          }.runTaskLater(Main.main, 0L);
-			
+	          }.runTaskLater(Main.getInstance(), 0L);
+			*/
 		}
 		
 	}
-	public void SetCompass(int count) {
+	public void SetCompass(Player P, int count) {
 		ItemStack item = new ItemStack(Material.COMPASS);
 		CompassMeta meta = (CompassMeta) item.getItemMeta();
 		double size = 10;
@@ -172,7 +192,7 @@ public class DistributePower implements Listener{
 		Location loc = P.getLocation().add(x, 1, z);
 		meta.setLodestone(loc);
 		item.setItemMeta(meta);
-		Inv.setItem(2+18*Case, item);
+		gui.get(0).setItem(2+18*Case, item);
 		P.sendMessage("" + angle + "/" + b);
 		
 	}

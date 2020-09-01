@@ -6,6 +6,7 @@ import java.util.Arrays;
 import java.util.Collections;
 
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
@@ -15,19 +16,40 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
-import Mission.TimerBase;
+import bepo.au.base.Mission;
+import bepo.au.base.Mission.MissionType;
+import bepo.au.base.TimerBase;
 
 
-public class OpenManifold implements Listener {
+public class E_OpenManifold extends Mission {
+	
 	int[] PassWord  = new int[10];
-	Player P = null;
 	int Count = -1;
-	Inventory Inv = null;
 	OpenManifoldTimer Timer = new OpenManifoldTimer();
+	
+	public E_OpenManifold(MissionType mt2, String name, String korean, int clear, Location loc) {
+		super(mt2, name, korean, clear, loc);
+	}
+
+	public void onAssigned(Player p) {
+		assign(p);
+		uploadInventory(p, 18, "Manifold");
+	}
+
+	public void onStart(Player p, int i) {
+		openManifold(p);
+	}
+
+	public void onStop(Player p, int i) {
+		if(Timer.GetTimerRunning()) Timer.StopTimer();
+	}
+
+	public void onClear(Player p, int i) {
+		generalClear(p, i);
+	}
 	
 	public void openManifold(Player p) {
 		Inventory inv = Bukkit.createInventory(p, 18, "Manifold"); //gui »ý¼º
-		P = p;
 		PassWord = difrandom(1, 10, 10);
 		for(int i = 0; i <= 9; i++) {
 			if(i/5 == 0) {
@@ -43,8 +65,11 @@ public class OpenManifold implements Listener {
 	
 	@EventHandler
 	public void Click(InventoryClickEvent e) {
+		
+		if(!checkPlayer(e)) return;
+		
 		Inventory inv = e.getClickedInventory();
-		Player p = (Player) e.getWhoClicked();
+		Player P = (Player) e.getWhoClicked();
 		if(e.getView().getTitle().equals("Manifold")) {
 			if(e.getCurrentItem().getType() == Material.WHITE_STAINED_GLASS_PANE) {
 				e.setCancelled(true);
@@ -61,12 +86,11 @@ public class OpenManifold implements Listener {
 					inv.setItem(x, new ItemStack(Material.GREEN_STAINED_GLASS_PANE, Count));
 					Count++;
 					if(Count == 11) {
-						p.closeInventory();
-						p.sendMessage("Clear");
+						P.closeInventory();
+						P.sendMessage("Clear");
 					}
 				}
 				else {
-					Inv = inv;
 					Timer.StartTimer(2);
 				}
 			}
@@ -92,10 +116,10 @@ public class OpenManifold implements Listener {
 			// TODO Auto-generated method stub
 			for(int i = 0; i <= 9; i++) {
 				if(i/5 == 0) {
-					Inv.setItem(i+2, new ItemStack(Material.WHITE_STAINED_GLASS_PANE, PassWord[i]));
+					gui.get(0).setItem(i+2, new ItemStack(Material.WHITE_STAINED_GLASS_PANE, PassWord[i]));
 				}
 				else {
-					Inv.setItem(i+6, new ItemStack(Material.WHITE_STAINED_GLASS_PANE, PassWord[i]));
+					gui.get(0).setItem(i+6, new ItemStack(Material.WHITE_STAINED_GLASS_PANE, PassWord[i]));
 				}
 				Count = 1;
 			}
@@ -109,15 +133,21 @@ public class OpenManifold implements Listener {
 		@Override
 		public void EventStartTimer() {
 			// TODO Auto-generated method stub
-			P.playSound(P.getLocation(), Sound.BLOCK_NOTE_BLOCK_SNARE, 10, 1);
-			for(int i = 0; i <= 9; i++) {
-				if(i/5 == 0) {
-					Inv.setItem(i+2, new ItemStack(Material.RED_STAINED_GLASS_PANE, PassWord[i]));
-				}
-				else {
-					Inv.setItem(i+6, new ItemStack(Material.RED_STAINED_GLASS_PANE, PassWord[i]));
+			
+			if(getPlayer() != null) {
+				Player P = getPlayer();
+				P.playSound(P.getLocation(), Sound.BLOCK_NOTE_BLOCK_SNARE, 10, 1);
+				for(int i = 0; i <= 9; i++) {
+					if(i/5 == 0) {
+						gui.get(0).setItem(i+2, new ItemStack(Material.RED_STAINED_GLASS_PANE, PassWord[i]));
+					}
+					else {
+						gui.get(0).setItem(i+6, new ItemStack(Material.RED_STAINED_GLASS_PANE, PassWord[i]));
+					}
 				}
 			}
+			
+			
 			
 		}
 	

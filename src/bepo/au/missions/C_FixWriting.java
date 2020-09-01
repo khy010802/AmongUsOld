@@ -37,6 +37,9 @@ public class C_FixWriting extends Mission {
 
 			{ Material.RED_STAINED_GLASS_PANE, Material.BLUE_STAINED_GLASS_PANE, Material.GREEN_STAINED_GLASS_PANE,
 					Material.PURPLE_STAINED_GLASS_PANE } };
+	
+	private int[] destination = new int[3];
+	private int progress = 0;
 
 	@Override
 	public void onAssigned(Player p) {
@@ -45,11 +48,18 @@ public class C_FixWriting extends Mission {
 		for (int i = 0; i < 3; i++) {
 			uploadInventory(p, 54, "FixWriting" + i);
 		}
-
+		int a = Util.random(0, 2);
+		int b = Util.random(a+1, 4);
+		int c = Util.random(b+1, 5);
+		destination = new int[]{ a, b, c };
+		
 	}
 
 	@Override
 	public void onStart(Player p, int i) {
+		
+		if(destination[progress] != i) return;
+		
 		for (int slot = 0; slot < 54; slot++) {// gui인벤토리
 			int y = slot / 9, x = slot % 9;
 			if (y == 0 || y == 2 || y == 3 || y == 5) {
@@ -82,6 +92,7 @@ public class C_FixWriting extends Mission {
 	@Override
 	public void onClear(Player p, int i) {
 		generalClear(p, i);
+		progress++;
 	}
 
 	public static int yToidx(int y) {
