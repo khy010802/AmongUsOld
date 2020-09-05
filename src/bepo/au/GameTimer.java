@@ -138,12 +138,13 @@ public class GameTimer extends BukkitRunnable{
 				p.sendMessage("§f=======================");
 				p.sendMessage("§4당신은 임포스터입니다.");
 				p.sendMessage("§c인벤토리에 검을 지급해드렸습니다. 적절한 시기에 크루원을 죽이십시오. (쿨타임 " + Main.KILL_COOLTIME_SEC + "초)");
-				p.sendMessage("§c일과 진행도가 100%로 도달하기 전에 임포스터와 크루원의 수가 같아지면 임포스터의 승리입니다.");
+				p.sendMessage("§c일과 진행도가 100%에 도달하기 전 임포스터와 크루원의 수가 같아지거나,");
+				p.sendMessage("§c산소/원자로 사보타지가 성공했을 경우 임포스터의 승리입니다.");
 				p.sendMessage("§c");
 				p.sendMessage("§c임포스터 플레이어 : §f" + imposter);
 				p.sendMessage("§f=======================");
 			} else {
-				p.sendTitle("§f§l크루원", "§7임무를 수행하고, 임포스터를 추방하며, 끝까지 생존하십시오", 10, 100, 10);
+				p.sendTitle("§f§l크루원", "§7모든 임포스터를 추방하십시오", 10, 100, 10);
 				p.sendMessage("§f=======================");
 				p.sendMessage("§f당신은 크루원입니다.");
 				p.sendMessage("§7배정받은 일과를 수행하고, 일과 진행도를 100%까지 채우십시오.");
@@ -175,7 +176,7 @@ public class GameTimer extends BukkitRunnable{
 		}
 		
 		for(int i=0;i<Main.EASY_MISSION_AMOUNT;i++) {
-			pd.addMission(MissionList.EASY.get(missions.get(i)).clone());
+			pd.addMission(p, MissionList.EASY.get(missions.get(i)).getClone());
 		}
 	}
 	

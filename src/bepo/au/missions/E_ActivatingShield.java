@@ -8,13 +8,14 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.Inventory;
-import bepo.au.Util;
+
 import bepo.au.base.Mission;
+import bepo.au.utils.Util;
 
 
-public class H_ActivatingShield extends Mission {
+public class E_ActivatingShield extends Mission {
 	
-	public H_ActivatingShield(MissionType mt2, String name, String korean, int clear, Location loc) {
+	public E_ActivatingShield(MissionType mt2, String name, String korean, int clear, Location loc) {
 		super(mt2, name, korean, clear, loc);
 	}
 	

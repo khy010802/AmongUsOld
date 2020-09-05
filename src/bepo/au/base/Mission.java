@@ -30,6 +30,7 @@ public abstract class Mission implements Listener{
 	
 	public enum MissionType {
 		
+		SABOTAGE,
 		HARD,
 		EASY,
 		COMMON;
@@ -112,8 +113,13 @@ public abstract class Mission implements Listener{
 		return Bukkit.getPlayer(playername);
 	}
 	
-	public final Mission clone() {
-		return this.clone();
+	public Mission getClone() {
+		try {
+			return (Mission) this.clone();
+		} catch (CloneNotSupportedException e) {
+			e.printStackTrace();
+			return null;
+		}
 	}
 	
 	public final void uploadInventory(InventoryHolder owner, int slot, String name) {
@@ -180,20 +186,40 @@ public abstract class Mission implements Listener{
 	}
 	
 	
-	
 	public final boolean checkPlayer(Event event) {
+		return checkPlayer(event, true);
+	}
+	
+	public final boolean checkPlayer(Event event, boolean checkName) {
 		if(event instanceof InventoryEvent) {
 			InventoryEvent ie = (InventoryEvent) event;
 			boolean bool = false;
 			for(String title : gui_title) if(ie.getView().getTitle().contains(title)) bool = true;
 			if(!bool) bool = gui_title.contains(ie.getView().getTitle());
 			boolean bool2 = false;
-			if(event instanceof InventoryCloseEvent) bool2 = ((InventoryCloseEvent) event).getPlayer() instanceof Player;
-			else {
-				if(event instanceof InventoryClickEvent) bool2 = ((InventoryClickEvent) event).getWhoClicked() instanceof Player;
-				if(event instanceof InventoryDragEvent) bool2 = ((InventoryDragEvent) event).getWhoClicked() instanceof Player;
-				if(ie.getInventory().getType() == InventoryType.PLAYER) bool2 = false;
+			Player p = null;
+			if(event instanceof InventoryCloseEvent) {
+				if(((InventoryCloseEvent) event).getPlayer() instanceof Player) p = (Player) ((InventoryCloseEvent) event).getPlayer();
 			}
+			else {
+				if(event instanceof InventoryClickEvent) {
+					if(((InventoryClickEvent) event).getWhoClicked() instanceof Player) p = (Player) ((InventoryCloseEvent) event).getPlayer();
+				}
+				if(event instanceof InventoryDragEvent) {
+					if(((InventoryDragEvent) event).getWhoClicked() instanceof Player) p = (Player) ((InventoryDragEvent) event).getWhoClicked();
+				}
+				
+			}
+			
+			
+			if(p != null) {
+				if(playername != null && checkName) {
+					bool2 = playername.equalsIgnoreCase(p.getName());
+				} else bool2 = true;
+			}
+			
+			if(ie.getInventory().getType() == InventoryType.PLAYER) bool2 = false;
+			
 			return bool && bool2;
 		}
 		return false;

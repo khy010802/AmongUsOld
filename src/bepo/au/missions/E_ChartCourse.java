@@ -6,8 +6,8 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.inventory.InventoryClickEvent;
 
-import bepo.au.Util;
 import bepo.au.base.Mission;
+import bepo.au.utils.Util;
 
 //Cur_route가 4되면 끝
 public class E_ChartCourse extends Mission {

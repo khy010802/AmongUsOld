@@ -21,6 +21,10 @@ public class PlayerData {
 		return PLAYERDATA.get(name.toLowerCase());
 	}
 	
+	public static List<PlayerData> getPlayerDataList(){
+		return new ArrayList<PlayerData>(PLAYERDATA.values());
+	}
+	
 	private String name;
 	private Color color;
 	private ChatColor chatcolor;
@@ -69,9 +73,14 @@ public class PlayerData {
 		score--;
 	}
 	
-	public void addMission(Mission m) { 
+	public void addMission(Player p, Mission m) {
+		
+		if(p != null) m.onAssigned(p);
+		else if(Bukkit.getPlayer(name) != null) m.onAssigned(Bukkit.getPlayer(name));
+		
 		addLine(m.getKoreanName() + (m.getRequiredClear() > 1 ? "(0/" + m.getRequiredClear() + ")" : ""));
 		missions.add(m);
+		
 	}
 	
 	public void kill() {

@@ -15,9 +15,9 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 
 import org.bukkit.inventory.ItemStack;
 
-import bepo.au.Util;
 import bepo.au.base.Mission;
 import bepo.au.base.TimerBase;
+import bepo.au.utils.Util;
 
 //8ƽ -> 2ƽ
 public class H_InspectSample extends Mission{
