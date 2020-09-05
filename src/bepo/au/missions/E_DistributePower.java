@@ -9,14 +9,15 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.CompassMeta;
-import bepo.au.Util;
+
 import bepo.au.base.Mission;
 import bepo.au.base.TimerBase;
+import bepo.au.utils.Util;
 
 
-public class H_DistributePower extends Mission{
+public class E_DistributePower extends Mission{
 	
-	public H_DistributePower(MissionType mt2, String name, String korean, int clear, Location loc) {
+	public E_DistributePower(MissionType mt2, String name, String korean, int clear, Location loc) {
 		super(mt2, name, korean, clear, loc);
 	}
 	

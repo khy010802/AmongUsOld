@@ -10,17 +10,17 @@ import org.bukkit.event.inventory.InventoryDragEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 
-import bepo.au.Util;
 import bepo.au.base.Mission;
+import bepo.au.utils.Util;
 
-public class AlignEngine extends Mission {
+public class H_AlignEngine extends Mission {
 
 	private int maxslot = 27;
 	private Material m = Material.ACACIA_BOAT;
 	private String guiName = "AlignEngine";
 	private String Namelore[] = { "Upper", "Lower" };
 
-	public AlignEngine(MissionType mt, String name, String korean, int required_clear, Location[] loc) {
+	public H_AlignEngine(MissionType mt, String name, String korean, int required_clear, Location loc) {
 		super(mt, name, korean, required_clear, loc);
 	}
 
@@ -87,7 +87,10 @@ public class AlignEngine extends Mission {
 
 	@EventHandler
 	public void onDrag(InventoryDragEvent e) {
-		if (e.getView().getTitle().equals(guiName) && !e.getRawSlots().isEmpty() && e.getCursor().getType() == m) {
+		
+		if(!checkPlayer(e)) return;
+		
+		if (!e.getRawSlots().isEmpty() && e.getCursor().getType() == m) {
 			for (int slot : e.getRawSlots())
 				if (slot == 13) {
 					for (int i = 0; i < 2; i++) {

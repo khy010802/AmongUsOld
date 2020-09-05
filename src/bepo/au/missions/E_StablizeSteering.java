@@ -15,8 +15,9 @@ import org.bukkit.event.inventory.InventoryDragEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 
-import bepo.au.Util;
 import bepo.au.base.Mission;
+import bepo.au.utils.Util;
+
 import java.util.Random;
 
 public class E_StablizeSteering extends Mission {

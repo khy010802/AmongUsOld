@@ -12,16 +12,16 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryDragEvent;
 import org.bukkit.inventory.ItemStack;
 
-import bepo.au.Util;
 import bepo.au.base.Mission;
+import bepo.au.utils.Util;
 
-public class H_EmptyChute extends Mission {
+public class E_EmptyChute extends Mission {
 
 	int maxLeaves = 5; // 해야하는 나뭇잎 개수 HARD EASY 조절 가능. 최대 36개.
 	int remainingLeaves;
 	int maxslot = 45;
 
-	public H_EmptyChute(MissionType mt, String name, String korean, int clear, Location loc) {
+	public E_EmptyChute(MissionType mt, String name, String korean, int clear, Location loc) {
 		super(mt, name, korean, clear, loc);
 	}
 	

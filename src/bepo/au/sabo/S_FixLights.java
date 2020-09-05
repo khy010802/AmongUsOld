@@ -3,64 +3,75 @@ package bepo.au.sabo;
 import java.util.Arrays;
 import java.util.List;
 
-import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 
-import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.InventoryClickEvent;
-
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
+import bepo.au.base.Sabotage;
+import bepo.au.utils.Util;
 
 import java.util.Random;
 
-public class Sabo_FixLights implements Listener {
-	Main main;
-	Player p;
+public class S_FixLights extends Sabotage {
+
+	private static Inventory gui = null;
+	
 	Random random = new Random();
 	int maxslot = 45;
-	Inventory gui;
-	static boolean started = false;
+	
 	static boolean[] leverStatus = new boolean[5];
 	static boolean[] connected = new boolean[5];
 
+	public static boolean Activated = false;
+	
+	public S_FixLights(MissionType mt2, String name, String korean, int clear, Location loc) {
+		super(mt2, name, korean, clear, loc, SaboType.ELEC, 0);
+	}
+	
+	public void onAssigned(Player p) {
+		initialize_fixLights();
+		setGUI();
+	}
+	
+	public void onStart(Player p, int i) {
+		s_fixLightsOpen(p);
+	}
+	
+	public void onStop(Player p, int i) {
+		
+	}
+	
+	public void onClear(Player p, int i) {
+		Activated = false;
+		gui = null;
+	}
+	
 	/*
 	 * 명령어 쳤을 때 실행됨, gui 열기 시도.
 	 */
-	public void s_fixLightsOpen(Player pl, Main m) {
-		
-		main = m;
-		p = pl;
-		if (started) {
+	public void s_fixLightsOpen(Player p) {
+
+		if (Activated) {
 			p.openInventory(gui);
 		} else {
 			Util.debugMessage("전등 사보타주는 아직 시작되지 않았습니다");
 		}
 	}
 
-	/*
-	 * 명령어 쳤을 때 실행됨
-	 */
-	public void s_fixLightsStart() {
-		if (started) {
-			Util.debugMessage("전등 사보타주는 이미 시작되었습니다.");
-		} else {
-			initialize_fixLights();
-			Util.debugMessage("전등 사보타주 실행됨");
-		}
-	}
 
 	/*
 	 * 초기화 ; gui를 만듦.
 	 */
 	public void initialize_fixLights() {
-		started = true;
-		gui = Bukkit.createInventory(null, maxslot, "S_FixLights");
+		Activated = true;
+		uploadInventory(null, maxslot, "S_FixLights");
 		gui.setMaxStackSize(1);
 		for (int i = 0; i < 5; i++)
 			connected[i] = false;
@@ -104,7 +115,6 @@ public class Sabo_FixLights implements Listener {
 		leverStatus[idx] = !leverStatus[idx];
 		updateGUI();
 		check();
-		
 	}
 
 	/*
@@ -117,7 +127,8 @@ public class Sabo_FixLights implements Listener {
 				return;
 		}
 		Util.debugMessage("사보타주 클리어");
-		started=false;
+		Activated=false;
+		Sabotage.saboClear(0);
 		for (HumanEntity he : gui.getViewers()) {((Player) he).closeInventory();}
 	}
 
@@ -139,7 +150,9 @@ public class Sabo_FixLights implements Listener {
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	@EventHandler
 	public void onClick(InventoryClickEvent e) {
-		if (e.getView().getTitle().equals("S_FixLights")) {
+		
+		if(!checkPlayer(e, false)) return;
+		
 			Util.debugMessage("클릭 인식됨");
 			int slot = e.getRawSlot();
 			ItemStack itemstack = e.getCurrentItem();
@@ -162,7 +175,7 @@ public class Sabo_FixLights implements Listener {
 					e.setCancelled(true);
 				}
 			}
-		}
+	
 	}
 	/*
 	@EventHandler

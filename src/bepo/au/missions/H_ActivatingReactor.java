@@ -8,9 +8,9 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.Inventory;
 
-import bepo.au.Util;
 import bepo.au.base.Mission;
 import bepo.au.base.TimerBase;
+import bepo.au.utils.Util;
 
 public class H_ActivatingReactor extends Mission {
 

@@ -9,9 +9,9 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
-import bepo.au.Util;
 import bepo.au.base.Mission;
 import bepo.au.base.TimerBase;
+import bepo.au.utils.Util;
 
 public class H_EmptyGarbage extends Mission {
 

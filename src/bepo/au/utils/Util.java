@@ -1,4 +1,4 @@
-package bepo.au;
+package bepo.au.utils;
 
 import java.util.ArrayList;								
 import java.util.Arrays;								
