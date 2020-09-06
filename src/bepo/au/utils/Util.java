@@ -8,7 +8,9 @@ import java.util.Random;
 								
 import org.bukkit.Bukkit;								
 import org.bukkit.Color;								
-import org.bukkit.Material;								
+import org.bukkit.Material;
+import org.bukkit.OfflinePlayer;
+import org.bukkit.craftbukkit.v1_16_R2.inventory.CraftItemStack;
 import org.bukkit.entity.Player;								
 import org.bukkit.event.Listener;								
 import org.bukkit.inventory.Inventory;								
@@ -16,7 +18,12 @@ import org.bukkit.inventory.InventoryView;
 import org.bukkit.inventory.ItemFlag;								
 import org.bukkit.inventory.ItemStack;								
 import org.bukkit.inventory.meta.ItemMeta;								
-import org.bukkit.inventory.meta.PotionMeta;								
+import org.bukkit.inventory.meta.PotionMeta;
+import org.bukkit.inventory.meta.SkullMeta;
+
+import bepo.au.base.PlayerData;
+import net.minecraft.server.v1_16_R2.NBTTagCompound;
+import net.minecraft.server.v1_16_R2.NBTTagList;								
 								
 								
 								
@@ -84,7 +91,13 @@ public class Util implements Listener{
 		is.setItemMeta(isp);						
 		return is;						
 	}							
-								
+	public static ItemStack itemWithName(String name) {
+		ItemStack item = new ItemStack(Material.PLAYER_HEAD);
+		SkullMeta meta = (SkullMeta) item.getItemMeta();
+		meta.setOwningPlayer(Bukkit.getPlayer(name));
+		item.setItemMeta(meta);
+		return item;
+	}
 ////////////////////////////								
 	public static void giveItem(Player p, Material mat, int amount, String name, List<String> lore) {							
 		p.getInventory().addItem(createItem(mat, amount, name, lore));						

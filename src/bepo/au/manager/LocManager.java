@@ -25,6 +25,7 @@ import org.bukkit.entity.Player;
 
 public class LocManager {
 	String[] locList= {
+			"SEATS",
 			"FixWiring",
 			"DivertPower",
 			"EmptyGarbage","EmptyGarbageStorage",
@@ -49,7 +50,7 @@ public class LocManager {
 			};
 	
 	public String locationCommand ="locate";
-	private Map<String, ArrayList<Location>> LocationMap = new HashMap<String,ArrayList<Location>>();
+	private static Map<String, ArrayList<Location>> LocationMap = new HashMap<String,ArrayList<Location>>();
 	private FileConfiguration location;
 	private File file = new File("plugins/AmongUs/locations.yml");
 	
@@ -71,7 +72,7 @@ public class LocManager {
 	public void saveLocs() {
 		saveLocations();
 	}
-	public ArrayList<Location> getLoc(String locName) {
+	public static ArrayList<Location> getLoc(String locName) {
 		return LocationMap.get(locName);
 	}
 
