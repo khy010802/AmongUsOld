@@ -65,8 +65,24 @@ public class Util implements Listener{
 	}							
 								
 	public static void debugMessage(String message) {  //디버그메세지							
-		if (debug == true) Bukkit.broadcastMessage("[Debug]"+message);						
+		if (debug == true) Bukkit.broadcastMessage("[Debug]"+buildLogMsg(message));						
 	}							
+	public static String buildLogMsg(String message) {
+
+		StackTraceElement ste = Thread.currentThread().getStackTrace()[4];
+
+		StringBuilder sb = new StringBuilder();
+
+		sb.append("[");
+		sb.append(ste.getFileName().replace(".java", ""));
+		sb.append("::");
+		sb.append(ste.getMethodName());
+		sb.append("]");
+		sb.append(message);
+
+		return sb.toString();
+
+	}
 	public static boolean isDebug() {							
 		return debug;						
 	}							
