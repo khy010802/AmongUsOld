@@ -222,9 +222,11 @@ public class VoteSystem extends BukkitRunnable implements Listener  {
 		public void run() {
 			voteTimer--;
 			Util.Stack(gui, guiSize-2, Material.CLOCK,voteTimer/20, "남은시간 : "+voteTimer/20);
-			switch(voteTimer) {
+			switch(voteTimer) {//투표 종료 후 이벤트 관련
 			case 0:
 				timeover();
+			case -25://투표 완전 종료.
+				this.cancel();
 			}
 		}
 
