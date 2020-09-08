@@ -163,12 +163,16 @@ public class VoteSystem extends BukkitRunnable implements Listener  {
 			
 			if(voted=="SKIP") {
 				voteMap.get(voted).add(voter);
+				remainedVoter--;
 			}
 			else if(PlayerData.getPlayerData(voter).isAlive()) {
 				voteMap.get(voted).add(voter);
 				remainedVoter--;
 			}
 			else Util.debugMessage("죽은사람이 투표를 시도했습니다.");
+			if (remainedVoter==SURVIVERS.size()) {
+				voteover();
+			}
 		}
 		
 		/*
