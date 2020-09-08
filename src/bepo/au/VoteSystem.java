@@ -72,7 +72,7 @@ public class VoteSystem extends BukkitRunnable implements Listener  {
 		public void setGUI(Player p) { //투표할때 GUI용
 			guiSize=((DATALIST.size()+3)/9+1)*9; //플레이어 수에 따라 유동적으로 gui 크기 조절
 			int idx=0;
-			this.gui = Bukkit.createInventory(p, guiSize, "DistributePower");
+			this.gui = Bukkit.createInventory(p, guiSize, guiName);
 			voteMap= new HashMap<String, ArrayList<String>>();
 			for (PlayerData pd : DATALIST) {
 				String name = pd.getName();

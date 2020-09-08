@@ -4,7 +4,5 @@
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="lib" path="D:/빌드패스/Netherboard-Bukkit-1.2.1.jar"/>
 	<classpathentry kind="lib" path="D:/빌드패스/코어/patched_1.16.2.jar"/>
-	<classpathentry kind="lib" path="C:/Users/panto/Downloads/Netherboard-Bukkit-1.2.1.jar"/>
-	<classpathentry kind="lib" path="C:/Users/panto/OneDrive/바탕 화면/1.16.2 서버/cache/patched_1.16.2.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
