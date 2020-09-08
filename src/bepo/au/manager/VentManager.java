@@ -10,6 +10,8 @@ import org.bukkit.World;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 
+import bepo.au.Main;
+
 
 public class VentManager {
 	
@@ -102,6 +104,6 @@ public class VentManager {
 		x=Integer.parseInt(xyz[0]);
 		y=Integer.parseInt(xyz[1]);
 		z=Integer.parseInt(xyz[2]);
-		return new Location(Bukkit.getServer().getWorld("world"),x,y,z);
+		return new Location(Bukkit.getServer().getWorld(Main.WORLD_NAME),x,y,z);
 	}
 }
