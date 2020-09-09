@@ -11,7 +11,9 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.ArmorStand;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -41,6 +43,7 @@ public class VoteSystem extends BukkitRunnable implements Listener  {
 		private static ArrayList<String> VOTERS;
 		private static int remainedVoter;
 		private static int guiSize;
+		private static ArrayList<ArmorStand> armorstandList;
 		public static enum resultType {
 					
 					TIE,
@@ -133,6 +136,7 @@ public class VoteSystem extends BukkitRunnable implements Listener  {
 					arm.setInvulnerable(true);
 					arm.setCustomName("§7"+currentPlayer.getName());
 					arm.addScoreboardTag("forVote");
+					armorstandList.add(arm);
 					EntityEquipment armeq = arm.getEquipment();
 					
 					armeq.setHelmet(new ItemStack(Material.SKELETON_SKULL));
@@ -231,6 +235,9 @@ public class VoteSystem extends BukkitRunnable implements Listener  {
 			case 0:
 				timeover();
 			case -25://투표 완전 종료.
+				for (ArmorStand arm : armorstandList) {
+					arm.remove();
+				}
 				this.cancel();
 			}
 		}
