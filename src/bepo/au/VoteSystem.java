@@ -38,6 +38,7 @@ public class VoteSystem extends BukkitRunnable implements Listener  {
 		private static ArrayList<Location> SEATS;
 		private static List<PlayerData> DATALIST;
 		private static ArrayList<String> SURVIVERS;
+		private static ArrayList<String> VOTERS;
 		private static int remainedVoter;
 		private static int guiSize;
 		public static enum resultType {
@@ -64,6 +65,7 @@ public class VoteSystem extends BukkitRunnable implements Listener  {
 				if (pd.isAlive()) {SURVIVERS.add(pd.getName());}
 			}
 			remainedVoter=SURVIVERS.size();
+			VOTERS.clear();
 			setGUI(p);
 			setSeats();
 			this.runTaskTimer(main, 0L, 1L);
@@ -160,14 +162,17 @@ public class VoteSystem extends BukkitRunnable implements Listener  {
 		   */
 		private void putVoter(String voter, String voted) {
 			if(voteTimer<=0) return;
+			if(VOTERS.contains(voter)) return;
 			
 			if(voted=="SKIP") {
 				voteMap.get(voted).add(voter);
 				remainedVoter--;
+				VOTERS.add(voter);
 			}
 			else if(PlayerData.getPlayerData(voter).isAlive()) {
 				voteMap.get(voted).add(voter);
 				remainedVoter--;
+				VOTERS.add(voter);
 			}
 			else Util.debugMessage("죽은사람이 투표를 시도했습니다.");
 			if (remainedVoter==SURVIVERS.size()) {
