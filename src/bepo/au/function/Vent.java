@@ -1,4 +1,4 @@
-package bepo.au.manager;
+package bepo.au.function;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -11,7 +11,7 @@ import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 
 
-public class VentManager {
+public class Vent {
 	
 	private HashMap<String, Location> ventLocations = new HashMap<String, Location>();
 	private HashMap<String, ArrayList<String>> ventDestinations = new HashMap<String,ArrayList<String>>();

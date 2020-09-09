@@ -1,4 +1,4 @@
-package bepo.au;
+package bepo.au.function;
 
 import java.util.ArrayList;
 
@@ -17,12 +17,15 @@ import org.bukkit.inventory.meta.LeatherArmorMeta;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
+import bepo.au.base.TimerBase;
+import bepo.au.utils.Util;
+
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.EntityType;
 
-public class CCTV implements Listener {
+public class Cctv implements Listener {
 	
-	ArrayList<CCTV> cctvList;
+	ArrayList<Cctv> cctvList;
 	
 	CCTVTimer Timer = new CCTVTimer();
 	Player P;
