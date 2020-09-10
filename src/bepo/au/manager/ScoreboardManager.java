@@ -47,7 +47,7 @@ public class ScoreboardManager implements AssembleAdapter{
 			boolean imposter = GameTimer.IMPOSTER.contains(player.getName());
 			
 			if(imposter) {
-				line.add("§7하단 미션은 위장용 미션입니다.");
+				line.add("§7하단 미션은 위장용 미션입니다. ㅇㅇ");
 			}
 			
 			if(alive) {
