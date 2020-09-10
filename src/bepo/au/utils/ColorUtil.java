@@ -1,6 +1,5 @@
 package bepo.au.utils;
 
-import org.bukkit.Color;
 import org.bukkit.DyeColor;
 import org.bukkit.ChatColor;
 

@@ -131,6 +131,11 @@ public abstract class Sabotage extends Mission {
 	public static final boolean isActivating(int id) {
 		return Remain_Tick[0] > 0 || Remain_Tick[id] > 0;
 	}
+	
+	@Override
+	public String getScoreboardMessage() {
+		return "¡×c" + getKoreanName();
+	}
 
 	public final SaboType getType() {
 		return this.type;

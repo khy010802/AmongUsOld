@@ -9,8 +9,6 @@ import org.bukkit.ChatColor;
 import org.bukkit.Color;
 import org.bukkit.entity.Player;
 
-import fr.minuskube.netherboard.bukkit.BPlayerBoard;
-
 public class PlayerData {
 	
 	private static HashMap<String, PlayerData> PLAYERDATA = new HashMap<String, PlayerData>();
@@ -29,16 +27,11 @@ public class PlayerData {
 	private Color color;
 	private ChatColor chatcolor;
 	
-	private boolean isImposter = false;
-	
 	private boolean survive = true;
-	
-	private int workID = 0;
 	
 	private List<Mission> missions = new ArrayList<Mission>();
 	
-	private BPlayerBoard board;
-	private int score = 15;
+	private List<String> scoreboard_line = new ArrayList<String>();
 	
 	public PlayerData(String name) {
 		this.name = name;
@@ -46,23 +39,23 @@ public class PlayerData {
 	}
 	
 	public String getName() { return this.name; }
-	public boolean isImposter() { return this.isImposter; }
 	public Color getColor() { return this.color; }
 	public ChatColor getChatColor() { return this.chatcolor; }
-	public int getWorkID() { return this.workID; }
 	public boolean isAlive() { return this.survive; }
-	public BPlayerBoard getBoard() { return this.board; }
 	
 	public List<Mission> getMissions() { return this.getMissions(); }
-	
-	public void setImposter() { this.isImposter = true; }
+
 	public void setColor(Color c) { this.color = c; }
 	public void setChatColor(ChatColor c) { this.chatcolor = c; }
-	public void setWorkID(int id) { this.workID = id; }
 	
 	public void addLine(String line) {
-		board.set(line, score);
-		score--;
+		scoreboard_line.add(line);
+	}
+	
+	public void setLine(int i, String line) {
+		if(scoreboard_line.size() > i) {
+			if(!scoreboard_line.get(i-1).equals(line)) scoreboard_line.set(i-1, line);
+		}
 	}
 	
 	public void addMission(Player p, Mission m) {
@@ -70,7 +63,6 @@ public class PlayerData {
 		if(p != null) m.onAssigned(p);
 		else if(Bukkit.getPlayer(name) != null) m.onAssigned(Bukkit.getPlayer(name));
 		
-		addLine(m.getKoreanName() + (m.getRequiredClear() > 1 ? "(0/" + m.getRequiredClear() + ")" : ""));
 		missions.add(m);
 		
 	}

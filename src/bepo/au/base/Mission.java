@@ -109,6 +109,15 @@ public abstract class Mission implements Listener{
 	public List<String> getTitles() { return gui_title; }
 	public int getRequiredClear() { return this.required_clear; }
 	
+	public String getScoreboardMessage() {
+		String s = getKoreanName() + (getRequiredClear() > 1 ? "(0/" + getRequiredClear() + ")" : "");
+		if(cleared.size() > 0) {
+			if(cleared.size() < required_clear) s = "§e" + s;
+			else s = "§a" + s;
+		}
+		return s;
+	}
+	
 	public final Player getPlayer() {
 		return Bukkit.getPlayer(playername);
 	}
@@ -144,7 +153,7 @@ public abstract class Mission implements Listener{
 		p.closeInventory();
 		p.sendMessage(Main.PREFIX + "임무 완료!");
 		PlayerData pd = PlayerData.getPlayerData(p.getName());
-		if(pd != null && !pd.isImposter()) {
+		if(pd != null && cleared.size() == required_clear && !GameTimer.IMPOSTER.contains(p.getName())) {
 			GameTimer.CLEARED_MISSION++;
 			
 			if(GameTimer.CLEARED_MISSION == GameTimer.REQUIRED_MISSION) {

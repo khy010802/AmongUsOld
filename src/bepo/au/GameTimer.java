@@ -47,7 +47,7 @@ public class GameTimer extends BukkitRunnable{
 
 	public static List<String> OBSERVER = new ArrayList<String>();
 	public static List<String> PLAYERS = new ArrayList<String>();
-	public static int IMPOSETER_LEFT = 0;
+	public static List<String> IMPOSTER = new ArrayList<String>();
 	
 	public static int REQUIRED_MISSION = 0;
 	public static int CLEARED_MISSION = 0;
@@ -61,7 +61,16 @@ public class GameTimer extends BukkitRunnable{
 		
 	}
 	
+	public static final int getRemainImposter() {
+		int i = 0;
+		for(String name : IMPOSTER) {
+			if(PlayerData.getPlayerData(name) != null && PlayerData.getPlayerData(name).isAlive()) i++;
+		}
+		return i;
+	}
+	
 	public Status getStatus() { return this.status; }
+	
 	
 	public void start(Player p) {
 		reset();
@@ -112,13 +121,13 @@ public class GameTimer extends BukkitRunnable{
 			String name = PLAYERS.get(i);
 			PlayerData pd = new PlayerData(name);
 			if(i < Main.IMPOSTER_AMOUNT) {
-				pd.setImposter();
+				IMPOSTER.add(name);
 				imposter = imposter + name + " ";
 			}
 			pd.setColor(COLORS.get(i));
 			pd.setChatColor(CHATCOLORS.get(i));
 		}
-		GameTimer.IMPOSETER_LEFT = Main.IMPOSTER_AMOUNT;
+		
 		give_item(imposter);
 	}
 	
@@ -144,7 +153,7 @@ public class GameTimer extends BukkitRunnable{
 			}
 			p.getInventory().setArmorContents(ac);
 			
-			if(pd.isImposter()) {
+			if(IMPOSTER.contains(p.getName())) {
 				p.sendTitle("§4§l임포스터", "§c모든 크루원을 죽이십시오", 10, 100, 10);
 				p.sendMessage("§f=======================");
 				p.sendMessage("§4당신은 임포스터입니다.");
@@ -173,27 +182,27 @@ public class GameTimer extends BukkitRunnable{
 	private void random_mission(Player p) {
 		PlayerData pd = PlayerData.getPlayerData(p.getName());
 		
-		List<Integer> missions = new ArrayList<Integer>();
+		if(IMPOSTER.contains(p.getName())) {
+			pd.addLine("");
+		}
+
 		
 		if(Main.EASY_MISSION_AMOUNT > 0) {
-			int[] a_easy = Util.difrandom(0, 7, 3);
-			Collections.shuffle(missions);
-			
-			
+			int[] a_easy = Util.difrandom(0, MissionList.EASY.size(), Main.EASY_MISSION_AMOUNT);
+			for(int index=0;index<a_easy.length;index++) pd.addMission(p, MissionList.EASY.get(a_easy[index]).getClone());
 		}
 		
-		
-		
-		
-		assemble.start(2L);
-		if(pd.isImposter()) {
-			pd.addLine("§c하단 미션은 위장용 미션입니다.");
-			pd.addLine("§a");
+		if(Main.HARD_MISSION_AMOUNT > 0) {
+			int[] a_hard = Util.difrandom(0, MissionList.HARD.size(), Main.HARD_MISSION_AMOUNT);
+			for(int index=0;index<a_hard.length;index++) pd.addMission(p, MissionList.HARD.get(a_hard[index]).getClone());
 		}
 		
-		for(int i=0;i<Main.EASY_MISSION_AMOUNT;i++) {
-			pd.addMission(p, MissionList.EASY.get(missions.get(i)).getClone());
+		if(Main.COMMON_MISSION_AMOUNT > 0) {
+			int[] a_common = Util.difrandom(0, MissionList.COMMON.size(), Main.COMMON_MISSION_AMOUNT);
+			for(int index=0;index<a_common.length;index++) pd.addMission(p, MissionList.COMMON.get(a_common[index]).getClone());
 		}
+		
+		assemble.start(5L);
 	}
 	
 	

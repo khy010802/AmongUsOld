@@ -27,6 +27,7 @@ import org.bukkit.inventory.meta.LeatherArmorMeta;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
+import bepo.au.GameTimer;
 import bepo.au.Main;
 import bepo.au.base.PlayerData;
 import bepo.au.manager.LocManager;
@@ -86,8 +87,8 @@ public class VoteSystem extends BukkitRunnable implements Listener  {
 				ItemMeta meta=item.getItemMeta();
 				voteMap.put(pd.getName(), new ArrayList<String>());
 				
-				isImposter=PlayerData.getPlayerData(p.getDisplayName()).isImposter();//임포스터일시 서로 구별용
-				if (isImposter&&pd.isImposter()) {
+				isImposter=GameTimer.IMPOSTER.contains(p.getName());//임포스터일시 서로 구별용
+				if (isImposter&& GameTimer.IMPOSTER.contains(p.getName())) {
 					meta.setDisplayName("§4"+name);
 					meta.addEnchant(Enchantment.MENDING, idx, true);
 					meta.addItemFlags(ItemFlag.HIDE_ENCHANTS);		
