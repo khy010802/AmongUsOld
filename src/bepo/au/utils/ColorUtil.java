@@ -1,10 +1,13 @@
 package bepo.au.utils;
 
 import org.bukkit.DyeColor;
+
+import java.util.ArrayList;
+
 import org.bukkit.ChatColor;
 
-public class ColorUtil {
-	enum Color{
+
+	public enum ColorUtil{
 	  BLACK(DyeColor.BLACK, ChatColor.BLACK), 
 	  BLUE(DyeColor.BLUE, ChatColor.BLUE), 
 	  BROWN(DyeColor.BROWN, ChatColor.DARK_RED), 
@@ -24,7 +27,7 @@ public class ColorUtil {
 		private final DyeColor dyecolor;
 		private final ChatColor chatcolor;
 		
-		private Color(DyeColor dyecolor, ChatColor chatcolor) {
+		private ColorUtil(DyeColor dyecolor, ChatColor chatcolor) {
 			this.dyecolor = dyecolor;
 			this.chatcolor = chatcolor;
 		}
@@ -35,7 +38,8 @@ public class ColorUtil {
 
 		public ChatColor getChatColor() {
 			return this.chatcolor;
-		}
+		}	
 		
 	}
-}
+
+
