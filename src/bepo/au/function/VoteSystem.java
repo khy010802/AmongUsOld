@@ -1,4 +1,4 @@
-package bepo.au;
+package bepo.au.function;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -27,6 +27,7 @@ import org.bukkit.inventory.meta.LeatherArmorMeta;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
+import bepo.au.Main;
 import bepo.au.base.PlayerData;
 import bepo.au.manager.LocManager;
 import bepo.au.utils.Util;
