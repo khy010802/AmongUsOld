@@ -9,8 +9,6 @@ import org.bukkit.ChatColor;
 import org.bukkit.Color;
 import org.bukkit.entity.Player;
 
-import bepo.au.Main;
-import fr.minuskube.netherboard.Netherboard;
 import fr.minuskube.netherboard.bukkit.BPlayerBoard;
 
 public class PlayerData {
@@ -24,6 +22,8 @@ public class PlayerData {
 	public static List<PlayerData> getPlayerDataList(){
 		return new ArrayList<PlayerData>(PLAYERDATA.values());
 	}
+	
+	
 	
 	private String name;
 	private Color color;
@@ -59,14 +59,6 @@ public class PlayerData {
 	public void setColor(Color c) { this.color = c; }
 	public void setChatColor(ChatColor c) { this.chatcolor = c; }
 	public void setWorkID(int id) { this.workID = id; }
-	
-	public void registerBoard() {
-		board = Netherboard.instance().createBoard(Bukkit.getPlayer(name), Main.MAIN_SCOREBOARD, "AMONG US");
-	}
-	
-	public void modifyLine(int line, String string) {
-		board.set(string, 11-line);
-	}
 	
 	public void addLine(String line) {
 		board.set(line, score);

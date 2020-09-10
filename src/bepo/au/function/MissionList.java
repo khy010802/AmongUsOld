@@ -1,4 +1,4 @@
-package bepo.au;
+package bepo.au.function;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -31,7 +31,7 @@ public class MissionList {
 	public final static E_DivertPower divertpower =			new E_DivertPower(MissionType.EASY, "DivertPower", "에너지 전환하기", 2, (Location) null);
 	public final static E_DistributePower distributepower =	new E_DistributePower(MissionType.EASY, "DistributePower", "배전기 조정하기", 1, (Location) null);
 	public final static E_OpenManifold openmanifold =		new E_OpenManifold(MissionType.EASY, "OpenManifold", "매니폴드 열기", 1, (Location) null);
-	//public final static E_Data data =								new E_Data(MissionType.EASY, "데이터 전송하기", "Data", 2, (Location) null);
+	public final static E_Data data =								new E_Data(MissionType.EASY, "Data", "데이터 전송하기", 2, (Location) null);
 	 
 	// HARD 7개
 	public final static H_InspectSample inspectsample = 	new H_InspectSample(MissionType.HARD, "InspectSample", "샘플 분석", 1, (Location) null);

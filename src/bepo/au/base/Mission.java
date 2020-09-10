@@ -23,7 +23,7 @@ import org.bukkit.inventory.meta.ItemMeta;
 
 import bepo.au.GameTimer;
 import bepo.au.Main;
-import bepo.au.MissionList;
+import bepo.au.function.MissionList;
 import bepo.au.manager.EventManager;
 
 public abstract class Mission implements Listener{

@@ -7,13 +7,13 @@ import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.bukkit.scoreboard.Scoreboard;
-import org.bukkit.scoreboard.Team;
-import org.bukkit.scoreboard.Team.Option;
-import org.bukkit.scoreboard.Team.OptionStatus;
 
 import bepo.au.base.Mission;
+import bepo.au.function.MissionList;
 import bepo.au.manager.CommandManager;
+import bepo.au.manager.ScoreboardManager;
+import io.github.thatkawaiisam.assemble.Assemble;
+import io.github.thatkawaiisam.assemble.AssembleStyle;
 
 public class Main extends JavaPlugin implements Listener{
 	
@@ -22,9 +22,6 @@ public class Main extends JavaPlugin implements Listener{
 	public static GameTimer gt = null;
 	private static Main main;
 	public CommandManager cm;
-	
-	public static Scoreboard MAIN_SCOREBOARD;
-	public static Team MAIN_TEAM;
 	
 	public static String WORLD_NAME = "world";
 	public static World w;
@@ -45,8 +42,7 @@ public class Main extends JavaPlugin implements Listener{
 	
 	public static int MISSION_DIFFICULTY = 5;
 	public static int IMPOSTER_AMOUNT = 2;
-	
-	public static List<String> OBSERVER = new ArrayList<String>();
+
 	
 	public static Main getInstance() {
 		return main;
@@ -55,17 +51,6 @@ public class Main extends JavaPlugin implements Listener{
 	public void onEnable() {
 		main = this;
 		w = Bukkit.getWorld(WORLD_NAME);
-		
-		MAIN_SCOREBOARD = Bukkit.getScoreboardManager().getMainScoreboard();
-		
-		if(MAIN_SCOREBOARD.getTeam("amongus") == null) {
-			Team t = MAIN_SCOREBOARD.registerNewTeam("amongus");
-			t.setAllowFriendlyFire(true);
-			t.setCanSeeFriendlyInvisibles(false);
-			t.setOption(Option.NAME_TAG_VISIBILITY, OptionStatus.NEVER);
-			t.setOption(Option.COLLISION_RULE, OptionStatus.NEVER);
-		}
-		MAIN_TEAM = MAIN_SCOREBOARD.getTeam("amongus");
 		
 		for(Mission m : MissionList.EASY) {
 			Bukkit.getConsoleSender().sendMessage(m.getMissionName());
