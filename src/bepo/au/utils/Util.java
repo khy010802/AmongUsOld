@@ -40,7 +40,11 @@ public class Util implements Listener{
 		ArrayList<Integer> numbers = new ArrayList<Integer>();						
 		for (int num = min; num<=max ; num++) numbers.add(num);						
 		Collections.shuffle(numbers);
-		return Arrays.stream(numbers.toArray(new Integer[numbers.size()])).mapToInt(Integer::intValue).toArray();						
+		int[] a_int = new int[length];
+		for(int i=0;i<a_int.length;i++) {
+			a_int[i] = numbers.get(i);
+		}
+		return a_int;	
 								
 	}							
 								

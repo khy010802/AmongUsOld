@@ -19,6 +19,7 @@ import bepo.au.base.Mission;
 import bepo.au.base.PlayerData;
 import bepo.au.function.MissionList;
 import bepo.au.manager.ScoreboardManager;
+import bepo.au.utils.Util;
 import io.github.thatkawaiisam.assemble.Assemble;
 import io.github.thatkawaiisam.assemble.AssembleStyle;
 
@@ -77,7 +78,7 @@ public class GameTimer extends BukkitRunnable{
 	
 	private void setting() {
 		for(Player ap : Bukkit.getOnlinePlayers()) {
-			if(!Main.OBSERVER.contains(ap.getName().toLowerCase())) {
+			if(!GameTimer.OBSERVER.contains(ap.getName().toLowerCase())) {
 				PLAYERS.add(ap.getName());
 				ap.getInventory().clear();
 				ap.setExp(0F);
@@ -175,9 +176,7 @@ public class GameTimer extends BukkitRunnable{
 		List<Integer> missions = new ArrayList<Integer>();
 		
 		if(Main.EASY_MISSION_AMOUNT > 0) {
-			for(int id=1;id<MissionList.EASY.size();id++) {
-				missions.add(id);
-			}
+			int[] a_easy = Util.difrandom(0, 7, 3);
 			Collections.shuffle(missions);
 			
 			
