@@ -44,10 +44,11 @@ public class Util implements Listener{
 		for(int i=0;i<a_int.length;i++) {
 			a_int[i] = numbers.get(i);
 		}
-		return a_int;	
-								
-	}							
-								
+		return a_int;					
+	}
+	public static int[] difrandom(int min, int max) {	
+		return difrandom(min, max, max-min+1);
+	}
 	public static void fillAround(Inventory inv, int slot, Material item){//gui ฐüทร
 		int Slot;
 		for (int i=-1;i<2;i++) {
