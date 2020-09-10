@@ -86,11 +86,11 @@ public class CommandManager implements CommandExecutor{
 		String name = args[1].toLowerCase();
 		String s = player ? "참가자" : "관전자";
 		
-		if(player && Main.OBSERVER.contains(name)) {
-			Main.OBSERVER.remove(name);
+		if(player && GameTimer.OBSERVER.contains(name)) {
+			GameTimer.OBSERVER.remove(name);
 			p.sendMessage(Main.PREFIX + "§f" + args[1] + " 님을 관전자에서 제거했습니다.");
-		} else if(!player && !Main.OBSERVER.contains(name)) {
-			Main.OBSERVER.add(name);
+		} else if(!player && !GameTimer.OBSERVER.contains(name)) {
+			GameTimer.OBSERVER.add(name);
 			p.sendMessage(Main.PREFIX + "§f" + args[1] + " 님을 관전자에 추가했습니다.");
 		} else {
 			p.sendMessage(Main.PREFIX + "§c이미 " + args[1] + "님은 " + s + "에 등록되어있습니다.");
