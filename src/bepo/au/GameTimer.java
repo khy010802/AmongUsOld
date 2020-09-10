@@ -17,6 +17,10 @@ import org.bukkit.scheduler.BukkitRunnable;
 
 import bepo.au.base.Mission;
 import bepo.au.base.PlayerData;
+import bepo.au.function.MissionList;
+import bepo.au.manager.ScoreboardManager;
+import io.github.thatkawaiisam.assemble.Assemble;
+import io.github.thatkawaiisam.assemble.AssembleStyle;
 
 public class GameTimer extends BukkitRunnable{
 	
@@ -39,15 +43,21 @@ public class GameTimer extends BukkitRunnable{
 	
 	private Status status = Status.READY;
 	private boolean pause = false;
-	
+
+	public static List<String> OBSERVER = new ArrayList<String>();
 	public static List<String> PLAYERS = new ArrayList<String>();
 	public static int IMPOSETER_LEFT = 0;
 	
 	public static int REQUIRED_MISSION = 0;
 	public static int CLEARED_MISSION = 0;
 	
+	private Assemble assemble;
+	
 	public GameTimer(Main main) {
 		this.main = main;
+		assemble = new Assemble(main, new ScoreboardManager());
+		assemble.setAssembleStyle(AssembleStyle.VIPER);
+		
 	}
 	
 	public Status getStatus() { return this.status; }
@@ -163,13 +173,20 @@ public class GameTimer extends BukkitRunnable{
 		PlayerData pd = PlayerData.getPlayerData(p.getName());
 		
 		List<Integer> missions = new ArrayList<Integer>();
-		for(int id=1;id<MissionList.EASY.size();id++) {
-			missions.add(id);
+		
+		if(Main.EASY_MISSION_AMOUNT > 0) {
+			for(int id=1;id<MissionList.EASY.size();id++) {
+				missions.add(id);
+			}
+			Collections.shuffle(missions);
+			
+			
 		}
 		
-		Collections.shuffle(missions);
 		
-		pd.registerBoard();
+		
+		
+		assemble.start(2L);
 		if(pd.isImposter()) {
 			pd.addLine("§c하단 미션은 위장용 미션입니다.");
 			pd.addLine("§a");

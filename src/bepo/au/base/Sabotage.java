@@ -7,7 +7,7 @@ import org.bukkit.event.inventory.InventoryCloseEvent.Reason;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import bepo.au.Main;
-import bepo.au.MissionList;
+import bepo.au.function.MissionList;
 
 public abstract class Sabotage extends Mission {
 
