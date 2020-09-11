@@ -34,10 +34,8 @@ public class ScoreboardManager implements AssembleAdapter{
 			line.add("§7당신은 관전자입니다.");
 			line.add("§f");
 			line.add("생존한 임포스터 (" + GameTimer.getRemainImposter() + "명)");
-			for(String name : GameTimer.IMPOSTER) {
-				if(PlayerData.getPlayerData(name) != null) {
-					line.add(PlayerData.getPlayerData(name).getChatColor() + (PlayerData.getPlayerData(name).isAlive() ? "" : "§n") + name);
-				}
+			for(String name : GameTimer.ALIVE_IMPOSTERS) {
+				line.add(PlayerData.getPlayerData(name).getColor().getChatColor() + name);
 			}
 			line.add("§f ");
 			line.add("일과 진행도 " + GameTimer.CLEARED_MISSION + "/" + GameTimer.REQUIRED_MISSION);
@@ -47,7 +45,7 @@ public class ScoreboardManager implements AssembleAdapter{
 			boolean imposter = GameTimer.IMPOSTER.contains(player.getName());
 			
 			if(imposter) {
-				line.add("§7하단 미션은 위장용 미션입니다. ㅇㅇ");
+				line.add("§7하단 미션은 위장용 미션입니다.");
 			}
 			
 			if(alive) {

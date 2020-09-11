@@ -3,11 +3,15 @@ package bepo.au.base;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.UUID;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Color;
 import org.bukkit.entity.Player;
+
+import bepo.au.Main;
+import bepo.au.utils.ColorUtil;
 
 public class PlayerData {
 	
@@ -21,11 +25,13 @@ public class PlayerData {
 		return new ArrayList<PlayerData>(PLAYERDATA.values());
 	}
 	
-	
+	//임포 전용
+	private int kill_remain_tick = 100;
+	private int emerg_remain_time = 1;
 	
 	private String name;
-	private Color color;
-	private ChatColor chatcolor;
+	private UUID uuid;
+	private ColorUtil color;
 	
 	private boolean survive = true;
 	
@@ -33,20 +39,28 @@ public class PlayerData {
 	
 	private List<String> scoreboard_line = new ArrayList<String>();
 	
-	public PlayerData(String name) {
+	public PlayerData(String name, UUID uuid) {
 		this.name = name;
+		this.uuid = uuid;
 		PLAYERDATA.put(name.toLowerCase(), this);
+		emerg_remain_time = Main.EMER_BUTTON_PER_PLAYER;
 	}
 	
 	public String getName() { return this.name; }
-	public Color getColor() { return this.color; }
-	public ChatColor getChatColor() { return this.chatcolor; }
+	public UUID getUUID() { return this.uuid; }
+	public ColorUtil getColor() { return this.color; }
 	public boolean isAlive() { return this.survive; }
+	
+	public int getRemainEmerg() { return this.emerg_remain_time; }
+	public void subtractRemainEmerg() { this.emerg_remain_time--; }
+	
+	public int getKillCool() { return this.kill_remain_tick; }
+	public void resetKillCool(boolean after_vote) { this.kill_remain_tick = after_vote ? 100 : Main.KILL_COOLTIME_SEC * 20; }
+	public void subtractKillCool() { if(this.kill_remain_tick > 0) this.kill_remain_tick--; }
 	
 	public List<Mission> getMissions() { return this.getMissions(); }
 
-	public void setColor(Color c) { this.color = c; }
-	public void setChatColor(ChatColor c) { this.chatcolor = c; }
+	public void setColor(ColorUtil c) { this.color = c; }
 	
 	public void addLine(String line) {
 		scoreboard_line.add(line);

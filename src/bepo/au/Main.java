@@ -1,8 +1,5 @@
 package bepo.au;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.event.Listener;
@@ -11,9 +8,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 import bepo.au.base.Mission;
 import bepo.au.function.MissionList;
 import bepo.au.manager.CommandManager;
-import bepo.au.manager.ScoreboardManager;
-import io.github.thatkawaiisam.assemble.Assemble;
-import io.github.thatkawaiisam.assemble.AssembleStyle;
+import bepo.au.manager.EventManager;
 
 public class Main extends JavaPlugin implements Listener{
 	
@@ -22,6 +17,7 @@ public class Main extends JavaPlugin implements Listener{
 	public static GameTimer gt = null;
 	private static Main main;
 	public CommandManager cm;
+	private static EventManager em;
 	
 	public static String WORLD_NAME = "world";
 	public static World w;
@@ -48,6 +44,10 @@ public class Main extends JavaPlugin implements Listener{
 		return main;
 	}
 	
+	public static EventManager getEventManager() {
+		return em;
+	}
+	
 	public void onEnable() {
 		main = this;
 		w = Bukkit.getWorld(WORLD_NAME);
@@ -63,6 +63,7 @@ public class Main extends JavaPlugin implements Listener{
 		}
 		
 		cm = new CommandManager();
+		em = new EventManager();
 		
 		getCommand("au").setExecutor(cm);
 		

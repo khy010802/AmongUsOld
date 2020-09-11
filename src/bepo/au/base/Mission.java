@@ -25,6 +25,8 @@ import bepo.au.GameTimer;
 import bepo.au.Main;
 import bepo.au.function.MissionList;
 import bepo.au.manager.EventManager;
+import bepo.au.utils.ColorUtil;
+import bepo.au.utils.PlayerUtil;
 
 public abstract class Mission implements Listener{
 	
@@ -116,6 +118,15 @@ public abstract class Mission implements Listener{
 			else s = "¡×a" + s;
 		}
 		return s;
+	}
+	
+	public final void shinePosition() {
+		if(getPlayer() == null) return;
+		for(int i=0;i<locs.length;i++) {
+			if(!cleared.contains((Integer) i)) {
+				PlayerUtil.spawnGlowingBlock(getPlayer(), locs[i], this instanceof Sabotage ? ColorUtil.RED : ColorUtil.WHITE);
+			}
+		}
 	}
 	
 	public final Player getPlayer() {

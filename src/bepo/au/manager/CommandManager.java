@@ -8,7 +8,8 @@ import org.bukkit.entity.Player;
 
 import bepo.au.GameTimer;
 import bepo.au.Main;
-import bepo.au.base.Mission;
+import bepo.au.utils.ColorUtil;
+import bepo.au.utils.PlayerUtil;
 
 public class CommandManager implements CommandExecutor{
 
@@ -45,13 +46,8 @@ public class CommandManager implements CommandExecutor{
 	}
 	
 	private void debug(Player p, String[] args) {
-		if(args.length == 1) {
-			Mission.activateMissions();
-			return;
-		}
-		Mission m = Mission.getMission(args[1]);
-		m.onAssigned(p);
-		m.onStart(p, Integer.parseInt(args[2]));
+		PlayerUtil.resetGlowingBlock(p);
+		PlayerUtil.spawnGlowingBlock(p, p.getLocation(), ColorUtil.GREEN);
 	}
 	
 	private void config(Player p) {

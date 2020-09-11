@@ -4,8 +4,9 @@ import java.util.ArrayList;
 import java.util.Arrays;								
 import java.util.Collections;								
 import java.util.List;								
-import java.util.Random;								
-								
+import java.util.Random;
+import java.util.UUID;
+
 import org.bukkit.Bukkit;								
 import org.bukkit.Color;								
 import org.bukkit.Material;
@@ -93,7 +94,19 @@ public class Util implements Listener{
 	}							
 	public static void setDebug(boolean debug) {							
 		Util.debug = debug;						
-	}							
+	}
+	
+	public static ItemStack createHead(String name) {
+		ItemStack is = new ItemStack(Material.PLAYER_HEAD);
+		SkullMeta sm = (SkullMeta) is.getItemMeta();
+		UUID uuid = null;
+		if(Bukkit.getPlayer(name) != null) uuid = Bukkit.getPlayer(name).getUniqueId();
+		else if(PlayerData.getPlayerData(name) != null) uuid = PlayerData.getPlayerData(name).getUUID();
+		if(uuid == null) return new ItemStack(Material.AIR);
+		sm.setOwningPlayer(Bukkit.getOfflinePlayer(uuid));
+		is.setItemMeta(sm);
+		return is;
+	}
 								
 	public static ItemStack createItem(Material mat, int amount, String name, List<String> lore) {							
 		ItemStack is = new ItemStack(mat, amount);						

@@ -26,6 +26,10 @@ import org.bukkit.entity.Player;
 public class LocManager {
 	String[] locList= {
 			"SEATS",
+			"EmergencyButton",
+			"ImposterNotice",
+			"ImposterNoticeArmorStand",
+			"Desk",
 			"FixWiring",
 			"DivertPower",
 			"EmptyGarbage","EmptyGarbageStorage",
@@ -103,11 +107,13 @@ public class LocManager {
 
 	private void saveLocations() {
 		location = YamlConfiguration.loadConfiguration(file);
+		
 		try {
 			 for( String key : LocationMap.keySet() ){
+				 boolean yawpitch = key.equalsIgnoreCase("SEATS") || key.contains("ImposterNotice") || key.equalsIgnoreCase("Desk");
 				 String value = "";
 				for(Location loc: LocationMap.get(key)) {
-					value=value+LocationToCoor(loc)+"/";
+					value=value+LocationToCoor(loc, yawpitch)+"/";
 				}
 				location.set(key, value);
 				}
@@ -124,10 +130,11 @@ public class LocManager {
 	}
 	private void saveALocation(String locName) {
 		location = YamlConfiguration.loadConfiguration(file);
+		boolean yawpitch = locName.equalsIgnoreCase("SEATS") || locName.contains("ImposterNotice") || locName.equalsIgnoreCase("Desk");
 		try { 
 			 String value = "";
 			for(Location loc: LocationMap.get(locName)) {
-				value=value+LocationToCoor(loc)+"/";
+				value=value+LocationToCoor(loc, yawpitch)+"/";
 			}
 			location.set(locName, value);
 			location.save(file);
@@ -136,17 +143,23 @@ public class LocManager {
 		}
 	}
 	
-	private String LocationToCoor(Location loc) {
-		String coor = loc.getX()+","+loc.getY()+","+loc.getZ();
+	private String LocationToCoor(Location loc, boolean yawpitch) {
+		String coor = loc.getX()+","+loc.getY()+","+loc.getZ() + (yawpitch ? "," + loc.getYaw() +"," + loc.getPitch() : "");
 		return coor;
 	}
 	private Location StringToLoc(String str) {
 		int x,y,z;
+		float yaw = 0F, pitch = 0F;
 		String[] xyz=str.split(",");
 		x=Integer.parseInt(xyz[0]);
 		y=Integer.parseInt(xyz[1]);
 		z=Integer.parseInt(xyz[2]);
-		return new Location(Bukkit.getServer().getWorld("world"),x,y,z);
+		if(xyz.length > 3) {
+			yaw = Float.parseFloat(xyz[3]);
+			pitch = Float.parseFloat(xyz[4]);
+		}
+		
+		return new Location(Bukkit.getServer().getWorld("world"),x,y,z,yaw,pitch);
 	}
 	
 	public List<String> onTabComplete(CommandSender sender, Command command, String alias, String[] args) {

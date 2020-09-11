@@ -1,16 +1,14 @@
 package bepo.au;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
-import org.bukkit.Color;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
+import org.bukkit.event.HandlerList;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.LeatherArmorMeta;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -19,6 +17,8 @@ import bepo.au.base.Mission;
 import bepo.au.base.PlayerData;
 import bepo.au.function.MissionList;
 import bepo.au.manager.ScoreboardManager;
+import bepo.au.utils.ColorUtil;
+import bepo.au.utils.PlayerUtil;
 import bepo.au.utils.Util;
 import io.github.thatkawaiisam.assemble.Assemble;
 import io.github.thatkawaiisam.assemble.AssembleStyle;
@@ -33,10 +33,8 @@ public class GameTimer extends BukkitRunnable{
 		END;
 	}
 	
-	public Color[] COLORLIST 			= { Color.AQUA, Color.BLUE, Color.GRAY, Color.GREEN, Color.ORANGE, Color.PURPLE, Color.RED, Color.WHITE, Color.YELLOW, Color.SILVER, Color.NAVY, Color.TEAL };
-	public ChatColor[] CHATCOLORLIST 	= { ChatColor.AQUA, ChatColor.BLUE, ChatColor.DARK_GRAY, ChatColor.GOLD, ChatColor.DARK_PURPLE, ChatColor.WHITE, ChatColor.YELLOW, ChatColor.GRAY, ChatColor.BLUE };
-	public List<Color> COLORS = new ArrayList<Color>();
-	public List<ChatColor> CHATCOLORS = new ArrayList<ChatColor>();
+	public final ColorUtil[] COLORLIST 			= { ColorUtil.CYAN, ColorUtil.BLUE, ColorUtil.GRAY, ColorUtil.GREEN, ColorUtil.ORANGE, ColorUtil.PURPLE, ColorUtil.RED, ColorUtil.WHITE, ColorUtil.YELLOW, ColorUtil.PINK, ColorUtil.YELLOW, ColorUtil.LIGHT_GRAY };
+	public List<ColorUtil> COLORS = new ArrayList<ColorUtil>();
 	
 	private int timer = 0;
 	
@@ -49,8 +47,12 @@ public class GameTimer extends BukkitRunnable{
 	public static List<String> PLAYERS = new ArrayList<String>();
 	public static List<String> IMPOSTER = new ArrayList<String>();
 	
+	public static List<String> ALIVE_IMPOSTERS = new ArrayList<String>();
+	
 	public static int REQUIRED_MISSION = 0;
 	public static int CLEARED_MISSION = 0;
+	
+	public static int EMERG_REMAIN_TICK = 0;
 	
 	private Assemble assemble;
 	
@@ -70,6 +72,7 @@ public class GameTimer extends BukkitRunnable{
 	}
 	
 	public Status getStatus() { return this.status; }
+	public void setStatus(Status s) { this.status = s; }
 	
 	
 	public void start(Player p) {
@@ -95,12 +98,14 @@ public class GameTimer extends BukkitRunnable{
 			}
 		}
 
+		EMERG_REMAIN_TICK = Main.EMER_BUTTON_COOL_SEC * 20;
 		REQUIRED_MISSION = (Main.COMMON_MISSION_AMOUNT + Main.EASY_MISSION_AMOUNT + Main.HARD_MISSION_AMOUNT) * (PLAYERS.size() - Main.IMPOSTER_AMOUNT);
 	}
 	
 	private void reset() {
 		PLAYERS.clear();
 		CLEARED_MISSION = 0;
+		HandlerList.unregisterAll(Main.getEventManager());
 		Main.gt = null;
 	}
 	
@@ -110,22 +115,20 @@ public class GameTimer extends BukkitRunnable{
 		long seed = System.currentTimeMillis();
 		Random rn = new Random(seed);
 		
-		Collections.shuffle(PLAYERS);
+		Collections.shuffle(PLAYERS, rn);
+		COLORS.clear();
+		for(ColorUtil cu : COLORLIST) COLORS.add(cu);
 		Collections.shuffle(COLORS, rn);
-		Collections.shuffle(CHATCOLORS, rn);
-		
-		COLORS = new ArrayList<Color>(Arrays.asList(COLORLIST));
-		CHATCOLORS = new ArrayList<ChatColor>(Arrays.asList(CHATCOLORLIST));
 		
 		for(int i=0;i<PLAYERS.size();i++) {
+			if(Bukkit.getPlayer(PLAYERS.get(i)) == null) continue;
 			String name = PLAYERS.get(i);
-			PlayerData pd = new PlayerData(name);
+			PlayerData pd = new PlayerData(name, Bukkit.getPlayer(PLAYERS.get(i)).getUniqueId());
 			if(i < Main.IMPOSTER_AMOUNT) {
 				IMPOSTER.add(name);
 				imposter = imposter + name + " ";
 			}
 			pd.setColor(COLORS.get(i));
-			pd.setChatColor(CHATCOLORS.get(i));
 		}
 		
 		give_item(imposter);
@@ -138,28 +141,18 @@ public class GameTimer extends BukkitRunnable{
 			Player p = Bukkit.getPlayer(name);
 			PlayerData pd = PlayerData.getPlayerData(p.getName());
 			
-			p.setPlayerListName(pd.getChatColor() + "§o" + p.getName());
+			p.setPlayerListName(pd.getColor().getChatColor() + p.getName());
 			
-			String[] parts = { "BOOTS", "LEGGINGS", "CHESTPLATE", "HELMET",  };
-			ItemStack[] ac = new ItemStack[4];
-			
-			for(int temp=0;temp<4;temp++) {
-				ItemStack is = new ItemStack(Material.getMaterial("LEATHER_" + parts[temp]));
-				LeatherArmorMeta lam = (LeatherArmorMeta) is.getItemMeta();
-				lam.setColor(pd.getColor());
-				lam.setUnbreakable(true);
-				is.setItemMeta(lam);
-				ac[temp] = is;
-			}
+			ItemStack[] ac = PlayerUtil.getColoredArmorContent(pd.getColor());
 			p.getInventory().setArmorContents(ac);
 			
 			if(IMPOSTER.contains(p.getName())) {
 				p.sendTitle("§4§l임포스터", "§c모든 크루원을 죽이십시오", 10, 100, 10);
 				p.sendMessage("§f=======================");
 				p.sendMessage("§4당신은 임포스터입니다.");
-				p.sendMessage("§c인벤토리에 검을 지급해드렸습니다. 적절한 시기에 크루원을 죽이십시오. (쿨타임 " + Main.KILL_COOLTIME_SEC + "초)");
-				p.sendMessage("§c일과 진행도가 100%에 도달하기 전 임포스터와 크루원의 수가 같아지거나,");
-				p.sendMessage("§c산소/원자로 사보타지가 성공했을 경우 임포스터의 승리입니다.");
+				p.sendMessage("§c2번 슬롯에 검을 지급해드렸습니다. 적절한 시기에 크루원을 죽이십시오. (쿨타임 " + Main.KILL_COOLTIME_SEC + "초)");
+				p.sendMessage("§c숫자 키 3번, 4번으로 사보타지를 선택할 수 있으며,");
+				p.sendMessage("§c5번을 누르면 현재 선택된 사보타지를 발동시킬 수 있습니다.");
 				p.sendMessage("§c");
 				p.sendMessage("§c임포스터 플레이어 : §f" + imposter);
 				p.sendMessage("§f=======================");
@@ -181,11 +174,6 @@ public class GameTimer extends BukkitRunnable{
 	
 	private void random_mission(Player p) {
 		PlayerData pd = PlayerData.getPlayerData(p.getName());
-		
-		if(IMPOSTER.contains(p.getName())) {
-			pd.addLine("");
-		}
-
 		
 		if(Main.EASY_MISSION_AMOUNT > 0) {
 			int[] a_easy = Util.difrandom(0, MissionList.EASY.size(), Main.EASY_MISSION_AMOUNT);
@@ -226,6 +214,29 @@ public class GameTimer extends BukkitRunnable{
 		case 200:
 			team_split();
 			break;
+		case 300:
+			Bukkit.broadcastMessage(Main.PREFIX + "§f직업 분배가 완료되었습니다. 5초 뒤 게임을 시작합니다.");
+			break;
+		case 320:
+		case 340:
+		case 360:
+		case 380:
+		case 400:
+			Bukkit.broadcastMessage(Main.PREFIX + "§c" + ((420-timer)/20) + "초 전");
+			break;
+		case 420:
+			Bukkit.broadcastMessage(Main.PREFIX + "§a게임 시작!");
+			Bukkit.getPluginManager().registerEvents(Main.getEventManager(), main);
+			status = Status.WORKING;
+			break;
+		}
+		
+		if(status == Status.WORKING) {
+			for(String name : ALIVE_IMPOSTERS) {
+				PlayerData pd = PlayerData.getPlayerData(name);
+				pd.subtractKillCool();
+			}
+			if(EMERG_REMAIN_TICK > 0) EMERG_REMAIN_TICK--;
 		}
 		
 		if(!pause) timer++;
