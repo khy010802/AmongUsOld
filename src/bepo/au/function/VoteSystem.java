@@ -232,7 +232,7 @@ public class VoteSystem extends BukkitRunnable implements Listener {
 		if (VOTERS.contains(voter))
 			return;
 
-		if (voted == "SKIP") {
+		if (voted == "SKIP" && !Bukkit.getPlayer(voted).isOnline()) {
 			voteMap.get(voted).add(voter);
 			remainedVoter--;
 			VOTERS.add(voter);
