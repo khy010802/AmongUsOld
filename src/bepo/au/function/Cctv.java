@@ -17,6 +17,7 @@ import org.bukkit.inventory.meta.LeatherArmorMeta;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
+import bepo.au.base.PlayerData;
 import bepo.au.base.TimerBase;
 import bepo.au.utils.Util;
 
@@ -70,7 +71,7 @@ public class Cctv implements Listener {
 				Material[] clothes = {Material.LEATHER_BOOTS,Material.LEATHER_LEGGINGS,Material.LEATHER_CHESTPLATE};
 				ItemStack stack = new ItemStack(clothes[idx1]);
 				LeatherArmorMeta meta = (LeatherArmorMeta) stack.getItemMeta();
-				meta.setColor(Color.RED);
+				meta.setColor(PlayerData.getPlayerData(p.getName()).getColor().getDyeColor().getColor());
 				stack.setItemMeta(meta);
 				switch(idx1) {
 				case 0:
