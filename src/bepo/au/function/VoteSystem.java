@@ -158,7 +158,7 @@ public class VoteSystem extends BukkitRunnable implements Listener {
 			idx++;
 		}
 		Util.Stack(gui, guiSize - 2, Material.CLOCK, voteTimer / 20, "남은시간 : " + voteTimer / 20);
-		Util.Stack(gui, guiSize - 1, Material.MAGENTA_GLAZED_TERRACOTTA, 1, "SKIP", "§7투표");
+		Util.Stack(gui, guiSize - 1, Material.MAGENTA_GLAZED_TERRACOTTA, 1, "§fSKIP", "§7투표");
 	}
 
 	public void openGUI(Player p) {
@@ -232,7 +232,7 @@ public class VoteSystem extends BukkitRunnable implements Listener {
 		if (VOTERS.contains(voter))
 			return;
 
-		if (voted == "SKIP" && !Bukkit.getPlayer(voted).isOnline()) {
+		if (voted == "§fSKIP") {
 			voteMap.get(voted).add(voter);
 			remainedVoter--;
 			VOTERS.add(voter);
