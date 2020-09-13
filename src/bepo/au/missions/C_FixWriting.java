@@ -70,7 +70,7 @@ public class C_FixWriting extends Mission {
 				else if (x == 7)
 					fillWire(gui.get(i), slot, yToidx(y), i); // 오른쪽 와이어 채우기(고정)
 				else if (x == 6)
-					; // 오른쪽 와이어 빈공간
+					gui.get(i).clear(slot); // 오른쪽 와이어 빈공간
 				else
 					Util.Stack(gui.get(i), slot, Material.WHITE_STAINED_GLASS_PANE, 1, " "); // 배경
 			} else
