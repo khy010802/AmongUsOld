@@ -103,7 +103,7 @@ public class H_AlignEngine extends Mission {
 						if (e.getView().getTitle().split(" ")[1] == Namelore[i]) {
 							new BukkitRunnable() {
 								public void run() {
-									if(gui.get(0).getItem(22).getType()==m) {
+									if(gui.get(0).getItem(13).getType()==m) {
 										Util.debugMessage("Å¬¸®¾î!");
 										onClear((Player) e.getWhoClicked(), c);
 									}

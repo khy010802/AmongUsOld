@@ -153,7 +153,6 @@ public class E_Data extends Mission {
 			}
 
 			percentage = Basispoint / 100;
-			Util.debugMessage(" 0.1ÃÊ °æ°ú, " + percentage + "% count:" + count);
 			switch (percentage) {
 			case 0:
 				slot = -1;

@@ -26,6 +26,7 @@ public class H_EmptyGarbage extends Mission {
 	}
 
 	public void onStart(Player p, int i) {
+		Timer = new EmptyGarbageTimer();
 		if (i == 0)
 			emptyGarbage1(p);
 		else if (cleared.contains((Integer) i))
@@ -33,14 +34,14 @@ public class H_EmptyGarbage extends Mission {
 	}
 
 	public void onStop(Player p, int i) {
-		if(Timer.GetTimerRunning()) Timer.StopTimer();
+		if(Timer != null && Timer.GetTimerRunning()) Timer.StopTimer();
 	}
 
 	public void onClear(Player p, int i) {
 		generalClear(p, i);
 	}
 
-	EmptyGarbageTimer Timer = new EmptyGarbageTimer();
+	EmptyGarbageTimer Timer;
 	ItemStack stack[];
 
 	public void emptyGarbage1(Player p) {

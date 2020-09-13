@@ -75,14 +75,14 @@ public class E_ActivatingShield extends Mission {
 		int dot = e.getSlot();
 		Player p = (Player) e.getWhoClicked();
 		
-		if(e.getCurrentItem().getType() == Material.RED_WOOL) {  // 빨강 양털을 클릭하면 파란양털로 변경 이후 점수 증가 
+		if(e.getCurrentItem() != null && e.getCurrentItem().getType() == Material.RED_WOOL) {  // 빨강 양털을 클릭하면 파란양털로 변경 이후 점수 증가 
 			e.setCancelled(true);
 			Util.Stack(inv, dot, Material.WHITE_WOOL, 1, " ");
 			p.playSound(p.getLocation(), Sound.BLOCK_NOTE_BLOCK_PLING, 10, 1);
 			Shield_score++;
 			if(Shield_score >= 9) {      								//점수가 9점에 도달하면 gui가 닫히고 테스크 성공
 				p.closeInventory();
-				p.sendMessage("Clear");
+				onClear(p, 0);
 				return;
 			}
 		}

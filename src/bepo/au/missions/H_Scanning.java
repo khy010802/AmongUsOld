@@ -34,7 +34,7 @@ public class H_Scanning extends Mission {
 	}
 	
 	public void onStop(Player p, int code) {
-		if(timer.GetTimerRunning()) timer.StopTimer();
+		if(timer != null && timer.GetTimerRunning()) timer.StopTimer();
 	}
 	
 	public class Timer extends TimerBase {
@@ -47,10 +47,8 @@ public class H_Scanning extends Mission {
 
 		@Override
 		public void EventRunningTimer(int count) {
-			Util.debugMessage(" 0.1초 경과");
 			int ccount = count / 20;
 			int slot = 9 - ccount;
-			Util.debugMessage(slot + "슬롯 설정됨");
 			Player p = getPlayer();
 			if (p.getOpenInventory().getTitle().split(" ")[0].equals("Scanning")) { // gui 열고있는지 확인
 
@@ -96,8 +94,8 @@ public class H_Scanning extends Mission {
 
 				if (p.getOpenInventory().getTitle().equals("Scanning")) {
 					status = false;
+					onClear(p, 0);
 					p.closeInventory();
-					Util.debugMessage("클리어!");
 				}
 			}
 		}

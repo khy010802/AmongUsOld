@@ -89,7 +89,7 @@ public class CommandManager implements CommandExecutor{
 			
 			for(int index=0;index<a_easy.length;index++) {
 				try {
-					pd.addMission(p, MissionList.EASY.get(a_easy[index]).getClone());
+					pd.addMission(p, MissionList.EASY.get(a_easy[index]));
 				} catch(Exception io) {
 					Util.debugMessage("a_easy[index] : " + a_easy[index]);
 					Util.debugMessage("null? : " + (MissionList.EASY.get(a_easy[index]) == null));

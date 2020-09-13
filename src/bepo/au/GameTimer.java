@@ -94,7 +94,12 @@ public class GameTimer extends BukkitRunnable{
 				ap.setLevel(0);
 			}
 		}
-
+		
+		if(Main.COMMON_MISSION_AMOUNT > 0) {
+			int[] a_common = Util.difrandom(0, MissionList.COMMON.size()-1, Main.COMMON_MISSION_AMOUNT);
+			for(int index=0;index<a_common.length;index++) Commons[index] = MissionList.COMMON.get(a_common[index]).getClone();
+		}
+		
 		EMERG_REMAIN_TICK = Main.EMER_BUTTON_COOL_SEC * 20;
 		REQUIRED_MISSION = (Main.COMMON_MISSION_AMOUNT + Main.EASY_MISSION_AMOUNT + Main.HARD_MISSION_AMOUNT) * (PLAYERS.size() - Main.IMPOSTER_AMOUNT);
 	}
@@ -166,10 +171,7 @@ public class GameTimer extends BukkitRunnable{
 				p.sendMessage("¡×f=======================");
 			}
 			
-			if(Main.COMMON_MISSION_AMOUNT > 0) {
-				int[] a_common = Util.difrandom(0, MissionList.COMMON.size()-1, Main.COMMON_MISSION_AMOUNT);
-				for(int index=0;index<a_common.length;index++) Commons[index] = MissionList.COMMON.get(a_common[index]).getClone();
-			}
+			
 			
 			random_mission(p);
 		}
@@ -183,7 +185,10 @@ public class GameTimer extends BukkitRunnable{
 		PlayerData pd = PlayerData.getPlayerData(p.getName());
 		
 		if(Main.COMMON_MISSION_AMOUNT > 0) {
-			for(int index=0;index<Commons.length;index++) if(Commons[index] != null) pd.addMission(p, Commons[index].getClone());
+			for(int index=0;index<Commons.length;index++) if(Commons[index] != null) {
+				Bukkit.broadcastMessage(index + ", " + Commons[index].getKoreanName());
+				pd.addMission(p, Commons[index]);
+			}
 		}
 		
 		if(Main.EASY_MISSION_AMOUNT > 0) {

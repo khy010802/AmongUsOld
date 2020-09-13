@@ -158,7 +158,7 @@ public abstract class Mission implements Listener, Cloneable {
 		return s;
 	}
 
-	public final void shinePosition(boolean order) {
+	public void shinePosition(boolean order) {
 		if (getPlayer() == null) return;
 		for (int i = (order ? cleared.size() : 0); i < (order ? cleared.size()+1 : locs.size()); i++) {
 			if (!cleared.contains((Integer) i)) {
@@ -167,15 +167,16 @@ public abstract class Mission implements Listener, Cloneable {
 		}
 	}
 	
-	public final void shinePosition(int i) {
+	public void shinePosition(int i) {
 		PlayerUtil.spawnGlowingBlock(getPlayer(), locs.get(i),
 				this instanceof Sabotage ? ColorUtil.RED : ColorUtil.WHITE);
 	}
 
-	public final Player getPlayer() {
+	public  Player getPlayer() {
 		return Bukkit.getPlayer(playername);
 	}
 
+	
 	public Mission getClone() {
 		try {
 			return (Mission) this.clone();
@@ -184,27 +185,27 @@ public abstract class Mission implements Listener, Cloneable {
 			return null;
 		}
 	}
-
-	public final void uploadInventory(InventoryHolder owner, int slot, String name) {
+	
+	public void uploadInventory(InventoryHolder owner, int slot, String name) {
 		Inventory inv = Bukkit.createInventory(owner, slot, name);
 		gui.add(inv);
 		gui_title.add(name);
 	}
 
-	public final void reset() {
+	public void reset() {
 		cleared.clear();
 		gui = null;
 		gui_title = null;
 	}
 
-	public final void assign(Player p) {
+	public  void assign(Player p) {
 		ActivatedMission.add(this);
 		this.playername = p.getName();
 		shinePosition(order);
 		Bukkit.getPluginManager().registerEvents(this, Main.getInstance());
 	}
 
-	public final void generalClear(Player p, int code) {
+	public  void generalClear(Player p, int code) {
 		
 		if(order) {
 			PlayerUtil.removeGlowingBlock(p, locs.get(code));
@@ -231,7 +232,7 @@ public abstract class Mission implements Listener, Cloneable {
 		}
 	}
 
-	public final int getCode(Location bloc) {
+	public  int getCode(Location bloc) {
 		bloc = bloc.getBlock().getLocation();
 		for (int i = 0; i < locs.size(); i++) {
 			if (bloc.equals(locs.get(i)))
@@ -240,7 +241,7 @@ public abstract class Mission implements Listener, Cloneable {
 		return -1;
 	}
 
-	public final int getCode(String title) {
+	public  int getCode(String title) {
 		try {
 			return Integer.parseInt(title.split(" ")[1]);
 		} catch (Exception io) {
@@ -252,19 +253,19 @@ public abstract class Mission implements Listener, Cloneable {
 
 	}
 
-	public final boolean isCleared(int code) {
+	public  boolean isCleared(int code) {
 		return cleared.contains(code);
 	}
 
-	public final boolean isCleared() {
+	public  boolean isCleared() {
 		return cleared.size() >= required_clear;
 	}
 
-	public final boolean checkPlayer(Event event) {
+	public  boolean checkPlayer(Event event) {
 		return checkPlayer(event, true);
 	}
 
-	public final boolean checkPlayer(Event event, boolean checkName) {
+	public  boolean checkPlayer(Event event, boolean checkName) {
 		if (event instanceof InventoryEvent) {
 			InventoryEvent ie = (InventoryEvent) event;
 			boolean bool = false;
@@ -304,7 +305,7 @@ public abstract class Mission implements Listener, Cloneable {
 		return false;
 	}
 
-	public final ItemStack createItem(Material mat, int amount, String name, List<String> lore) {
+	public ItemStack createItem(Material mat, int amount, String name, List<String> lore) {
 		ItemStack is = new ItemStack(mat, amount);
 		ItemMeta ism = is.getItemMeta();
 		ism.setDisplayName(name);
@@ -313,12 +314,12 @@ public abstract class Mission implements Listener, Cloneable {
 		return is;
 	}
 
-	public final void giveItem(Player p, Material mat, int amount, String name, List<String> lore) {
+	public void giveItem(Player p, Material mat, int amount, String name, List<String> lore) {
 		p.getInventory().addItem(createItem(mat, amount, name, lore));
 		p.updateInventory();
 	}
 
-	public final void Stack(Inventory inv, int slot, Material mat, int amount, String name, List<String> lore) {
+	public void Stack(Inventory inv, int slot, Material mat, int amount, String name, List<String> lore) {
 		inv.setItem(slot, createItem(mat, amount, name, lore));
 	}
 
