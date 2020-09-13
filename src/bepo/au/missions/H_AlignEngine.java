@@ -79,7 +79,10 @@ public class H_AlignEngine extends Mission {
 					}
 				}
 
-			} else {
+			} else if(e.getCurrentItem().getType()==m) {
+				;
+			}
+			else {
 				Util.debugMessage("클릭 불가");
 				e.setCancelled(true);
 			}
