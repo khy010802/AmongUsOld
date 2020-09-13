@@ -80,7 +80,8 @@ public class Util implements Listener{
 		StringBuilder sb = new StringBuilder();
 
 		sb.append("[");
-		sb.append(ste.getFileName().replace(".java", ""));
+		sb.append(ste
+				.getFileName());
 		sb.append("::");
 		sb.append(ste.getMethodName());
 		sb.append("]");
@@ -109,7 +110,8 @@ public class Util implements Listener{
 	}
 								
 	public static ItemStack createItem(Material mat, int amount, String name, List<String> lore) {							
-		ItemStack is = new ItemStack(mat, amount);						
+		ItemStack is = new ItemStack(mat, amount);
+		if(!is.hasItemMeta()) return is;
 		ItemMeta ism = is.getItemMeta();						
 		ism.setDisplayName(name);						
 		ism.setLore(lore);						

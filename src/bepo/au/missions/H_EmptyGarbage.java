@@ -16,7 +16,7 @@ import bepo.au.utils.Util;
 public class H_EmptyGarbage extends Mission {
 
 	public H_EmptyGarbage(MissionType mt2, String name, String korean, int clear, Location loc) {
-		super(mt2, name, korean, clear, loc);
+		super(true, mt2, name, korean, clear, loc);
 	}
 
 	public void onAssigned(Player p) {

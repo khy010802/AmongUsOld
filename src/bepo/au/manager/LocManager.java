@@ -4,23 +4,13 @@ package bepo.au.manager;
 import java.io.File;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
-import java.util.Set;
-
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
-import org.bukkit.Material;
 import org.bukkit.World;
-import org.bukkit.block.Block;
-import org.bukkit.command.Command;
-import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
-import org.bukkit.entity.Player;
 
 
 public class LocManager {
@@ -32,25 +22,25 @@ public class LocManager {
 			"Desk",
 			"FixWiring",
 			"DivertPower",
-			"EmptyGarbage","EmptyGarbageStorage",
+			"EmptyGarbage",
 			"Card",
-			"ShootingMiddle",
+			"Shooting",
 			"ActivatingShield",
 			"ActivatingReactor",
 			"OpenManifold",
-			"GasStorage","GasEngineUpper","GasEngineLower",
-			"AlignEngineUpper","AlignEngineLower",
+			"Gas",
+			"AlignEngine",
 			"EmptyChute",
 			"ChartCourse",
 			"StablizeSteering",
 			"Scanning",
 			"InspectSample",
 			"DistributePower",
-			"DataUpload", "DataDownload",
-			"Sabo_FingerprintUpper","Sabo_FingerprintLower",
-			"Sabo_FixLights",
-			"Sabo_OxygenAdmin","Sabo_OxygenOxy",
-			"Sabo_Communication",
+			"Data",
+			"Fingerprint",
+			"FixLights",
+			"Oxygen",
+			"Communication",
 			};
 	
 	public String locationCommand ="locate";
@@ -83,14 +73,16 @@ public class LocManager {
 	
 	///////////////////
 	private void loadLocations() {
+		LocationMap.clear();
+		
 		location = YamlConfiguration.loadConfiguration(file);
 	    try {
 	        if (!file.exists()) {
-	        	for (String locName : locList) location.set(locName,"0,0,0");
 	        	location.save(file);
 	        }
 	        location.load(file);
 	        for (String locName : locList) {
+	        	if(!location.contains(locName)) continue;
 		        for (String coor : location.getString(locName).split("/")) {
 		        	if (coor==null) break;
 		        	if(LocationMap.get(locName)==null) {
@@ -144,16 +136,16 @@ public class LocManager {
 	}
 	
 	private String LocationToCoor(Location loc, boolean yawpitch) {
-		String coor = loc.getX()+","+loc.getY()+","+loc.getZ() + (yawpitch ? "," + loc.getYaw() +"," + loc.getPitch() : "");
+		String coor = (yawpitch ? loc.getX() : loc.getBlockX())+","+ (yawpitch ? loc.getY() : loc.getBlockY())+","+ (yawpitch ? loc.getZ() : loc.getBlockZ()) + (yawpitch ? "," + loc.getYaw() +"," + loc.getPitch() : "");
 		return coor;
 	}
 	private Location StringToLoc(String str) {
 		int x,y,z;
 		float yaw = 0F, pitch = 0F;
 		String[] xyz=str.split(",");
-		x=Integer.parseInt(xyz[0]);
-		y=Integer.parseInt(xyz[1]);
-		z=Integer.parseInt(xyz[2]);
+		x=(int) Double.parseDouble(xyz[0]);
+		y=(int) Double.parseDouble(xyz[1]);
+		z=(int) Double.parseDouble(xyz[2]);
 		if(xyz.length > 3) {
 			yaw = Float.parseFloat(xyz[3]);
 			pitch = Float.parseFloat(xyz[4]);
@@ -162,23 +154,7 @@ public class LocManager {
 		return new Location(Bukkit.getServer().getWorld("world"),x,y,z,yaw,pitch);
 	}
 	
-	public List<String> onTabComplete(CommandSender sender, Command command, String alias, String[] args) {
-		Player player = (Player) sender;
-		Block targ = player.getTargetBlock((Set<Material>) null, 5);
-		if (command.getName().equals("test")) {
-			switch (args.length) {
-			case 3:
-				if (args[0].equalsIgnoreCase("locate") && (args[1].equalsIgnoreCase("i")||args[1].equalsIgnoreCase("r"))) return Arrays.asList(getList());
-			case 4:
-				if (args[0].equalsIgnoreCase("locate") && args[1].equalsIgnoreCase("i")) return Collections.singletonList(targ.getX() + "");
-			case 5:
-				if (args[0].equalsIgnoreCase("locate") && args[1].equalsIgnoreCase("i")) return Collections.singletonList(targ.getY() + "");
-			case 6:
-				if (args[0].equalsIgnoreCase("locate") && args[1].equalsIgnoreCase("i")) return Collections.singletonList(targ.getZ() + "");
-			}
-		}
-		return null;
-	}
+	
 	
 	
 	

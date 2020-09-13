@@ -56,7 +56,7 @@ public class H_AlignEngine extends Mission {
 	}
 
 
-
+	@EventHandler
 	public void onClick(InventoryClickEvent e) {
 
 		if (!checkPlayer(e))
@@ -69,11 +69,12 @@ public class H_AlignEngine extends Mission {
 			e.setCancelled(true);
 		}
 		if (itemstack != null) {
+			
 			if (e.getRawSlot() == 13 && e.getCursor().getType() == m) {
 				for (int i = 0; i < 2; i++) {
 					if (e.getView().getTitle().split(" ")[1] == Namelore[i]) {
 						onClear((Player) e.getWhoClicked(), i);
-						;
+						
 						break;
 					}
 				}
@@ -90,7 +91,8 @@ public class H_AlignEngine extends Mission {
 		
 		if(!checkPlayer(e)) return;
 		
-		if (!e.getRawSlots().isEmpty() && e.getCursor().getType() == m) {
+		if (!e.getRawSlots().isEmpty() && e.getCursor() != null &&
+				e.getCursor().getType() == m) {
 			for (int slot : e.getRawSlots())
 				if (slot == 13) {
 					for (int i = 0; i < 2; i++) {

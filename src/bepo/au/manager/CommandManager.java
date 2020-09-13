@@ -1,6 +1,14 @@
 package bepo.au.manager;
 
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.Set;
+
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.block.Block;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -8,8 +16,11 @@ import org.bukkit.entity.Player;
 
 import bepo.au.GameTimer;
 import bepo.au.Main;
+import bepo.au.base.PlayerData;
+import bepo.au.function.MissionList;
 import bepo.au.utils.ColorUtil;
 import bepo.au.utils.PlayerUtil;
+import bepo.au.utils.Util;
 
 public class CommandManager implements CommandExecutor{
 
@@ -37,6 +48,10 @@ public class CommandManager implements CommandExecutor{
 			toggle(p, args, false);
 		} else if(args[0].equalsIgnoreCase("debug")) {
 			debug(p, args);
+		} else if(args[0].equalsIgnoreCase("locate")) {
+			locate(p, args);
+		} else if(args[0].equalsIgnoreCase("reload")) {
+			reload(p);
 		}
 		else {
 			help(p);
@@ -45,9 +60,44 @@ public class CommandManager implements CommandExecutor{
 		return true;
 	}
 	
+	private void reload(Player p) {
+		Main.getLocManager().loadLocs();
+	}
+	
+	private void locate(Player p, String[] args) {
+		if(args.length <= 1) {
+			p.sendMessage(Main.PREFIX + "§c올바른 명령어 : /au locate [이름] [block]");
+			return;
+		}
+		boolean target = args.length == 3 && args[2].equalsIgnoreCase("block");
+		String name = args[1];
+		
+		Location loc = target ? p.getTargetBlock(10).getLocation() : p.getLocation();
+		
+		Main.getLocManager().inputLocation(name, loc);
+		p.sendMessage(Main.PREFIX + "§e" + name + " §f에 " + (target ? "현재 바라보고 있는 블럭" : "현재 위치") + " 추가 (총 " + LocManager.getLoc(name).size() + "개)");
+	}
+
+	
+	
 	private void debug(Player p, String[] args) {
-		PlayerUtil.resetGlowingBlock(p);
-		PlayerUtil.spawnGlowingBlock(p, p.getLocation(), ColorUtil.GREEN);
+		
+		PlayerData pd = new PlayerData(p.getName(), p.getUniqueId());
+		
+		if(Main.EASY_MISSION_AMOUNT > 0) {
+			int[] a_easy = Util.difrandom(0, MissionList.EASY.size(), Main.EASY_MISSION_AMOUNT);
+			
+			for(int index=0;index<a_easy.length;index++) {
+				try {
+					pd.addMission(p, MissionList.EASY.get(a_easy[index]).getClone());
+				} catch(Exception io) {
+					Util.debugMessage("a_easy[index] : " + a_easy[index]);
+					Util.debugMessage("null? : " + (MissionList.EASY.get(a_easy[index]) == null));
+					Util.debugMessage("clone null? : " + (MissionList.EASY.get(a_easy[index]).getClone() == null));
+				}
+				
+			}
+		}
 	}
 	
 	private void config(Player p) {

@@ -6,8 +6,6 @@ import java.util.List;
 import java.util.UUID;
 
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
-import org.bukkit.Color;
 import org.bukkit.entity.Player;
 
 import bepo.au.Main;
@@ -58,7 +56,7 @@ public class PlayerData {
 	public void resetKillCool(boolean after_vote) { this.kill_remain_tick = after_vote ? 100 : Main.KILL_COOLTIME_SEC * 20; }
 	public void subtractKillCool() { if(this.kill_remain_tick > 0) this.kill_remain_tick--; }
 	
-	public List<Mission> getMissions() { return this.getMissions(); }
+	public List<Mission> getMissions() { return this.missions; }
 
 	public void setColor(ColorUtil c) { this.color = c; }
 	

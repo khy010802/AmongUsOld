@@ -16,7 +16,7 @@ import bepo.au.base.TimerBase;
 public class H_Gas extends Mission {
 
 	public H_Gas(MissionType mt2, String name, String korean, int clear, Location loc) {
-		super(mt2, name, korean, clear, loc);
+		super(true, mt2, name, korean, clear, loc);
 	}
 
 	public void onAssigned(Player p) {
@@ -40,7 +40,7 @@ public class H_Gas extends Mission {
 		generalClear(p, i);
 	}
 	
-	GasTimer Timer = new GasTimer();
+	GasTimer Timer;
 
 	public void gas1(Player p) {
 		ItemStack RED_STAINED_GLASS_PANE = new ItemStack(Material.RED_STAINED_GLASS_PANE);
@@ -80,24 +80,28 @@ public class H_Gas extends Mission {
 		if(!checkPlayer(e)) return;
 		
 		if (getCode(e.getView().getTitle()) == 0) {
+			
 			if (e.getCurrentItem().getType() == Material.GRAY_CONCRETE) {
 				e.setCancelled(true);
-				Timer.setCase(0);
-				Timer.StartTimer(4, true);
+				startTimer(0);
 			} else {
 				e.setCancelled(true);
 			}
-		}
-		if (getCode(e.getView().getTitle()) == 1) {
+		} else if (getCode(e.getView().getTitle()) == 1) {
 			if (e.getCurrentItem().getType() == Material.GRAY_CONCRETE) {
 				e.setCancelled(true);
-				Timer.setCase(1);
-				Timer.StartTimer(4, true);
+				startTimer(1);
 			} else {
 				e.setCancelled(true);
 			}
 		}
 
+	}
+	
+	public void startTimer(int c) {
+		Timer = new GasTimer();
+		Timer.setCase(c);
+		Timer.StartTimer(4, true);
 	}
 
 	public int getCoordinate(int x, int y) {

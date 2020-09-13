@@ -15,13 +15,13 @@ import org.bukkit.ChatColor;
 	  GRAY(DyeColor.GRAY, ChatColor.DARK_GRAY), 
 	  GREEN(DyeColor.GREEN,ChatColor.DARK_GREEN), 
 	  LIGHT_BLUE(DyeColor.LIGHT_BLUE, ChatColor.AQUA), 
-	  LIGHT_GRAY(DyeColor.LIGHT_GRAY, ChatColor.GREEN), 
+	  LIGHT_GRAY(DyeColor.LIGHT_GRAY, ChatColor.GRAY), 
 	  LIME(DyeColor.LIME, ChatColor.GREEN), 
 	  MAGENTA(DyeColor.MAGENTA, ChatColor.LIGHT_PURPLE), 
 	  ORANGE(DyeColor.ORANGE, ChatColor.GOLD), 
 	  PINK(DyeColor.PINK, ChatColor.LIGHT_PURPLE), 
-	  PURPLE(DyeColor.PURPLE, ChatColor.RED), 
-	  RED(DyeColor.RED, ChatColor.GRAY), 
+	  PURPLE(DyeColor.PURPLE, ChatColor.DARK_PURPLE), 
+	  RED(DyeColor.RED, ChatColor.RED), 
 	  WHITE(DyeColor.WHITE, ChatColor.WHITE), 
 	  YELLOW(DyeColor.YELLOW, ChatColor.YELLOW);
 		private final DyeColor dyecolor;

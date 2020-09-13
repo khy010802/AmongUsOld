@@ -109,7 +109,7 @@ public class H_Scanning extends Mission {
 
 	}
 
-	Timer timer = new Timer();
+	Timer timer;
 	static boolean status = false;// 한 번에 한 플레이어만 가능,
 
 	///////////////////////////////////////////////////
@@ -117,6 +117,7 @@ public class H_Scanning extends Mission {
 		if (!status) {
 			p.openInventory(gui.get(0));
 			status = true;
+			timer = new Timer();
 			timer.StartTimer(200, true, 1);
 		} else {
 			p.sendMessage("이미 다른 플레이어가 사용중입니다.");

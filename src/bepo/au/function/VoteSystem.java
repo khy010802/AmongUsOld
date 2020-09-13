@@ -1,5 +1,6 @@
 package bepo.au.function;
 
+import java.awt.Event;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -11,10 +12,13 @@ import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.EntityType;
+import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.vehicle.VehicleExitEvent;
 import org.bukkit.inventory.EntityEquipment;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemFlag;
@@ -22,7 +26,6 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.LeatherArmorMeta;
 import org.bukkit.scheduler.BukkitRunnable;
-import org.bukkit.util.Vector;
 
 import bepo.au.GameTimer;
 import bepo.au.GameTimer.Status;
@@ -33,37 +36,43 @@ import bepo.au.utils.PlayerUtil;
 import bepo.au.utils.Util;
 
 public class VoteSystem extends BukkitRunnable implements Listener {
-	
+
 	public static VoteSystem PROGRESSED_VOTE = null;
-	
-	public static void start(String name, boolean reported) {
-		PROGRESSED_VOTE = new VoteSystem();
+
+	public void start(String name, boolean reported) {
+		PROGRESSED_VOTE = this;
 		Main.gt.setStatus(Status.VOTING);
 		Bukkit.getPluginManager().registerEvents(PROGRESSED_VOTE, Main.getInstance());
-		for(Player ap : Bukkit.getOnlinePlayers()) {
-			if(reported) ap.sendTitle("§c시체 발견", PlayerData.getPlayerData(name).getColor().getChatColor() + name + "§f님께서 시체를 발견하셨습니다.", 0, 80, 20);
-			else ap.sendTitle("§a긴급 소집", PlayerData.getPlayerData(name).getColor().getChatColor() + name + "§f님께서 긴급 소집 버튼을 눌렀습니다.", 0, 80, 20);
-			
-			if(PlayerData.getPlayerData(ap.getName()) != null && PlayerData.getPlayerData(ap.getName()).isAlive()) {
-				contents.put(ap.getName(), ap.getInventory().getContents().clone());
+		for (Player ap : Bukkit.getOnlinePlayers()) {
+			if (reported)
+				ap.sendTitle("§c시체 발견",
+						PlayerData.getPlayerData(name).getColor().getChatColor() + name + "§f님께서 시체를 발견하셨습니다.", 0, 80,
+						20);
+			else
+				ap.sendTitle("§a긴급 소집",
+						PlayerData.getPlayerData(name).getColor().getChatColor() + name + "§f님께서 긴급 소집 버튼을 눌렀습니다.", 0,
+						80, 20);
+
+			if (PlayerData.getPlayerData(ap.getName()) != null && PlayerData.getPlayerData(ap.getName()).isAlive()) {
+				onAssigned(ap);
 			}
-			
 		}
-		
+
 		new BukkitRunnable() {
 			public void run() {
-				
-				if(Main.gt == null || Main.gt.getStatus() != Status.VOTING) return;
-				
+
+				if (Main.gt == null || Main.gt.getStatus() != Status.VOTING || PROGRESSED_VOTE == null)
+					return;
+				/*
 				int temp = 0;
 				List<Location> locs = LocManager.getLoc("SEATS");
-				
-				for(Player ap : Bukkit.getOnlinePlayers()) {
-					if(PlayerData.getPlayerData(ap.getName()) != null) {
+
+				for (Player ap : Bukkit.getOnlinePlayers()) {
+					if (PlayerData.getPlayerData(ap.getName()) != null) {
 						PlayerData pd = PlayerData.getPlayerData(ap.getName());
-						
-						if(pd.isAlive()) {
-							if(locs.size() <= temp) temp = 0;
+
+						if (pd.isAlive()) {
+							if (locs.size() <= temp) temp = 0;
 							ap.teleport(locs.get(temp));
 							PlayerUtil.sitChair(ap, locs.get(temp));
 							temp++;
@@ -74,23 +83,25 @@ public class VoteSystem extends BukkitRunnable implements Listener {
 						ap.teleport(locs.get(0));
 					}
 				}
+				*/
+				setSeats();
+				PROGRESSED_VOTE.runTaskTimer(main, 0L, 1L);
 			}
 		}.runTaskLater(Main.getInstance(), 100L);
 	}
-	
-	
-	
+
 	String guiName = "투표";
-	Inventory gui;
 	private Main main;
 	private boolean isImposter;
-	
+
 	private static HashMap<String, ItemStack[]> contents = new HashMap<String, ItemStack[]>();
+
+	private static HashMap<String, Inventory> gui_list = new HashMap<String, Inventory>();
 	
 	private static HashMap<String, ArrayList<String>> voteMap;
 	private static ArrayList<Location> SEATS;
 	private static List<PlayerData> DATALIST;
-	private static ArrayList<String> SURVIVERS;
+	private static ArrayList<String> SURVIVORS;
 	private static ArrayList<String> VOTERS;
 	private static int remainedVoter;
 	private static int guiSize;
@@ -107,31 +118,41 @@ public class VoteSystem extends BukkitRunnable implements Listener {
 	public VoteSystem() {
 		this.main = Main.getInstance();
 		voteTimer = Main.VOTE_SEC * 20;
+		
+		DATALIST = PlayerData.getPlayerDataList();
+		for (PlayerData pd : DATALIST) {
+			if (pd.isAlive()) {
+				SURVIVORS.add(pd.getName());
+			}
+		}
+		remainedVoter = SURVIVORS.size();
+		VOTERS.clear();
 	}
 
-	private static resultType voteResult;
+	private static resultType voteResult = null;
 
 	/*
 	 * 투표 시작 관련
 	 */
 	public void onAssigned(Player p) {// p는 주체
-		DATALIST = PlayerData.getPlayerDataList();
-		for (PlayerData pd : DATALIST) {
-			if (pd.isAlive()) {
-				SURVIVERS.add(pd.getName());
-			}
-		}
-		remainedVoter = SURVIVERS.size();
-		VOTERS.clear();
+		
+		
 		setGUI(p);
-		setSeats();
-		this.runTaskTimer(main, 0L, 1L);
+		
+		contents.put(p.getName(), p.getInventory().getContents().clone());
+		p.getInventory().clear();
+		p.getInventory().setItem(8, getBook());
+	}
+	
+	private final ItemStack getBook() {
+		return Util.createItem(Material.BOOK, 1, "§f투표창 열기", Arrays.asList("§7들고 우클릭 시 투표창을 엽니다."));
 	}
 
 	public void setGUI(Player p) { // 투표할때 GUI용
 		guiSize = ((DATALIST.size() + 3) / 9 + 1) * 9; // 플레이어 수에 따라 유동적으로 gui 크기 조절
 		int idx = 0;
-		this.gui = Bukkit.createInventory(p, guiSize, guiName);
+		
+		Inventory gui = Bukkit.createInventory(p, guiSize, guiName);
 		voteMap = new HashMap<String, ArrayList<String>>();
 		for (PlayerData pd : DATALIST) {
 			String name = pd.getName();
@@ -159,22 +180,29 @@ public class VoteSystem extends BukkitRunnable implements Listener {
 		}
 		Util.Stack(gui, guiSize - 2, Material.CLOCK, voteTimer / 20, "남은시간 : " + voteTimer / 20);
 		Util.Stack(gui, guiSize - 1, Material.MAGENTA_GLAZED_TERRACOTTA, 1, "§fSKIP", "§7투표");
+		gui_list.put(p.getName(), gui);
 	}
 
 	public void openGUI(Player p) {
-		p.openInventory(this.gui);
+		p.openInventory(gui_list.get(p.getName()));
 	}
 
 	@EventHandler
 	public void onClick(InventoryClickEvent e) {
 		ItemStack its = e.getCurrentItem();
-		if (guiName == e.getView().getTitle() && its != null) {
+		if(SURVIVORS.contains(e.getWhoClicked().getName())) e.setCancelled(true);
+		if (guiName == e.getView().getTitle() && its != null && voteResult == null) {
 			if (its.getItemMeta().hasLore() && its.getItemMeta().getLore().get(0).equals("§7투표")) {
 				putVoter(e.getWhoClicked().getName(), its.getItemMeta().getDisplayName());
 			}
-			e.setCancelled(true);
 		}
-
+	}
+	
+	@EventHandler
+	public void onLeave(VehicleExitEvent event) {
+		if(event.getExited() instanceof Player && SURVIVORS.contains(((Player) event.getExited()).getName())) {
+			event.setCancelled(true);
+		}
 	}
 
 	Material[] clothes = { Material.LEATHER_BOOTS, Material.LEATHER_LEGGINGS, Material.LEATHER_CHESTPLATE };
@@ -187,9 +215,11 @@ public class VoteSystem extends BukkitRunnable implements Listener {
 		for (int idx = 0; idx < DATALIST.size(); idx++) {
 			Player currentPlayer = Bukkit.getPlayer(DATALIST.get(idx).getName());
 			currentPlayer.teleport(SEATS.get(idx));// 플레이어를 각 자리로 이동
-			Vector dir = LocManager.getLoc("Center").get(0).clone().subtract(currentPlayer.getEyeLocation()).toVector();
-			Location loc = currentPlayer.getLocation().setDirection(dir);
-			currentPlayer.teleport(loc);// 플레이어방향 바꾸기
+			PlayerUtil.sitChair(currentPlayer, SEATS.get(idx));
+			/*
+			 * Vector dir = LocManager.getLoc("Center").get(0).clone().subtract(currentPlayer.getEyeLocation()).toVector();
+			 * Location loc = currentPlayer.getLocation().setDirection(dir);
+			 */
 
 			if (!DATALIST.get(idx).isAlive()) {// 플레이어가 유령상태일때
 				ArmorStand arm = (ArmorStand) currentPlayer.getWorld().spawnEntity(SEATS.get(idx),
@@ -242,7 +272,7 @@ public class VoteSystem extends BukkitRunnable implements Listener {
 			VOTERS.add(voter);
 		} else
 			Util.debugMessage("죽은사람이 투표를 시도했습니다.");
-		if (remainedVoter == SURVIVERS.size()) {
+		if (remainedVoter == SURVIVORS.size()) {
 			voteover();
 		}
 	}
@@ -261,6 +291,10 @@ public class VoteSystem extends BukkitRunnable implements Listener {
 		int current;
 		boolean tied = false;
 
+		for(Player ap : Bukkit.getOnlinePlayers()) ap.closeInventory();
+		
+		HandlerList.unregisterAll(PROGRESSED_VOTE);
+		
 		for (String voted : voteMap.keySet()) {
 			current = voteMap.get(voted).size();
 			if (maximum < current) {
@@ -274,12 +308,15 @@ public class VoteSystem extends BukkitRunnable implements Listener {
 		if (tied) {
 			voteResult = resultType.TIE;
 			top = null;
-		} else if (top == "SKIP") {
+		} else if (top == "§fSKIP") {
 			voteResult = resultType.SKIP;
 		} else {
 			voteResult = resultType.CHOOSED;
 		}
 
+		// 여기에 투표 삽입
+		
+		
 	}
 
 	/*
@@ -292,15 +329,21 @@ public class VoteSystem extends BukkitRunnable implements Listener {
 	@Override
 	public void run() {
 		voteTimer--;
-		Util.Stack(gui, guiSize - 2, Material.CLOCK, voteTimer / 20, "남은시간 : " + voteTimer / 20);
+		
 		switch (voteTimer) {// 투표 종료 후 이벤트 관련
 		case 0:
 			timeover();
+			break;
 		case -25:// 투표 완전 종료.
 			for (ArmorStand arm : armorstandList) {
 				arm.remove();
 			}
 			this.cancel();
+		}
+		
+		for(Inventory gui : gui_list.values()) {
+			Util.Stack(gui, guiSize - 2, Material.CLOCK, voteTimer / 20 + 1, "남은시간 : " + voteTimer / 20 + 1);
+			for(HumanEntity he : gui.getViewers()) if(he instanceof Player) ((Player) he).updateInventory();
 		}
 	}
 

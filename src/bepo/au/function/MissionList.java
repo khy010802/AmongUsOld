@@ -7,7 +7,6 @@ import org.bukkit.Location;
 
 import bepo.au.base.Mission;
 import bepo.au.base.Mission.MissionType;
-import bepo.au.base.Sabotage.SaboType;
 import bepo.au.base.Sabotage;
 import bepo.au.missions.*;
 import bepo.au.sabo.*;
@@ -20,7 +19,7 @@ public class MissionList {
 	public static List<Mission> HARD = new ArrayList<Mission>();
 	
 	// COMMON 2개
-	public final static C_FixWriting fixwriting = 				new C_FixWriting(MissionType.COMMON, "FixWriting", "배선 수리", 3, (Location) null);
+	public final static C_FixWriting fixwriting = 				new C_FixWriting(MissionType.COMMON, "FixWiring", "배선 수리", 3, (Location) null);
 	public final static C_Card card 		= 							new C_Card(MissionType.COMMON, "Card", "카드 긁기", 1, (Location) null);
 	
 	// EASY 8개

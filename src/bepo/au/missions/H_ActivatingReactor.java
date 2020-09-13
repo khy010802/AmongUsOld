@@ -41,7 +41,7 @@ public class H_ActivatingReactor extends Mission {
 	int Tmp = 0;
 	int Case = 0;
 	int MaxCount = 1;
-	ActivatingReactorTimer Timer = new ActivatingReactorTimer();
+	ActivatingReactorTimer Timer;
 
 	public void activatingReactor(Player p) {
 		for (int i = 0; i < 5; i++) {
@@ -79,7 +79,7 @@ public class H_ActivatingReactor extends Mission {
 					Count++;
 					if (Count == MaxCount) {
 						if (Count == 5) {
-							P.sendMessage("Clear");
+							generalClear(P, 0);
 							P.closeInventory();
 						} else {
 							for (int i = 2; i < 7; i++) {
@@ -101,6 +101,7 @@ public class H_ActivatingReactor extends Mission {
 	public void Lighting(int count) {
 		Case = 1;
 		MaxCount = count;
+		Timer = new ActivatingReactorTimer();
 		Timer.StartTimer(count, false, 10);
 	}
 
@@ -125,6 +126,7 @@ public class H_ActivatingReactor extends Mission {
 			}
 			
 			Player P = getPlayer();
+			P.sendMessage("Running");
 			
 			if (Case == 1) {
 				if (count > 0) {

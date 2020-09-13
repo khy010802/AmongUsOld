@@ -10,6 +10,7 @@ import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.craftbukkit.v1_16_R2.CraftWorld;
 import org.bukkit.craftbukkit.v1_16_R2.entity.CraftPlayer;
+import org.bukkit.craftbukkit.v1_16_R2.util.CraftMagicNumbers;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -19,19 +20,23 @@ import org.bukkit.scoreboard.Team;
 import org.bukkit.util.Vector;
 
 import bepo.au.Main;
+import net.minecraft.server.v1_16_R2.EntityFallingBlock;
+import net.minecraft.server.v1_16_R2.EntityMagmaCube;
+import net.minecraft.server.v1_16_R2.EntityPlayer;
 import net.minecraft.server.v1_16_R2.EntityShulker;
 import net.minecraft.server.v1_16_R2.EntityTypes;
+import net.minecraft.server.v1_16_R2.IBlockData;
 import net.minecraft.server.v1_16_R2.PacketPlayOutEntityDestroy;
 import net.minecraft.server.v1_16_R2.PacketPlayOutEntityMetadata;
+import net.minecraft.server.v1_16_R2.PacketPlayOutEntityTeleport;
+import net.minecraft.server.v1_16_R2.PacketPlayOutSpawnEntity;
 import net.minecraft.server.v1_16_R2.PacketPlayOutSpawnEntityLiving;
 import net.minecraft.server.v1_16_R2.WorldServer;
 
 public class PlayerUtil {
 	
 	/*
-	 * ¼ÈÄ¿ ±â´É
-	 */
-	public static class ShulkerInfo {
+	 public static class ShulkerInfo {
 		
 		private HashMap<Location, Integer> shulkerinfo;
 		private String name;
@@ -108,7 +113,10 @@ public class PlayerUtil {
 		}
 		
 		private Location locationParser(Location loc) {
-			return loc.getBlock().getLocation().add(0.5D, 0, 0.5D);
+			Location l = loc.getBlock().getLocation().add(0.5D, 0, 0.5D);
+			l.setYaw(0F);
+			l.setPitch(0F);
+			return l;
 		}
 		
 		private Player getPlayer() {
@@ -116,6 +124,101 @@ public class PlayerUtil {
 		}
 		
 	}
+	 */
+	
+	
+	/*
+	 * ¼ÈÄ¿ ±â´É
+	 */
+	 public static class ShulkerInfo {
+			
+			private HashMap<Location, Integer> shulkerinfo;
+			private String name;
+			
+			public ShulkerInfo(String name) {
+				this.name = name;
+				this.shulkerinfo = new HashMap<Location, Integer>();
+			}
+			
+			public String getName() { return this.name; }
+			
+			public void reset() {
+				if(getPlayer() == null) return;
+				List<Location> lists = new ArrayList<Location>(shulkerinfo.keySet());
+				for(Location loc : lists) removeShulker(loc);
+			}
+			
+			public void removeShulker(Location loc) {
+				
+				if(getPlayer() == null) return;
+				
+				Location l = locationParser(loc);
+				if(shulkerinfo.containsKey(l)) {
+					PacketPlayOutEntityDestroy destroy = new PacketPlayOutEntityDestroy(shulkerinfo.get(l));
+	                ((CraftPlayer)getPlayer()).getHandle().playerConnection.sendPacket(destroy);
+	                
+	                shulkerinfo.remove(l);
+				}
+			}
+			
+			public void addShulker(Location loc, ColorUtil c) {
+				
+				if(getPlayer() == null) return;
+				
+				Location l = locationParser(loc);
+				
+				if(shulkerinfo.containsKey(l)) removeShulker(l);
+				
+				WorldServer ws = ((CraftWorld) loc.getWorld()).getHandle();
+				EntityMagmaCube es = new EntityMagmaCube(EntityTypes.MAGMA_CUBE, ws);
+				
+				es.setPosition(loc.getBlockX() + 0.5D, loc.getBlockY() + 0.25D, loc.getBlockZ() + 0.5D);
+				es.setInvulnerable(true);
+				es.setNoAI(true);
+				es.setSize(1, true);
+				es.setSilent(true);
+				
+				es.setFlag(6, true); // ¹à±â
+				es.setFlag(5, true); // Åõ¸íÈ­
+				
+				es.setInvisible(true);
+				es.glowing = true;
+				
+				if(c != ColorUtil.WHITE) {
+					Scoreboard board = Bukkit.getScoreboardManager().getMainScoreboard();
+					String tname = "sh" + c.getChatColor().name();
+					
+					Team team;
+					if(board.getTeam(tname) != null) team = board.getTeam(tname);
+					else {
+						team = board.registerNewTeam(tname);
+						team.setColor(c.getChatColor());
+					}
+					
+					team.addEntry(es.getUniqueIDString());
+				}
+				
+				PacketPlayOutSpawnEntityLiving packet = new PacketPlayOutSpawnEntityLiving(es);
+				((CraftPlayer) getPlayer()).getHandle().playerConnection.sendPacket(packet);
+				
+				PacketPlayOutEntityMetadata metaPacket = new PacketPlayOutEntityMetadata(es.getId(), es.getDataWatcher(), true);
+				((CraftPlayer) getPlayer()).getHandle().playerConnection.sendPacket(metaPacket);
+				
+				shulkerinfo.put(l, es.getId());
+			}
+			
+			private Location locationParser(Location loc) {
+				Location l = loc.getBlock().getLocation().add(0.5D, 0.5D, 0.5D);
+				l.setYaw(0F);
+				l.setPitch(0F);
+				return l;
+			}
+			
+			private Player getPlayer() {
+				return Bukkit.getPlayer(name);
+			}
+			
+		}
 	
 	private static HashMap<String, ShulkerInfo> Shulkers = new HashMap<String, ShulkerInfo>();
 	

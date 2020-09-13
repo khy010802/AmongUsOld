@@ -1,5 +1,8 @@
 package bepo.au.missions;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -16,7 +19,6 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import bepo.au.base.Mission;
-import bepo.au.base.Mission.MissionType;
 import bepo.au.utils.Util;
 
 public class E_DivertPower extends Mission {
@@ -42,7 +44,7 @@ public class E_DivertPower extends Mission {
 			"보안실" };// 배경
 
 	public E_DivertPower(MissionType mt2, String name, String korean, int clear, Location loc) {
-		super(mt2, name, korean, clear, loc);
+		super(true, mt2, name, korean, clear, loc);
 	}
 	
 	public void onAssigned(Player p) {
@@ -52,9 +54,9 @@ public class E_DivertPower extends Mission {
 		roomNum = Util.random(1, 7) - 1;
 		if(roomNum >= 4) roomNum++;
 		
-		Location elec = locs[0];
-		Location loc1 = locs[roomNum+1];
-		locs = new Location[] { elec, loc1 };
+		Location elec = locs.get(0);
+		Location loc1 = locs.get(roomNum+1);
+		locs = new ArrayList<Location>(Arrays.asList(elec, loc1));
 	}
 	
 	public void onStart(Player p, int i) {

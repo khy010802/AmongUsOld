@@ -2,7 +2,6 @@ package bepo.au.manager;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
-import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -13,6 +12,7 @@ import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.inventory.EquipmentSlot;
 
 import bepo.au.GameTimer.Status;
 import bepo.au.GameTimer;
@@ -28,6 +28,8 @@ public class EventManager implements Listener {
 		Player p = event.getPlayer();
 		PlayerData pd = PlayerData.getPlayerData(p.getName());
 
+		if(event.getHand() != EquipmentSlot.HAND) return;
+		
 		if (pd == null)
 			return;
 
@@ -96,14 +98,14 @@ public class EventManager implements Listener {
 		}
 	}
 
-	@EventHandler
+	//@EventHandler
 	public void onBreak(BlockBreakEvent event) {
 		Player p = event.getPlayer();
 		if (GameTimer.PLAYERS.contains(p.getName()))
 			event.setCancelled(true);
 	}
 
-	@EventHandler
+	//@EventHandler
 	public void onPlace(BlockPlaceEvent event) {
 		Player p = event.getPlayer();
 		if (GameTimer.PLAYERS.contains(p.getName()))

@@ -32,6 +32,7 @@ public class H_InspectSample extends Mission{
 	
 	public void onStart(Player p, int code) {
 		uploadInventory(p, 54, "InspectSample");
+		inspectsample(p);
 	}
 	
 	public void onClear(Player p, int code) {
@@ -47,6 +48,7 @@ public class H_InspectSample extends Mission{
 		@Override
 		public void EventStartTimer() { // 타이머 시작
 			Util.debugMessage(" 타이머 시작됨");
+			P_timer = new PreparingTimer();
 			P_timer.StartTimer(45, false, 1);
 		}
 
@@ -136,8 +138,8 @@ public class H_InspectSample extends Mission{
 
 	}
 
-	Timer timer = new Timer();
-	PreparingTimer P_timer = new PreparingTimer();
+	Timer timer;
+	PreparingTimer P_timer;
 	int status = 0; // 0 실행안됨 | 1,2 실행됨 | 3 시약분석중 | 4 분석가능 | 100 클리어 상태
 	int bad;
 	final int time = 5; // 기다림 시간
@@ -191,6 +193,7 @@ public class H_InspectSample extends Mission{
 		case 2: // 시약 준비중
 			Util.debugMessage("status 2 실행");
 			Util.Stack(gui.get(0), 53, Material.ORANGE_STAINED_GLASS_PANE, 1, " ", "§4클릭불가");
+			timer = new Timer();
 			timer.StartTimer(time, true, 20);
 			status = 3;
 			p.openInventory(gui.get(0));

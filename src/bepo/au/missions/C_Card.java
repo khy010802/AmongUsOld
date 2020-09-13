@@ -15,7 +15,6 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 
-import bepo.au.Main;
 import bepo.au.base.Mission;
 
 public class C_Card extends Mission{
@@ -71,7 +70,7 @@ public class C_Card extends Mission{
 		Set<Integer> set = event.getInventorySlots();
 		if(set != null && set.size() == 8 && set.contains(16)) {
 			int timer = ct.getTimer();
-			int diff = Main.MISSION_DIFFICULTY;
+			int diff = 0;
 			int period = 11 - diff;
 			
 			if(timer > 20 + period) {

@@ -1,7 +1,10 @@
 package bepo.au;
 
+import java.util.List;
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.bukkit.World;
+import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -9,6 +12,10 @@ import bepo.au.base.Mission;
 import bepo.au.function.MissionList;
 import bepo.au.manager.CommandManager;
 import bepo.au.manager.EventManager;
+import bepo.au.manager.LocManager;
+import bepo.au.manager.TabCompleteManager;
+import bepo.au.utils.PlayerUtil;
+import bepo.au.utils.Util;
 
 public class Main extends JavaPlugin implements Listener{
 	
@@ -18,6 +25,8 @@ public class Main extends JavaPlugin implements Listener{
 	private static Main main;
 	public CommandManager cm;
 	private static EventManager em;
+	private static MissionList ml;
+	private static LocManager lm;
 	
 	public static String WORLD_NAME = "world";
 	public static World w;
@@ -36,8 +45,7 @@ public class Main extends JavaPlugin implements Listener{
 	
 	public static float MOVEMENT_SPEED = 1.0F;
 	
-	public static int MISSION_DIFFICULTY = 5;
-	public static int IMPOSTER_AMOUNT = 2;
+	public static int IMPOSTER_AMOUNT = 0;
 
 	
 	public static Main getInstance() {
@@ -48,32 +56,66 @@ public class Main extends JavaPlugin implements Listener{
 		return em;
 	}
 	
+	public static LocManager getLocManager() {
+		return lm;
+	}
+	
+	public static MissionList getMissionList() {
+		return ml;
+	}
+	
 	public void onEnable() {
 		main = this;
 		w = Bukkit.getWorld(WORLD_NAME);
 		
 		for(Mission m : MissionList.EASY) {
-			Bukkit.getConsoleSender().sendMessage(m.getMissionName());
 			Mission.MISSIONS.add(m);
 		}
 		
 		for(Mission m : MissionList.HARD) {
-			Bukkit.getConsoleSender().sendMessage(m.getMissionName());
+			Mission.MISSIONS.add(m);
+		}
+		
+		for(Mission m : MissionList.COMMON) {
+			Mission.MISSIONS.add(m);
+		}
+		
+		for(Mission m : MissionList.SABOTAGE) {
 			Mission.MISSIONS.add(m);
 		}
 		
 		cm = new CommandManager();
 		em = new EventManager();
+		ml = new MissionList();
+		lm = new LocManager();
+		lm.loadLocs();
+		
+		for(Mission m : Mission.MISSIONS) addLocation(m);
+		
+		
 		
 		getCommand("au").setExecutor(cm);
+		getCommand("au").setTabCompleter(new TabCompleteManager());
 		
 		Mission.initMain(this);
 		
 		Bukkit.getConsoleSender().sendMessage("AmongUs È°¼ºÈ­. By Team JonJAr");
 	}
 	
-	public void onDisable() {
+	private void addLocation(Mission m) {
 		
+		String s = m.getMissionName();
+		
+		List<Location> list = LocManager.getLoc(s);
+		Bukkit.getConsoleSender().sendMessage(m.getKoreanName() + " list size : " + list.size());
+		if(list != null && list.size() > 0) {
+			for(int i=0;i<list.size();i++) m.addLocation(list.get(i));
+		}
+	}
+	
+	public void onDisable() {
+		lm.saveLocs();
+		for(Player p : Bukkit.getOnlinePlayers()) PlayerUtil.resetGlowingBlock(p);
 	}
 
 }

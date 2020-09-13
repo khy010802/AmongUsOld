@@ -21,7 +21,7 @@ import bepo.au.utils.Util;
 public class E_Data extends Mission {
 	
 	public E_Data(MissionType mt2, String name, String korean, int clear, Location loc) {
-		super(mt2, name, korean, clear, loc);
+		super(true, mt2, name, korean, clear, loc);
 	}
 	
 	public void onAssigned(Player p) {
@@ -32,7 +32,6 @@ public class E_Data extends Mission {
 	
 	public void onStart(Player p, int i) {
 		data(p, i);
-		uploadInventory(p, 36, "ActivatingShield");
 	}
 	
 	public void onStop(Player p, int i) {
@@ -140,6 +139,7 @@ public class E_Data extends Mission {
 			//
 			int paperslot = (Basispoint / term) % 8 + 1;
 			Util.debugMessage(paperslot + ", ¸¸ºÐÀ² : " + Basispoint);
+			Bukkit.broadcastMessage("" + code);
 			if (Basispoint == 10000) {
 				Util.Stack(gui.get(code), 6, Material.AIR, 1, "");
 				Util.Stack(gui.get(code), 7, Material.AIR, 1, "");

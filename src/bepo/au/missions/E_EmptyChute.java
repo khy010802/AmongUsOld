@@ -40,7 +40,7 @@ public class E_EmptyChute extends Mission {
 	
 	@Override
 	public void onStop(Player p, int code) {
-		
+		p.getInventory().remove(Material.KELP);
 	}
 	
 	@Override
@@ -79,9 +79,9 @@ public class E_EmptyChute extends Mission {
 		
 	}
 
-	public void removeLeaf() {
+	public void removeLeaf(Player p) {
 		if (--remainingLeaves == 0) {
-			Util.debugMessage("클리어!");
+			onClear(p, 0);
 			return;
 		}
 		Util.debugMessage(remainingLeaves + "개 남음");
@@ -90,6 +90,10 @@ public class E_EmptyChute extends Mission {
 
 	@EventHandler
 	public void onClick(InventoryClickEvent e) {
+		if(!checkPlayer(e)) return;
+		
+		Player p = (Player) e.getWhoClicked();
+		
 		if (e.getView().getTitle().equals("EmptyChute")) {
 			Util.debugMessage("클릭 인식됨");
 			// int slot = e.getRawSlot();
@@ -106,9 +110,10 @@ public class E_EmptyChute extends Mission {
 				if (e.getCursor().getType() == Material.AIR && itemstack.getType() == Material.KELP)
 					Util.debugMessage("켈프 클릭 인식됨");
 				else if (e.getCursor().getType() == Material.KELP && itemstack.getType() == Material.HOPPER) {
-					removeLeaf();
+					
 					e.getWhoClicked().setItemOnCursor(null);
 					e.setCancelled(true);
+					removeLeaf(p);
 				} else {
 					Util.debugMessage("클릭 불가");
 					e.setCancelled(true);

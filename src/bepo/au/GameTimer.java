@@ -6,11 +6,9 @@ import java.util.List;
 import java.util.Random;
 
 import org.bukkit.Bukkit;
-import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.HandlerList;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.LeatherArmorMeta;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import bepo.au.base.Mission;
@@ -59,7 +57,7 @@ public class GameTimer extends BukkitRunnable{
 	public GameTimer(Main main) {
 		this.main = main;
 		assemble = new Assemble(main, new ScoreboardManager());
-		assemble.setAssembleStyle(AssembleStyle.VIPER);
+		assemble.setAssembleStyle(AssembleStyle.KOHI);
 		
 	}
 	
@@ -76,7 +74,6 @@ public class GameTimer extends BukkitRunnable{
 	
 	
 	public void start(Player p) {
-		reset();
 		Bukkit.broadcastMessage(Main.PREFIX + "§e" + p.getName() + "§f님께서 게임을 시작하셨습니다!");
 		status = Status.GAME_SETTING;
 		this.runTaskTimer(main, 0L, 1L);
@@ -84,7 +81,7 @@ public class GameTimer extends BukkitRunnable{
 	
 	public void stop() {
 		if(!this.isCancelled()) this.cancel();
-		
+		stop_reset();
 		Mission.deactivateMission();
 	}
 	
@@ -92,7 +89,7 @@ public class GameTimer extends BukkitRunnable{
 		for(Player ap : Bukkit.getOnlinePlayers()) {
 			if(!GameTimer.OBSERVER.contains(ap.getName().toLowerCase())) {
 				PLAYERS.add(ap.getName());
-				ap.getInventory().clear();
+				//ap.getInventory().clear();
 				ap.setExp(0F);
 				ap.setLevel(0);
 			}
@@ -102,11 +99,13 @@ public class GameTimer extends BukkitRunnable{
 		REQUIRED_MISSION = (Main.COMMON_MISSION_AMOUNT + Main.EASY_MISSION_AMOUNT + Main.HARD_MISSION_AMOUNT) * (PLAYERS.size() - Main.IMPOSTER_AMOUNT);
 	}
 	
-	private void reset() {
+	private void stop_reset() {
+		Main.gt = null;
+		Commons = new Mission[2];
 		PLAYERS.clear();
 		CLEARED_MISSION = 0;
 		HandlerList.unregisterAll(Main.getEventManager());
-		Main.gt = null;
+		Mission.deactivateMission();
 	}
 	
 	private void team_split() {
@@ -166,29 +165,41 @@ public class GameTimer extends BukkitRunnable{
 				p.sendMessage("§f일과는 우측 스코어보드에 표기되며, 진행도는 경험치 바에 표기됩니다.");
 				p.sendMessage("§f=======================");
 			}
+			
+			if(Main.COMMON_MISSION_AMOUNT > 0) {
+				int[] a_common = Util.difrandom(0, MissionList.COMMON.size()-1, Main.COMMON_MISSION_AMOUNT);
+				for(int index=0;index<a_common.length;index++) Commons[index] = MissionList.COMMON.get(a_common[index]).getClone();
+			}
+			
 			random_mission(p);
 		}
 		
 		
 	}
 	
+	private Mission[] Commons = new Mission[2];
+	
 	private void random_mission(Player p) {
 		PlayerData pd = PlayerData.getPlayerData(p.getName());
 		
+		if(Main.COMMON_MISSION_AMOUNT > 0) {
+			for(int index=0;index<Commons.length;index++) if(Commons[index] != null) pd.addMission(p, Commons[index].getClone());
+		}
+		
 		if(Main.EASY_MISSION_AMOUNT > 0) {
-			int[] a_easy = Util.difrandom(0, MissionList.EASY.size(), Main.EASY_MISSION_AMOUNT);
-			for(int index=0;index<a_easy.length;index++) pd.addMission(p, MissionList.EASY.get(a_easy[index]).getClone());
+			int[] a_easy = Util.difrandom(0, MissionList.EASY.size()-1, Main.EASY_MISSION_AMOUNT);
+			
+			for(int index=0;index<a_easy.length;index++) {
+				pd.addMission(p, MissionList.EASY.get(a_easy[index]).getClone());
+			}
 		}
 		
 		if(Main.HARD_MISSION_AMOUNT > 0) {
-			int[] a_hard = Util.difrandom(0, MissionList.HARD.size(), Main.HARD_MISSION_AMOUNT);
+			int[] a_hard = Util.difrandom(0, MissionList.HARD.size()-1, Main.HARD_MISSION_AMOUNT);
 			for(int index=0;index<a_hard.length;index++) pd.addMission(p, MissionList.HARD.get(a_hard[index]).getClone());
 		}
 		
-		if(Main.COMMON_MISSION_AMOUNT > 0) {
-			int[] a_common = Util.difrandom(0, MissionList.COMMON.size(), Main.COMMON_MISSION_AMOUNT);
-			for(int index=0;index<a_common.length;index++) pd.addMission(p, MissionList.COMMON.get(a_common[index]).getClone());
-		}
+		
 		
 		assemble.start(5L);
 	}

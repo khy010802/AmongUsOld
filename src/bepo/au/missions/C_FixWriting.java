@@ -22,7 +22,7 @@ import bepo.au.utils.Util;
 public class C_FixWriting extends Mission {
 
 	public C_FixWriting(MissionType mt2, String name, String korean, int clear, Location... locs) {
-		super(mt2, name, korean, clear, locs);
+		super(true, mt2, name, korean, clear, locs);
 	}
 
 	static int[][] wirecolorArray;
@@ -37,28 +37,25 @@ public class C_FixWriting extends Mission {
 
 			{ Material.RED_STAINED_GLASS_PANE, Material.BLUE_STAINED_GLASS_PANE, Material.GREEN_STAINED_GLASS_PANE,
 					Material.PURPLE_STAINED_GLASS_PANE } };
-	
-	private int[] destination = new int[3];
-	private int progress = 0;
 
 	@Override
 	public void onAssigned(Player p) {
 		assign(p);
 		wirecolorArray = new int[][] { Util.difrandom(0, 3, 4), Util.difrandom(0, 3, 4), Util.difrandom(0, 3, 4) };
 		for (int i = 0; i < 3; i++) {
-			uploadInventory(p, 54, "FixWriting" + i);
+			uploadInventory(p, 54, "FixWiring" + i);
 		}
 		int a = Util.random(0, 2);
-		int b = Util.random(a+1, 4);
-		int c = Util.random(b+1, 5);
-		destination = new int[]{ a, b, c };
+		int b = Util.random(a+1, 3);
+		int c = Util.random(b+1, 4);
+		locs = Arrays.asList(locs.get(a), locs.get(b), locs.get(c));
 		
 	}
 
 	@Override
 	public void onStart(Player p, int i) {
 		
-		if(destination[progress] != i) return;
+		if(i != cleared.size()) return;
 		
 		for (int slot = 0; slot < 54; slot++) {// gui인벤토리
 			int y = slot / 9, x = slot % 9;
@@ -92,7 +89,6 @@ public class C_FixWriting extends Mission {
 	@Override
 	public void onClear(Player p, int i) {
 		generalClear(p, i);
-		progress++;
 	}
 
 	public static int yToidx(int y) {
@@ -177,7 +173,7 @@ public class C_FixWriting extends Mission {
 		String title = e.getView().getTitle();
 		Util.debugMessage("클릭 인식됨");
 		int slot = e.getRawSlot();
-		int code = Integer.parseInt(title.replace("FixWriting", ""));
+		int code = Integer.parseInt(title.replace("FixWiring", ""));
 		ItemStack itemstack = e.getCurrentItem();
 
 		// Inventory gui = e.getClickedInventory();
@@ -208,7 +204,7 @@ public class C_FixWriting extends Mission {
 		
 		String title = e.getView().getTitle();
 
-		int code = Integer.parseInt(title.replace("FixWriting", ""));
+		int code = Integer.parseInt(title.replace("FixWiring", ""));
 		if (!e.getRawSlots().isEmpty()) {
 			for (int slot : e.getRawSlots()) {
 				checkConnection((Player) e.getWhoClicked(), code, slot);

@@ -38,7 +38,7 @@ public class E_DistributePower extends Mission{
 		generalClear(p, i);
 	}
 	
-	PowerTimer Timer = new PowerTimer();
+	PowerTimer Timer;
 	
 	int Case;
 	double Tmp;
@@ -48,26 +48,25 @@ public class E_DistributePower extends Mission{
 	double b;
 	
 	public void distributePower(Player p) {
-		Inventory inv = Bukkit.createInventory(p, 45, "DistributePower");
 		Case = 0;
 		
 		
         for (int slot = 0; slot < 45; slot++) {
         	if(slot == 2) {
-        		Util.Stack(inv, slot, Material.YELLOW_STAINED_GLASS_PANE, 1, " ");
+        		Util.Stack(gui.get(0), slot, Material.YELLOW_STAINED_GLASS_PANE, 1, " ");
         	}
         	else if(slot > 2 && slot < 6) {
         		;
         	}
         	else if(slot == 20) {
-        		Util.Stack(inv, slot, Material.BLUE_STAINED_GLASS_PANE, 1, " ");
+        		Util.Stack(gui.get(0), slot, Material.BLUE_STAINED_GLASS_PANE, 1, " ");
         	}
         	
         	else if(slot > 20 && slot < 24) {
         		;
         	}
         	else if(slot == 38) {
-        		Util.Stack(inv, slot, Material.LIGHT_BLUE_STAINED_GLASS_PANE, 1, " ");
+        		Util.Stack(gui.get(0), slot, Material.LIGHT_BLUE_STAINED_GLASS_PANE, 1, " ");
         	}
         	
         	else if(slot > 38 && slot < 42) {
@@ -75,10 +74,10 @@ public class E_DistributePower extends Mission{
         	}
         	
         	else if(slot == 7 || slot == 25 || slot == 43) {
-        		Util.Stack(inv, slot, Material.REDSTONE_BLOCK, 1, " ");
+        		Util.Stack(gui.get(0), slot, Material.REDSTONE_BLOCK, 1, " ");
             }
             else {
-                Util.Stack(inv, slot, Material.GRAY_STAINED_GLASS_PANE, 1, " ");
+                Util.Stack(gui.get(0), slot, Material.GRAY_STAINED_GLASS_PANE, 1, " ");
             }
 
         }
@@ -91,8 +90,9 @@ public class E_DistributePower extends Mission{
 			SetCompass(p, 0);
 		}
 		Case = 0;
+		Timer = new PowerTimer();
 		Timer.StartTimer(2*t, true, 2);
-		p.openInventory(inv);
+		p.openInventory(gui.get(0));
 	}
 	
 	@EventHandler
@@ -119,8 +119,8 @@ public class E_DistributePower extends Mission{
 							if(Case == 3) {
 								M = Material.LIGHT_BLUE_STAINED_GLASS_PANE;
 								Timer.StopTimer();
-								P.sendMessage("Clear");
 								P.closeInventory();
+								onClear(P, 0);
 							}
 							for(int i = e.getRawSlot()-4; i < e.getRawSlot()-1; i++) {
 								Util.Stack(Inv, i, M, 1, " ");

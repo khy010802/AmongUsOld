@@ -2,7 +2,6 @@ package bepo.au.function;
 
 import java.util.ArrayList;
 
-import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Sound;

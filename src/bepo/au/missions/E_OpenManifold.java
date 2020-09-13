@@ -71,7 +71,7 @@ public class E_OpenManifold extends Mission {
 		Inventory inv = e.getClickedInventory();
 		Player P = (Player) e.getWhoClicked();
 		if(e.getView().getTitle().equals("Manifold")) {
-			if(e.getCurrentItem().getType() == Material.WHITE_STAINED_GLASS_PANE) {
+			if(e.getCurrentItem() != null && e.getCurrentItem().getType() == Material.WHITE_STAINED_GLASS_PANE) {
 				e.setCancelled(true);
 				int x = e.getSlot();
 				int y = -1;
@@ -87,7 +87,7 @@ public class E_OpenManifold extends Mission {
 					Count++;
 					if(Count == 11) {
 						P.closeInventory();
-						P.sendMessage("Clear");
+						onClear(P, 0);
 					}
 				}
 				else {

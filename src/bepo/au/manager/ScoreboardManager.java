@@ -48,9 +48,15 @@ public class ScoreboardManager implements AssembleAdapter{
 				line.add("§7하단 미션은 위장용 미션입니다.");
 			}
 			
-			if(alive) {
-				if(imposter) line.add("§c당신은 죽었지만, 여전히 사보타지를 사용할 수 있습니다.");
-				else line.add("§7당신은 죽었지만, 여전히 일과를 수행할 수 있습니다.");
+			if(!alive) {
+				if(imposter) {
+					line.add("§c당신은 죽었지만, ");
+					line.add("§c여전히 사보타지를 사용할 수 있습니다.");
+				}
+				else {
+					line.add("§7당신은 죽었지만,");
+					line.add("§7여전히 일과를 수행할 수 있습니다.");
+				}
 			}
 			
 			for(int index=0;index<pd.getMissions().size();index++) {
