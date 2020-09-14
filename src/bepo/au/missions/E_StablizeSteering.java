@@ -48,7 +48,7 @@ public class E_StablizeSteering extends Mission {
 		while (true) {
 			x = random.nextInt(9);
 			y = random.nextInt(5);
-			if (!(2 < x && x < 5 && 0 < y && y < 4))
+			if (!(2 < x && x < 6 && 0 < y && y < 4))
 				break; // °¡¿îµ¥ 3x3Ä­Àº ¤¤¤¤
 		}
 		int elytraSlot = x + y * 9;
