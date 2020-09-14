@@ -51,12 +51,11 @@ public class E_DivertPower extends Mission {
 		assign(p);
 		uploadInventory(p, 54, "DivertPower 0");
 		uploadInventory(p, 27, "DivertPower 1");
-		roomNum = Util.random(1, 7) - 1;
-		if(roomNum >= 4) roomNum++;
-		
+		roomNum = Util.random(1, 8);
+		// 1 2 3 4 ¤± 6 7 8 9
 		Location elec = locs.get(0);
-		Location loc1 = locs.get(roomNum+1);
-		locs = new ArrayList<Location>(Arrays.asList(elec, loc1));
+		Location loc1 = locs.get(roomNum);
+		locs = Arrays.asList(elec, loc1);
 	}
 	
 	public void onStart(Player p, int i) {
@@ -65,7 +64,7 @@ public class E_DivertPower extends Mission {
 	}
 	
 	public void onStop(Player p, int i) {
-		//p.getInventory().remove(Material.ELYTRA);
+		p.getInventory().remove(Material.REDSTONE_BLOCK);
 	}
 	
 	public void onClear(Player p, int i) {

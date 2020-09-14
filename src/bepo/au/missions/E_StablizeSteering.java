@@ -91,7 +91,7 @@ public class E_StablizeSteering extends Mission {
 			public void run() {
 				if(gui.get(0).getItem(22).getType()==Clickable[0]) {
 					Util.debugMessage("Å¬¸®¾î!");
-					onClear(p, 1);
+					onClear(p, 0);
 				}
 			}
 		}.runTaskLater(main, 0L);

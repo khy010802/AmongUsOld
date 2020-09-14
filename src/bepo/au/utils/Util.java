@@ -111,7 +111,7 @@ public class Util implements Listener{
 								
 	public static ItemStack createItem(Material mat, int amount, String name, List<String> lore) {							
 		ItemStack is = new ItemStack(mat, amount);
-		if(!is.hasItemMeta()) return is;
+		if(is.getType() == Material.AIR) return is;
 		ItemMeta ism = is.getItemMeta();						
 		ism.setDisplayName(name);						
 		ism.setLore(lore);						

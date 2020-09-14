@@ -80,7 +80,7 @@ public class C_Card extends Mission{
 				resetInv(p, event.getView().getTopInventory());
 				Stack(gui.get(0), 17, Material.BARRIER, 1, "§c§l너무 빠르게 긁었습니다!", lore);
 			} else {
-				onClear(p, 1);
+				onClear(p, 0);
 			}
 			
 		} else {

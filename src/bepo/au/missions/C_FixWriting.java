@@ -29,15 +29,9 @@ public class C_FixWriting extends Mission {
 	private int[][] wirecolorArray;
 	private boolean[][] connected = { { false, false, false, false }, { false, false, false, false },
 			{ false, false, false, false } };
-	private Material[][] WIRECOLORARRAY = {
+	private Material[] WIRECOLORARRAY = 
 			{ Material.RED_STAINED_GLASS_PANE, Material.BLUE_STAINED_GLASS_PANE, Material.GREEN_STAINED_GLASS_PANE,
-					Material.PURPLE_STAINED_GLASS_PANE },
-
-			{ Material.RED_STAINED_GLASS_PANE, Material.BLUE_STAINED_GLASS_PANE, Material.GREEN_STAINED_GLASS_PANE,
-					Material.PURPLE_STAINED_GLASS_PANE },
-
-			{ Material.RED_STAINED_GLASS_PANE, Material.BLUE_STAINED_GLASS_PANE, Material.GREEN_STAINED_GLASS_PANE,
-					Material.PURPLE_STAINED_GLASS_PANE } };
+					Material.PURPLE_STAINED_GLASS_PANE };
 
 	@Override
 	public void onAssigned(Player p) {
@@ -82,7 +76,7 @@ public class C_FixWriting extends Mission {
 
 	@Override
 	public void onStop(Player p, int i) {
-		for (Material mat : WIRECOLORARRAY[0]) {
+		for (Material mat : WIRECOLORARRAY) {
 			p.getInventory().remove(mat);
 		}
 	}
@@ -115,17 +109,17 @@ public class C_FixWriting extends Mission {
 		List<String> lore = (num == 1 ? Arrays.asList("§4클릭불가") : Arrays.asList("§7우클릭만 가능합니다."));
 		switch (color) {
 		case 0:
-			Util.Stack(gui, slot, WIRECOLORARRAY[code][0], num, "§cRed §fWire", lore);
+			Util.Stack(gui, slot, WIRECOLORARRAY[0], num, "§cRed §fWire", lore);
 			break;
 		case 1:
-			Util.Stack(gui, slot, WIRECOLORARRAY[code][1], num, "§9Blue §fWire", lore);
+			Util.Stack(gui, slot, WIRECOLORARRAY[1], num, "§9Blue §fWire", lore);
 			break;
 		case 2:
-			Util.Stack(gui, slot, WIRECOLORARRAY[code][2], num, "§aGreen §fWire", lore);
+			Util.Stack(gui, slot, WIRECOLORARRAY[2], num, "§aGreen §fWire", lore);
 			;
 			break;
 		case 3:
-			Util.Stack(gui, slot, WIRECOLORARRAY[code][3], num, "§dPurple §fWire", lore);
+			Util.Stack(gui, slot, WIRECOLORARRAY[3], num, "§dPurple §fWire", lore);
 			break;
 		case -1:
 			gui.setItem(slot, new ItemStack(Material.BARRIER, num));
@@ -144,7 +138,7 @@ public class C_FixWriting extends Mission {
 					int idx = yToidx(slot / 9);
 					//Util.debugMessage(slot + "슬롯 연결 확인");
 					if (!(gui.get(code).getItem(slot) == null)
-							&& gui.get(code).getItem(slot).getType() == WIRECOLORARRAY[code][idx]) {
+							&& gui.get(code).getItem(slot).getType() == WIRECOLORARRAY[idx]) {
 						//Util.debugMessage("연결됨" + (slot + 2) + "에 노란 유리");
 						Util.Stack(gui.get(code), slot + 2, Material.YELLOW_STAINED_GLASS_PANE, 1, " ");// 전기 들어옴 표시
 						connected[code][idx] = true;
@@ -153,6 +147,7 @@ public class C_FixWriting extends Mission {
 								Util.debugMessage(i + "가 연결안됨");
 								return;
 							}
+						Util.debugMessage("connected[" + code + "][" + idx + "]");
 						Util.debugMessage("클리어!"); // 클리어!
 						onClear(p, code);
 					} else {
