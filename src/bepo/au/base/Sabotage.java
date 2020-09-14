@@ -9,6 +9,8 @@ import org.bukkit.scheduler.BukkitRunnable;
 
 import bepo.au.Main;
 import bepo.au.function.MissionList;
+import bepo.au.utils.ColorUtil;
+import bepo.au.utils.PlayerUtil;
 
 public abstract class Sabotage extends Mission {
 
@@ -83,7 +85,6 @@ public abstract class Sabotage extends Mission {
 			registerSabo(st);
 			for (PlayerData pd : PlayerData.getPlayerDataList()) {
 				Sabotage s = st.getClone();
-				
 				pd.addMission(null, s);
 			}
 
@@ -165,14 +166,17 @@ public abstract class Sabotage extends Mission {
 	
 	public final void saboGeneralClear() {
 		for(Player ap : Bukkit.getOnlinePlayers()) {
-			if(gui_title.contains(ap.getOpenInventory().getTitle())) ap.closeInventory(Reason.PLUGIN);
+			if(gui_title.contains(ap.getOpenInventory().getTitle())) {
+				ap.closeInventory(Reason.PLUGIN);
+			}
+			for(Location loc : locs) PlayerUtil.removeGlowingBlock(ap, loc);
 		}
 	}
 	
 	private static void registerSabo(Sabotage s) {
 		Bukkit.getPluginManager().registerEvents(s, Main.getInstance());
 		for(Location loc : s.getLocations()) {
-			
+			for(Player ap : Bukkit.getOnlinePlayers()) PlayerUtil.spawnGlowingBlock(ap, loc, ColorUtil.RED);
 		}
 	}
 
