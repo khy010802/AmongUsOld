@@ -25,6 +25,7 @@ import bepo.au.Main;
 import bepo.au.function.MissionList;
 import bepo.au.utils.ColorUtil;
 import bepo.au.utils.PlayerUtil;
+import bepo.au.utils.Util;
 
 public abstract class Mission implements Listener, Cloneable {
 
@@ -73,16 +74,27 @@ public abstract class Mission implements Listener, Cloneable {
 
 	protected String name;
 	protected String korean;
-	protected List<Location> locs;
 	protected MissionType type;
 	
 	protected boolean order;
 
 	protected List<Inventory> gui = new ArrayList<Inventory>();
 	protected List<String> gui_title = new ArrayList<String>();
-
-	protected int required_clear = 0;
+	protected List<Location> locs;
 	protected List<Integer> cleared = new ArrayList<Integer>();
+	
+	protected int required_clear = 0;
+	
+	@Override
+	public Object clone() throws CloneNotSupportedException { 
+		Mission m = (Mission) super.clone();
+		m.gui = new ArrayList<Inventory>(gui);
+		m.gui_title = new ArrayList<String>(gui_title);
+		m.locs = new ArrayList<Location>(locs);
+		m.cleared = new ArrayList<Integer>(cleared);
+		return m;
+	}
+	
 
 	public Mission(boolean order, MissionType mt, String name, String korean, int required_clear, Location... loc) {
 		this.name = name;
@@ -122,6 +134,8 @@ public abstract class Mission implements Listener, Cloneable {
 			MissionList.HARD.add(this);
 		else MissionList.SABOTAGE.add((Sabotage) this);
 	}
+	
+	
 
 	public void addLocation(Location loc) {
 		this.locs.add(loc);
@@ -179,6 +193,7 @@ public abstract class Mission implements Listener, Cloneable {
 	
 	public Mission getClone() {
 		try {
+			Util.debugMessage("cloned " + this);
 			return (Mission) this.clone();
 		} catch (CloneNotSupportedException e) {
 			e.printStackTrace();
@@ -207,8 +222,13 @@ public abstract class Mission implements Listener, Cloneable {
 
 	public  void generalClear(Player p, int code) {
 		
+		for(PlayerData pd : PlayerData.getPlayerDataList()) {
+			for(Mission m : pd.getMissions()) Util.debugMessage("" + pd.getName() + "'s Mission : " + m);
+		}
+		
+		Util.debugMessage(p.getName() + " == " + playername + " : " + this);
+		PlayerUtil.removeGlowingBlock(p, locs.get(code));
 		if(order) {
-			PlayerUtil.removeGlowingBlock(p, locs.get(code));
 			if(locs.size() > code+1) shinePosition(code+1);
 		}
 		

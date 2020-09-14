@@ -25,7 +25,7 @@ public class E_OpenManifold extends Mission {
 	
 	int[] PassWord  = new int[10];
 	int Count = -1;
-	OpenManifoldTimer Timer = new OpenManifoldTimer();
+	OpenManifoldTimer Timer;
 	
 	public E_OpenManifold(MissionType mt2, String name, String korean, int clear, Location loc) {
 		super(mt2, name, korean, clear, loc);
@@ -41,7 +41,8 @@ public class E_OpenManifold extends Mission {
 	}
 
 	public void onStop(Player p, int i) {
-		if(Timer.GetTimerRunning()) Timer.StopTimer();
+		if(Timer != null && Timer.GetTimerRunning()) Timer.StopTimer();
+		Timer = null;
 	}
 
 	public void onClear(Player p, int i) {
@@ -49,18 +50,18 @@ public class E_OpenManifold extends Mission {
 	}
 	
 	public void openManifold(Player p) {
-		Inventory inv = Bukkit.createInventory(p, 18, "Manifold"); //gui »ý¼º
+		Timer = new OpenManifoldTimer();
 		PassWord = difrandom(1, 10, 10);
 		for(int i = 0; i <= 9; i++) {
 			if(i/5 == 0) {
-				inv.setItem(i+2, new ItemStack(Material.WHITE_STAINED_GLASS_PANE, PassWord[i]));
+				gui.get(0).setItem(i+2, new ItemStack(Material.WHITE_STAINED_GLASS_PANE, PassWord[i]));
 			}
 			else {
-				inv.setItem(i+6, new ItemStack(Material.WHITE_STAINED_GLASS_PANE, PassWord[i]));
+				gui.get(0).setItem(i+6, new ItemStack(Material.WHITE_STAINED_GLASS_PANE, PassWord[i]));
 			}
 		}
 		Count = 1;
-		p.openInventory(inv);
+		p.openInventory(gui.get(0));
 	}
 	
 	@EventHandler

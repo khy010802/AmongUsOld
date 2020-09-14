@@ -1,5 +1,7 @@
 package bepo.au.missions;
 
+import java.util.Arrays;
+
 import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -21,19 +23,23 @@ public class H_Gas extends Mission {
 
 	public void onAssigned(Player p) {
 		assign(p);
-		uploadInventory(p, 54, "Gas 0");
-		uploadInventory(p, 54, "Gas 1");
+		for(int i=0;i<4;i++) {
+			uploadInventory(p, 54, "Gas " + i);
+			uploadInventory(p, 54, "Gas " + i);
+		}
+		locs = Arrays.asList(locs.get(0), locs.get(1), locs.get(0), locs.get(2));
 	}
 
 	public void onStart(Player p, int i) {
-		if (i == 0)
-			gas1(p);
-		else if (cleared.contains((Integer) i))
-			gas2(p);
+		if (i == 0 || i == 2)
+			gas1(p, i);
+		else if(cleared.contains(1)) gas2(p, 1);
+		else if(cleared.contains(3)) gas2(p, 3);
 	}
 
 	public void onStop(Player p, int i) {
-		if(Timer.GetTimerRunning()) Timer.StopTimer();
+		if(Timer != null && Timer.GetTimerRunning()) Timer.StopTimer();
+		Timer = null;
 	}
 
 	public void onClear(Player p, int i) {
@@ -42,36 +48,36 @@ public class H_Gas extends Mission {
 	
 	GasTimer Timer;
 
-	public void gas1(Player p) {
+	public void gas1(Player p, int code) {
 		ItemStack RED_STAINED_GLASS_PANE = new ItemStack(Material.RED_STAINED_GLASS_PANE);
 		for (int i = 1; i < 6; i++) {
-			gui.get(0).setItem(getCoordinate(1, i), RED_STAINED_GLASS_PANE);
-			gui.get(0).setItem(getCoordinate(5, i), RED_STAINED_GLASS_PANE);
+			gui.get(code).setItem(getCoordinate(1, i), RED_STAINED_GLASS_PANE);
+			gui.get(code).setItem(getCoordinate(5, i), RED_STAINED_GLASS_PANE);
 		}
-		gui.get(0).setItem(getCoordinate(2, 5), RED_STAINED_GLASS_PANE);
-		gui.get(0).setItem(getCoordinate(3, 5), RED_STAINED_GLASS_PANE);
-		gui.get(0).setItem(getCoordinate(4, 5), RED_STAINED_GLASS_PANE);
-		gui.get(0).setItem(getCoordinate(2, 0), RED_STAINED_GLASS_PANE);
-		gui.get(0).setItem(getCoordinate(4, 0), RED_STAINED_GLASS_PANE);
-		gui.get(0).setItem(getCoordinate(7, 4), new ItemStack(Material.GRAY_CONCRETE));
+		gui.get(code).setItem(getCoordinate(2, 5), RED_STAINED_GLASS_PANE);
+		gui.get(code).setItem(getCoordinate(3, 5), RED_STAINED_GLASS_PANE);
+		gui.get(code).setItem(getCoordinate(4, 5), RED_STAINED_GLASS_PANE);
+		gui.get(code).setItem(getCoordinate(2, 0), RED_STAINED_GLASS_PANE);
+		gui.get(code).setItem(getCoordinate(4, 0), RED_STAINED_GLASS_PANE);
+		gui.get(code).setItem(getCoordinate(7, 4), new ItemStack(Material.GRAY_CONCRETE));
 
-		p.openInventory(gui.get(0));
+		p.openInventory(gui.get(code));
 	}
 
-	public void gas2(Player p) {
+	public void gas2(Player p, int code) {
 		ItemStack WHITE_STAINED_GLASS_PANE = new ItemStack(Material.WHITE_STAINED_GLASS_PANE);
 		for (int i = 1; i < 6; i++) {
-			gui.get(1).setItem(getCoordinate(3, i), WHITE_STAINED_GLASS_PANE);
-			gui.get(1).setItem(getCoordinate(5, i), WHITE_STAINED_GLASS_PANE);
+			gui.get(code).setItem(getCoordinate(3, i), WHITE_STAINED_GLASS_PANE);
+			gui.get(code).setItem(getCoordinate(5, i), WHITE_STAINED_GLASS_PANE);
 		}
-		gui.get(1).setItem(getCoordinate(4, 5), WHITE_STAINED_GLASS_PANE);
-		gui.get(1).setItem(getCoordinate(7, 4), new ItemStack(Material.GRAY_CONCRETE));
+		gui.get(code).setItem(getCoordinate(4, 5), WHITE_STAINED_GLASS_PANE);
+		gui.get(code).setItem(getCoordinate(7, 4), new ItemStack(Material.GRAY_CONCRETE));
 		ItemStack potion = new ItemStack(Material.POTION);
 		PotionMeta mateP = (PotionMeta) potion.getItemMeta();
 		mateP.setColor(Color.YELLOW);
 		potion.setItemMeta(mateP);
-		gui.get(1).setItem(getCoordinate(5, 0), potion);
-		p.openInventory(gui.get(1));
+		gui.get(code).setItem(getCoordinate(5, 0), potion);
+		p.openInventory(gui.get(code));
 	}
 
 	@EventHandler
@@ -128,19 +134,19 @@ public class H_Gas extends Mission {
 				return;
 			}
 			
-			if (Case == 0) {
+			if (Case % 2 == 0) {
 				if (!(count == 0)) {
 					for (int i = 2; i < 5; i++) {
-						gui.get(0).setItem(getCoordinate(i, count), new ItemStack(Material.YELLOW_STAINED_GLASS_PANE));
+						gui.get(Case).setItem(getCoordinate(i, count), new ItemStack(Material.YELLOW_STAINED_GLASS_PANE));
 					}
 				}
 			}
-			if (Case == 1) {
+			if (Case % 2 == 1) {
 				if (!(count == 0)) {
-					gui.get(1).setItem(getCoordinate(4, count), new ItemStack(Material.YELLOW_STAINED_GLASS_PANE));
+					gui.get(Case).setItem(getCoordinate(4, count), new ItemStack(Material.YELLOW_STAINED_GLASS_PANE));
 				}
 				if (count == 1) {
-					gui.get(1).setItem(getCoordinate(5, 0), new ItemStack(Material.GLASS_BOTTLE));
+					gui.get(Case).setItem(getCoordinate(5, 0), new ItemStack(Material.GLASS_BOTTLE));
 				}
 			}
 		}

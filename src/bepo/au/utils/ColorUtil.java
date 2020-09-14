@@ -2,8 +2,6 @@ package bepo.au.utils;
 
 import org.bukkit.DyeColor;
 
-import java.util.ArrayList;
-
 import org.bukkit.ChatColor;
 
 

@@ -50,7 +50,7 @@ public class H_Shooting extends Mission {
 		Inventory inv = e.getClickedInventory();
 		Player p = (Player) e.getWhoClicked();
 
-		if (e.getCurrentItem().getType() == Material.RED_WOOL) { // »¡°­ ¾çÅÐÀ»
+		if (e.getCurrentItem() != null && e.getCurrentItem().getType() == Material.RED_WOOL) { // »¡°­ ¾çÅÐÀ»
 																												// Å¬¸¯ÇÏ¸é
 			e.setCancelled(true);
 			int dot = e.getSlot();

@@ -236,7 +236,7 @@ public class H_InspectSample extends Mission{
 			for (int slot = 36; slot <= 44; slot += 2)
 				Util.Stack(gui.get(0), slot, Material.GRAY_STAINED_GLASS_PANE, 1, " ", "§4클릭불가");
 			status = 100;
-			Util.debugMessage(" 클리어!");
+			onClear(p, 0);
 		} else {
 			p.playSound(p.getLocation(), Sound.ITEM_SHIELD_BREAK, 1.0f, 0.1f);
 			Util.debugMessage(" 틀림, 재시작");
