@@ -186,8 +186,8 @@ public class GameTimer extends BukkitRunnable{
 		
 		if(Main.COMMON_MISSION_AMOUNT > 0) {
 			for(int index=0;index<Commons.length;index++) if(Commons[index] != null) {
-				Bukkit.broadcastMessage(index + ", " + Commons[index].getKoreanName());
-				pd.addMission(p, Commons[index]);
+				pd.addMission(p, Commons[index].getClone());
+				Bukkit.broadcastMessage(pd.getMissions().get(0).toString());
 			}
 		}
 		

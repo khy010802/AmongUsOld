@@ -9,7 +9,9 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.CompassMeta;
+import org.bukkit.scheduler.BukkitRunnable;
 
+import bepo.au.Main;
 import bepo.au.base.Mission;
 import bepo.au.base.TimerBase;
 import bepo.au.utils.Util;
@@ -152,13 +154,13 @@ public class E_DistributePower extends Mission{
 		@Override
 		public void EventRunningTimer(int count) {
 			
-			if(getPlayer() == null) {
+			Player P = getPlayer();
+			
+			if(P == null) {
 				StopTimer();
 				return;
 			}
-			
-			Player P = getPlayer();
-			
+
 			if(!(P.getOpenInventory().getTitle().equals("DistributePower"))) {
 				Timer.StopTimer();
 				Case = 0;
@@ -172,14 +174,7 @@ public class E_DistributePower extends Mission{
 		@Override
 		public void EventEndTimer() {
 			// TODO Auto-generated method stub
-			/*
-			new BukkitRunnable(){
-	            public void run(){
-	            	Timer.StartTimer(2*t, true, 2);
-	            }
-	            
-	          }.runTaskLater(Main.getInstance(), 0L);
-			*/
+			
 		}
 		
 	}
@@ -194,7 +189,7 @@ public class E_DistributePower extends Mission{
 		meta.setLodestone(loc);
 		item.setItemMeta(meta);
 		gui.get(0).setItem(2+18*Case, item);
-		P.sendMessage("" + angle + "/" + b);
+		//P.sendMessage("" + angle + "/" + b);
 		
 	}
 	

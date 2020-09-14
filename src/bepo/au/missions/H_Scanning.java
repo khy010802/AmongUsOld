@@ -22,7 +22,7 @@ public class H_Scanning extends Mission {
 	
 	public void onAssigned(Player p) {
 		assign(p);
-		uploadInventory(p, 54, "Scanning");
+		uploadInventory(p, 9, "Scanning");
 	}
 	
 	public void onStart(Player p, int code) {

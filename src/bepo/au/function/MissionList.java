@@ -37,7 +37,7 @@ public class MissionList {
 	public final static H_Scanning scanning =					new H_Scanning(MissionType.HARD, "Scanning", "스캔 제출", 1, (Location) null);
 	public final static H_ActivatingReactor activatingreactor = new H_ActivatingReactor(MissionType.HARD, "ActivatingReactor", "원자로 가동하기", 1, (Location) null);
 	public final static H_AlignEngine alignengine =			new H_AlignEngine(MissionType.HARD, "AlignEngine", "엔진 출력 정렬시키기", 2, (Location) null);
-	public final static H_Gas gas = 								new H_Gas(MissionType.HARD, "Gas", "연료 공급하기", 2, (Location) null);
+	public final static H_Gas gas = 								new H_Gas(MissionType.HARD, "Gas", "연료 공급하기", 4, (Location) null);
 	public final static H_Shooting shooting =					new H_Shooting(MissionType.HARD, "Shooting", "운석 파괴하기", 1, (Location) null);
 	public final static H_EmptyGarbage emptygarbage = 	new H_EmptyGarbage(MissionType.HARD, "EmptyGarbage", "쓰레기 버리기", 2, (Location) null);
 	

@@ -25,10 +25,11 @@ public class C_FixWriting extends Mission {
 		super(true, mt2, name, korean, clear, locs);
 	}
 
-	static int[][] wirecolorArray;
-	static boolean[][] connected = { { false, false, false, false }, { false, false, false, false },
+	
+	private int[][] wirecolorArray;
+	private boolean[][] connected = { { false, false, false, false }, { false, false, false, false },
 			{ false, false, false, false } };
-	static Material[][] WIRECOLORARRAY = {
+	private Material[][] WIRECOLORARRAY = {
 			{ Material.RED_STAINED_GLASS_PANE, Material.BLUE_STAINED_GLASS_PANE, Material.GREEN_STAINED_GLASS_PANE,
 					Material.PURPLE_STAINED_GLASS_PANE },
 
@@ -110,7 +111,7 @@ public class C_FixWriting extends Mission {
 		return idx;
 	}
 
-	public static void fillWire(Inventory gui, int slot, int color, int num, int code) {
+	public void fillWire(Inventory gui, int slot, int color, int num, int code) {
 		List<String> lore = (num == 1 ? Arrays.asList("§4클릭불가") : Arrays.asList("§7우클릭만 가능합니다."));
 		switch (color) {
 		case 0:
@@ -132,7 +133,7 @@ public class C_FixWriting extends Mission {
 		}
 	}
 
-	public static void fillWire(Inventory inv, int slot, int color, int code) {
+	public void fillWire(Inventory inv, int slot, int color, int code) {
 		fillWire(inv, slot, color, 1, code);
 	}
 
@@ -141,10 +142,10 @@ public class C_FixWriting extends Mission {
 			public void run() {
 				if (slot % 9 == 6 && slot < 54 && slot / 9 != 1 && slot / 9 != 4) {
 					int idx = yToidx(slot / 9);
-					Util.debugMessage(slot + "슬롯 연결 확인");
+					//Util.debugMessage(slot + "슬롯 연결 확인");
 					if (!(gui.get(code).getItem(slot) == null)
 							&& gui.get(code).getItem(slot).getType() == WIRECOLORARRAY[code][idx]) {
-						Util.debugMessage("연결됨" + (slot + 2) + "에 노란 유리");
+						//Util.debugMessage("연결됨" + (slot + 2) + "에 노란 유리");
 						Util.Stack(gui.get(code), slot + 2, Material.YELLOW_STAINED_GLASS_PANE, 1, " ");// 전기 들어옴 표시
 						connected[code][idx] = true;
 						for (int i = 0; i < 4; i++)
@@ -155,7 +156,7 @@ public class C_FixWriting extends Mission {
 						Util.debugMessage("클리어!"); // 클리어!
 						onClear(p, code);
 					} else {
-						Util.debugMessage("연결안됨" + (slot + 2) + "에 검은 유리");
+						//Util.debugMessage("연결안됨" + (slot + 2) + "에 검은 유리");
 						Util.Stack(gui.get(code), slot + 2, Material.BLACK_STAINED_GLASS_PANE, 1, " ");// 전기 끊김 표시
 						connected[code][idx] = false;
 					}

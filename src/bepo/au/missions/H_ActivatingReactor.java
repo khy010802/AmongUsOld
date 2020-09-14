@@ -70,7 +70,7 @@ public class H_ActivatingReactor extends Mission {
 		
 		Player P = (Player) e.getWhoClicked();
 		Inventory inv = e.getClickedInventory();
-			if (e.getCurrentItem().getType() == Material.WHITE_WOOL) {
+			if (e.getCurrentItem() != null && e.getCurrentItem().getType() == Material.WHITE_WOOL) {
 				e.setCancelled(true);
 				int x = e.getSlot();
 				if ((x % 9 - 4) + ((x / 9 - 1) * 3) == ReactorPassword[Count]) {
