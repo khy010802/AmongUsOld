@@ -1,5 +1,6 @@
 package bepo.au.missions;
 
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -52,7 +53,7 @@ public class H_AlignEngine extends Mission {
 	@Override
 	public void onStop(Player p, int i) {
 		p.getInventory().remove(m);
-
+		p.setItemOnCursor(new ItemStack(Material.AIR));
 	}
 
 
@@ -63,30 +64,28 @@ public class H_AlignEngine extends Mission {
 			return;
 
 		Util.debugMessage("클릭 인식됨");
-		ItemStack itemstack = e.getCurrentItem();
-		if (e.getClick().equals(ClickType.DOUBLE_CLICK) || e.isShiftClick() == true) { // 더블클릭,쉬프트클릭 금지
+		if (e.getClick().equals(ClickType.DOUBLE_CLICK) || e.isShiftClick() == true || e.getClick().equals(ClickType.NUMBER_KEY)) { // 더블클릭,쉬프트클릭 금지
 			Util.debugMessage("클릭 불가");
 			e.setCancelled(true);
+			return;
 		}
-		if (itemstack != null) {
 			
-			if (e.getRawSlot() == 13 && e.getCursor().getType() == m) {
+			if (e.getRawSlot() == 13 && e.getCursor() != null && e.getCursor().getType() == m) {
 				for (int i = 0; i < 2; i++) {
-					if (e.getView().getTitle().split(" ")[1] == Namelore[i]) {
+					if (e.getView().getTitle().split(" ")[1].equals(Namelore[i])) {
 						onClear((Player) e.getWhoClicked(), i);
 						
 						break;
 					}
 				}
 
-			} else if(e.getCurrentItem().getType()==m) {
-				;
+			} else if(e.getCurrentItem() != null && e.getCurrentItem().getType()==m) {
+
 			}
 			else {
 				Util.debugMessage("클릭 불가");
 				e.setCancelled(true);
 			}
-		}
 	}
 
 	@EventHandler
@@ -100,10 +99,11 @@ public class H_AlignEngine extends Mission {
 				if (slot == 13) {
 					for (int i = 0; i < 2; i++) {
 						final int c = i;
-						if (e.getView().getTitle().split(" ")[1] == Namelore[i]) {
+						Bukkit.broadcastMessage(Namelore[i]);
+						if (e.getView().getTitle().split(" ")[1].equals(Namelore[i])) {
 							new BukkitRunnable() {
 								public void run() {
-									if(gui.get(0).getItem(13).getType()==m) {
+									if(gui.get(c).getItem(13).getType()==m) {
 										Util.debugMessage("클리어!");
 										onClear((Player) e.getWhoClicked(), c);
 									}

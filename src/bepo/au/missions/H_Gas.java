@@ -25,7 +25,6 @@ public class H_Gas extends Mission {
 		assign(p);
 		for(int i=0;i<4;i++) {
 			uploadInventory(p, 54, "Gas " + i);
-			uploadInventory(p, 54, "Gas " + i);
 		}
 		locs = Arrays.asList(locs.get(0), locs.get(1), locs.get(0), locs.get(2));
 	}
@@ -33,8 +32,9 @@ public class H_Gas extends Mission {
 	public void onStart(Player p, int i) {
 		if (i == 0 || i == 2)
 			gas1(p, i);
-		else if(cleared.contains(1)) gas2(p, 1);
-		else if(cleared.contains(3)) gas2(p, 3);
+		else if(i == 3 && cleared.contains(2) && cleared.contains(1)) gas2(p, 3);
+		else if(i == 1 && cleared.contains(0)) gas2(p, 1);
+		
 	}
 
 	public void onStop(Player p, int i) {
@@ -85,18 +85,21 @@ public class H_Gas extends Mission {
 		
 		if(!checkPlayer(e)) return;
 		
-		if (getCode(e.getView().getTitle()) == 0) {
+		int code = getCode(e.getView().getTitle());
+		if(code < 0) return;
+		
+		if (code % 2 == 0) {
 			
-			if (e.getCurrentItem().getType() == Material.GRAY_CONCRETE) {
+			if (e.getCurrentItem() != null && e.getCurrentItem().getType() == Material.GRAY_CONCRETE) {
 				e.setCancelled(true);
-				startTimer(0);
+				startTimer(code);
 			} else {
 				e.setCancelled(true);
 			}
-		} else if (getCode(e.getView().getTitle()) == 1) {
-			if (e.getCurrentItem().getType() == Material.GRAY_CONCRETE) {
+		} else if (code % 2 == 1) {
+			if (e.getCurrentItem() != null && e.getCurrentItem().getType() == Material.GRAY_CONCRETE) {
 				e.setCancelled(true);
-				startTimer(1);
+				startTimer(code);
 			} else {
 				e.setCancelled(true);
 			}

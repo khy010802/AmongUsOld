@@ -75,7 +75,7 @@ public class Util implements Listener{
 	}							
 	public static String buildLogMsg(String message) {
 
-		StackTraceElement ste = Thread.currentThread().getStackTrace()[4];
+		StackTraceElement ste = Thread.currentThread().getStackTrace()[3];
 
 		StringBuilder sb = new StringBuilder();
 

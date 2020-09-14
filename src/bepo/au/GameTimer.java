@@ -31,7 +31,7 @@ public class GameTimer extends BukkitRunnable{
 		END;
 	}
 	
-	public final ColorUtil[] COLORLIST 			= { ColorUtil.CYAN, ColorUtil.BLUE, ColorUtil.GRAY, ColorUtil.GREEN, ColorUtil.ORANGE, ColorUtil.PURPLE, ColorUtil.RED, ColorUtil.WHITE, ColorUtil.YELLOW, ColorUtil.PINK, ColorUtil.YELLOW, ColorUtil.LIGHT_GRAY };
+	public final ColorUtil[] COLORLIST 			= { ColorUtil.CYAN, ColorUtil.BLUE, ColorUtil.GRAY, ColorUtil.GREEN, ColorUtil.ORANGE, ColorUtil.PURPLE, ColorUtil.RED, ColorUtil.WHITE, ColorUtil.YELLOW, ColorUtil.PINK, ColorUtil.BLACK, ColorUtil.LIGHT_GRAY };
 	public List<ColorUtil> COLORS = new ArrayList<ColorUtil>();
 	
 	private int timer = 0;
@@ -187,7 +187,6 @@ public class GameTimer extends BukkitRunnable{
 		if(Main.COMMON_MISSION_AMOUNT > 0) {
 			for(int index=0;index<Commons.length;index++) if(Commons[index] != null) {
 				pd.addMission(p, Commons[index].getClone());
-				Bukkit.broadcastMessage(pd.getMissions().get(0).toString());
 			}
 		}
 		

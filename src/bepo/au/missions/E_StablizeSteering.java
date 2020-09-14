@@ -89,7 +89,7 @@ public class E_StablizeSteering extends Mission {
 	private void check(Player p) {
 		new BukkitRunnable() {
 			public void run() {
-				if(gui.get(0).getItem(22).getType()==Clickable[0]) {
+				if(gui.get(0).getItem(22) != null && gui.get(0).getItem(22).getType()==Clickable[0]) {
 					Util.debugMessage("클리어!");
 					onClear(p, 0);
 				}
@@ -116,7 +116,7 @@ public class E_StablizeSteering extends Mission {
 		}
 		if (itemstack != null) {
 			if (Arrays.asList(Clickable).contains(itemstack.getType())) {
-				
+				check((Player) e.getWhoClicked());
 			} else {
 				Util.debugMessage("클릭 불가");
 				e.setCancelled(true);

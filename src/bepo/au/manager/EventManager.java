@@ -1,5 +1,7 @@
 package bepo.au.manager;
 
+import java.util.List;
+
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
@@ -58,12 +60,22 @@ public class EventManager implements Listener {
 					return;
 				}
 				for (Mission m : pd.getMissions()) {
-					int i = m.getCode(loc);
-					if (i >= 0) {
-						if (m.isCleared(i) || m.isCleared())
+					List<Integer> list = m.getCode(loc);
+					int first = -1;
+					if(list.size() > 0) {
+						
+						for(int i=0;i<list.size();i++) {
+							if(!m.isCleared(list.get(i))) {
+								first = list.get(i);
+								break;
+							}
+						}
+						
+						if(first == -1) {
 							p.sendMessage(Main.PREFIX + "§c이미 완료한 미션입니다.");
-						else
-							m.onStart(p, i);
+						} else {
+							m.onStart(p, first);
+						}
 					}
 				}
 			}
@@ -82,7 +94,8 @@ public class EventManager implements Listener {
 
 			for (Mission m : Mission.MISSIONS) {
 				if (m.getTitles().contains(event.getView().getTitle())) {
-					m.onStop(p, 0); // stop 시 어떻게 코드를 받아올 것인가?
+					m.onStop(p, 0);
+					 // stop 시 어떻게 코드를 받아올 것인가?
 					break;
 				}
 			}

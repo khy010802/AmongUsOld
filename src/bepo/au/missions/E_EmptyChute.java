@@ -18,7 +18,7 @@ import bepo.au.utils.Util;
 public class E_EmptyChute extends Mission {
 
 	int maxLeaves = 5; // ÇØ¾ßÇÏ´Â ³ª¹µÀÙ °³¼ö HARD EASY Á¶Àý °¡´É. ÃÖ´ë 36°³.
-	int remainingLeaves = 0;
+	int remainingLeaves = 5;
 	int maxslot = 45;
 
 	public E_EmptyChute(MissionType mt, String name, String korean, int clear, Location loc) {
@@ -32,11 +32,10 @@ public class E_EmptyChute extends Mission {
 		
 		gui.get(0).setMaxStackSize(1);
 		HashSet<Integer> leafSlots = new HashSet<Integer>();
-		while (true && remainingLeaves < 5) {
+		while (true) {
 			int leafslot = Util.random(3, 8) + 9 * Util.random(0, 4);
 			Util.debugMessage(leafslot + "¿¡ ³ª¹µÀÙ");
 			leafSlots.add(leafslot);
-			remainingLeaves++;
 			if (leafSlots.size() == maxLeaves)
 				break;
 		}
