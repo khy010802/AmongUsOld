@@ -48,6 +48,8 @@ public class S_Oxygen extends Sabotage {
 
 	public void onClear(Player p, int i) {
 		Activated = false;
+		Sabotage.saboClear(0);
+		saboGeneralClear();
 	}
 
 	public void resetInv(Player p, int code) {

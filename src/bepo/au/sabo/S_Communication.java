@@ -56,6 +56,8 @@ public class S_Communication extends Sabotage {
 	
 	public void onClear(Player p, int i) {
 		Activated = false;
+		Sabotage.saboClear(0);
+		saboGeneralClear();
 	}
 	
 	
@@ -174,8 +176,7 @@ public class S_Communication extends Sabotage {
 				return;
 		}
 		Util.debugMessage("사보타주 클리어");
-		Activated = false;
-		Sabotage.saboClear(0);
+		onClear(null, 0);
 	}
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

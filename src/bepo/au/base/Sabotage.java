@@ -117,12 +117,17 @@ public abstract class Sabotage extends Mission {
 					pd.getMissions().remove(stm);
 				}
 			}
+			
+			
+			
 		}
 
 		int s_id = id == 0 ? 0 : 1;
 		Sabos[s_id].onClear(null, id);
 		Sabos[s_id] = null;
 
+		
+		
 		Activated_Sabo = -1;
 		Remain_Tick[id] = -1;
 		Sabo_Cool[id] = 600;

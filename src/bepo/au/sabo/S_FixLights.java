@@ -51,6 +51,8 @@ public class S_FixLights extends Sabotage {
 	public void onClear(Player p, int i) {
 		Activated = false;
 		gui = null;
+		Sabotage.saboClear(0);
+		saboGeneralClear();
 	}
 	
 	/*

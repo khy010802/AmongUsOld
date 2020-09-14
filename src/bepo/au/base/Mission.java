@@ -193,7 +193,6 @@ public abstract class Mission implements Listener, Cloneable {
 	
 	public Mission getClone() {
 		try {
-			Util.debugMessage("cloned " + this);
 			return (Mission) this.clone();
 		} catch (CloneNotSupportedException e) {
 			e.printStackTrace();

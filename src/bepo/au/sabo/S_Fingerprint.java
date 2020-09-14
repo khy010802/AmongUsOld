@@ -52,6 +52,8 @@ public class S_Fingerprint extends Sabotage {
 	public void onClear(Player p, int i) {
 		Activated = false;
 		gui[0] = null; gui[1] = null;
+		Sabotage.saboClear(0);
+		saboGeneralClear();
 	}
 	
 	/*
