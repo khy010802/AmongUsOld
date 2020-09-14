@@ -93,7 +93,7 @@ public class E_DistributePower extends Mission{
 		}
 		Case = 0;
 		Timer = new PowerTimer();
-		Timer.StartTimer(2*t, true, 2);
+		Timer.StartTimer(-1, false, 2);
 		p.openInventory(gui.get(0));
 	}
 	
@@ -166,7 +166,7 @@ public class E_DistributePower extends Mission{
 				Case = 0;
 			}
 			
-			SetCompass(P, count);
+			SetCompass(P, -count%(2*t));
 			
 			
 		}
