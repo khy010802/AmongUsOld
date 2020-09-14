@@ -42,7 +42,7 @@ public class S_Communication extends Sabotage {
 		Color[0] = Material.LIME_WOOL;
 		Color[1] = Material.ORANGE_WOOL;
 		Color[2] = Material.WHITE_WOOL;
-		initialize_s_communications(p);
+		if(p != null) initialize_s_communications(p);
 		
 	}
 	

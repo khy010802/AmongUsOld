@@ -76,7 +76,6 @@ public abstract class Sabotage extends Mission {
 			for (Sabotage s : MissionList.SABOTAGE) {
 				if (s.getType() == type) {
 					st = s.getClone();
-					
 					break;
 				}
 			}
