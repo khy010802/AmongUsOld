@@ -1,5 +1,7 @@
 package bepo.au.missions;
 
+import java.util.Arrays;
+
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Sound;
@@ -20,25 +22,31 @@ public class H_EmptyGarbage extends Mission {
 	}
 
 	public void onAssigned(Player p) {
+		int i = Util.random(0, 1);
+		locs = Arrays.asList(locs.get(i), locs.get(2));
+		
+		
 		assign(p);
 		uploadInventory(p, 45, "EmptyGarbage 0");
 		uploadInventory(p, 45, "EmptyGarbage 1");
 	}
 
 	public void onStart(Player p, int i) {
-		Timer = new EmptyGarbageTimer();
+		
 		if (i == 0)
 			emptyGarbage1(p);
-		else if (cleared.contains((Integer) i))
+		else if (cleared.contains((Integer) 0))
 			emptyGarbage2(p);
 	}
 
 	public void onStop(Player p, int i) {
 		if(Timer != null && Timer.GetTimerRunning()) Timer.StopTimer();
+		Timer = null;
 	}
 
 	public void onClear(Player p, int i) {
 		generalClear(p, i);
+		Timer = null;
 	}
 
 	EmptyGarbageTimer Timer;
@@ -103,8 +111,9 @@ public class H_EmptyGarbage extends Mission {
 		if (!checkPlayer(e))
 			return;
 
-		if (e.getCurrentItem().getType() == Material.GRAY_CONCRETE) {
+		if (e.getCurrentItem() != null && e.getCurrentItem().getType() == Material.GRAY_CONCRETE && Timer == null) {
 			e.setCancelled(true);
+			Timer = new EmptyGarbageTimer(getCode(e.getView().getTitle()));
 			Timer.StartTimer(4);
 		} else {
 			e.setCancelled(true);
@@ -125,10 +134,16 @@ public class H_EmptyGarbage extends Mission {
 
 	public final class EmptyGarbageTimer extends TimerBase {
 
+		private int Case;
+		
+		public EmptyGarbageTimer(int Case) {
+			this.Case = Case;
+		}
+		
 		@Override
 		public void EventStartTimer() {
 			// TODO Auto-generated method stub
-
+			if(getPlayer() != null) getPlayer().playSound(getPlayer().getLocation(), Sound.ENTITY_MINECART_RIDING, 1, 1);
 		}
 
 		@Override
@@ -150,7 +165,7 @@ public class H_EmptyGarbage extends Mission {
 			stack = Inv.getContents();
 			for (int i = 4; i > 0; i--) {
 				for (int j = 1; j < 5; j++) {
-					P.playSound(P.getLocation(), Sound.ENTITY_MINECART_RIDING, 1, 1);
+					
 					Inv.setItem(getCoordinate(i, j), stack[getCoordinate(i, j) - 9]);
 				}
 			}
@@ -160,6 +175,7 @@ public class H_EmptyGarbage extends Mission {
 		public void EventEndTimer() {
 			// TODO Auto-generated method stub
 			getPlayer().closeInventory();
+			onClear(getPlayer(), Case);
 		}
 
 	}

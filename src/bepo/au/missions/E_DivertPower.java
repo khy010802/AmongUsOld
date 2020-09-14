@@ -55,6 +55,7 @@ public class E_DivertPower extends Mission {
 		// 1 2 3 4 ¤± 6 7 8 9
 		Location elec = locs.get(0);
 		Location loc1 = locs.get(roomNum);
+		if(roomNum >= 4) roomNum++;
 		locs = Arrays.asList(elec, loc1);
 	}
 	
@@ -65,6 +66,7 @@ public class E_DivertPower extends Mission {
 	
 	public void onStop(Player p, int i) {
 		p.getInventory().remove(Material.REDSTONE_BLOCK);
+		p.setItemOnCursor(new ItemStack(Material.AIR, 1));
 	}
 	
 	public void onClear(Player p, int i) {

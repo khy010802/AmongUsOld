@@ -221,12 +221,7 @@ public abstract class Mission implements Listener, Cloneable {
 	}
 
 	public  void generalClear(Player p, int code) {
-		
-		for(PlayerData pd : PlayerData.getPlayerDataList()) {
-			for(Mission m : pd.getMissions()) Util.debugMessage("" + pd.getName() + "'s Mission : " + m);
-		}
-		
-		Util.debugMessage(p.getName() + " == " + playername + " : " + this);
+		Util.debugMessage("cleared " + code);
 		PlayerUtil.removeGlowingBlock(p, locs.get(code));
 		if(order) {
 			if(locs.size() > code+1) shinePosition(code+1);
@@ -252,13 +247,13 @@ public abstract class Mission implements Listener, Cloneable {
 		}
 	}
 
-	public  int getCode(Location bloc) {
+	public List<Integer> getCode(Location bloc) {
+		List<Integer> list = new ArrayList<Integer>();
 		bloc = bloc.getBlock().getLocation();
 		for (int i = 0; i < locs.size(); i++) {
-			if (bloc.equals(locs.get(i)))
-				return i;
+			if (bloc.equals(locs.get(i))) list.add(i);
 		}
-		return -1;
+		return list;
 	}
 
 	public  int getCode(String title) {

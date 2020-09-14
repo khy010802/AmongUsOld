@@ -27,11 +27,11 @@ public class E_Data extends Mission{
 	}
 	
 	public void onAssigned(Player p) {
-		assign(p);
+		
 		
 		int i = Util.random(1, 4);
 		locs = Arrays.asList(locs.get(i), locs.get(0));
-		
+		assign(p);
 		uploadInventory(p, 18, "Data Download");
 		uploadInventory(p, 18, "Data Upload");
 	}
@@ -41,7 +41,7 @@ public class E_Data extends Mission{
 	}
 	
 	public void onStop(Player p, int i) {
-		p.getInventory().remove(Material.ELYTRA);
+		
 	}
 	
 	public void onClear(Player p, int i) {

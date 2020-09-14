@@ -34,6 +34,7 @@ public class E_ChartCourse extends Mission {
 	
 	public void onStop(Player p, int i) {
 		p.getInventory().remove(Material.ELYTRA);
+		
 	}
 	
 	public void onClear(Player p, int i) {
@@ -42,7 +43,7 @@ public class E_ChartCourse extends Mission {
 
 
 	private void a_reset() {
-		
+		Cur_route = 0;
 		routeArray = resetRoutes();
 
 		for (int Slot = 0; Slot < 54; Slot++) {

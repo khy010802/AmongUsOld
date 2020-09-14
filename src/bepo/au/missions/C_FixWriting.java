@@ -4,6 +4,7 @@ import java.util.Arrays;
 
 import java.util.List;
 
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -26,24 +27,29 @@ public class C_FixWriting extends Mission {
 	}
 
 	
-	private int[][] wirecolorArray;
-	private boolean[][] connected = { { false, false, false, false }, { false, false, false, false },
-			{ false, false, false, false } };
-	private Material[] WIRECOLORARRAY = 
+	protected int[][] wirecolorArray;
+	protected boolean[][] connected;
+	private final Material[] WIRECOLORARRAY = 
 			{ Material.RED_STAINED_GLASS_PANE, Material.BLUE_STAINED_GLASS_PANE, Material.GREEN_STAINED_GLASS_PANE,
 					Material.PURPLE_STAINED_GLASS_PANE };
 
 	@Override
 	public void onAssigned(Player p) {
+		
+		int a = Util.random(0, 2);
+		int b = Util.random(a+1, 3);
+		int c = Util.random(b+1, 4);
+		locs = Arrays.asList(locs.get(a), locs.get(b), locs.get(c));
 		assign(p);
 		wirecolorArray = new int[][] { Util.difrandom(0, 3, 4), Util.difrandom(0, 3, 4), Util.difrandom(0, 3, 4) };
 		for (int i = 0; i < 3; i++) {
 			uploadInventory(p, 54, "FixWiring" + i);
 		}
-		int a = Util.random(0, 2);
-		int b = Util.random(a+1, 3);
-		int c = Util.random(b+1, 4);
-		locs = Arrays.asList(locs.get(a), locs.get(b), locs.get(c));
+		
+		connected = new boolean[4][4];
+		for(int x=0;x<4;x++) {
+			for(int y=0;y<4;y++) connected[x][y] = false;
+		}
 		
 	}
 
@@ -55,7 +61,7 @@ public class C_FixWriting extends Mission {
 		for (int slot = 0; slot < 54; slot++) {// gui인벤토리
 			int y = slot / 9, x = slot % 9;
 			if (y == 0 || y == 2 || y == 3 || y == 5) {
-				Util.debugMessage(" wirecolorArray 확인 " + wirecolorArray[i][yToidx(y)]);
+				//Util.debugMessage(" wirecolorArray 확인 " + wirecolorArray[i][yToidx(y)]);
 				if (x == 8)
 					Util.Stack(gui.get(i), slot, Material.BLACK_STAINED_GLASS_PANE, 1, " ");// 검정색표시
 				else if (x == 0)
@@ -116,7 +122,6 @@ public class C_FixWriting extends Mission {
 			break;
 		case 2:
 			Util.Stack(gui, slot, WIRECOLORARRAY[2], num, "§aGreen §fWire", lore);
-			;
 			break;
 		case 3:
 			Util.Stack(gui, slot, WIRECOLORARRAY[3], num, "§dPurple §fWire", lore);
@@ -132,6 +137,7 @@ public class C_FixWriting extends Mission {
 	}
 
 	public void checkConnection(Player p, int code, int slot) {
+		
 		new BukkitRunnable() {
 			public void run() {
 				if (slot % 9 == 6 && slot < 54 && slot / 9 != 1 && slot / 9 != 4) {
@@ -182,12 +188,12 @@ public class C_FixWriting extends Mission {
 					(slot % 9 != 2 && slot % 9 != 6) || // 클릭 가능한 x좌표
 					slot / 9 == 1 || slot / 9 == 4 // 클릭 불가인 y좌표
 			) { //
-				Util.debugMessage("클릭 불가");
+				//Util.debugMessage("클릭 불가");
 				e.setCancelled(true);
 			}
 			if ((e.getCursor().getType() != Material.AIR || itemstack.getAmount() == 1)
 					&& (slot % 9 == 1 || slot % 9 == 2 || slot % 9 == 7)) {// 아이템 하나일시 클릭 불가 &
-				Util.debugMessage("클릭 불가");
+				//Util.debugMessage("클릭 불가");
 				e.setCancelled(true);
 			}
 		}
