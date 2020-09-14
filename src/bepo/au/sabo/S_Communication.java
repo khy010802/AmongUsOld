@@ -27,7 +27,7 @@ public class S_Communication extends Sabotage {
 								   // 20+ 오래걸릴듯
 	private int[] answerStatus = new int[5];
 	private int[] currentStatus = new int[5];
-	private Material[] Color = { Material.LIME_WOOL, Material.ORANGE_WOOL, Material.WHITE_WOOL }; // 각 인덱스는 정답과의 거리임.
+	private Material[] Color = new Material[3];  // 각 인덱스는 정답과의 거리임.
 																									// 거리는 maxNum에 영향을
 																									// 받음. (예시)정답이 1이고
 																									// 현재 2 이라면 1번째 인덱스.
@@ -39,7 +39,11 @@ public class S_Communication extends Sabotage {
 	}
 	
 	public void onAssigned(Player p) {
+		Color[0] = Material.LIME_WOOL;
+		Color[1] = Material.ORANGE_WOOL;
+		Color[2] = Material.WHITE_WOOL;
 		initialize_s_communications(p);
+		
 	}
 	
 	public void onStart(Player p, int i) {

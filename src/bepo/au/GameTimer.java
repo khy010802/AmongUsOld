@@ -13,6 +13,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 
 import bepo.au.base.Mission;
 import bepo.au.base.PlayerData;
+import bepo.au.base.Sabotage;
 import bepo.au.function.MissionList;
 import bepo.au.manager.ScoreboardManager;
 import bepo.au.utils.ColorUtil;
@@ -243,6 +244,7 @@ public class GameTimer extends BukkitRunnable{
 			Bukkit.broadcastMessage(Main.PREFIX + "§a게임 시작!");
 			Bukkit.getPluginManager().registerEvents(Main.getEventManager(), main);
 			status = Status.WORKING;
+			Sabotage.saboResetAll(true);
 			break;
 		}
 		

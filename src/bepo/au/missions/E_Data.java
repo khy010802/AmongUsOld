@@ -197,7 +197,7 @@ public class E_Data extends Mission{
 		timer.StartTimer(maxtimer,false,1);
 	}
 	public void stop(int pt) {
-		
+		gui.get(pt).remove(Material.PAPER);
 		timer.StopTimer();
 		timer = null;
 	}

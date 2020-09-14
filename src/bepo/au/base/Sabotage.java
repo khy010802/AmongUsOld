@@ -3,6 +3,7 @@ package bepo.au.base;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
+import org.bukkit.event.HandlerList;
 import org.bukkit.event.inventory.InventoryCloseEvent.Reason;
 import org.bukkit.scheduler.BukkitRunnable;
 
@@ -63,7 +64,7 @@ public abstract class Sabotage extends Mission {
 	}
 
 	// 발동 시 0, 발동 불가 시 남은 틱을 반환
-	public final int saboActivate(SaboType type, int id) {
+	public static final int saboActivate(SaboType type, int id) {
 		if (canActivate(id)) {
 
 			int s_id = id == 0 ? 0 : 1;
@@ -73,13 +74,18 @@ public abstract class Sabotage extends Mission {
 			for (Sabotage s : MissionList.SABOTAGE) {
 				if (s.getType() == type) {
 					st = s.getClone();
+					
 					break;
 				}
 			}
 
 			Sabos[s_id] = st;
-			for (PlayerData pd : PlayerData.getPlayerDataList())
-				pd.addMission(null, st.getClone());
+			registerSabo(st);
+			for (PlayerData pd : PlayerData.getPlayerDataList()) {
+				Sabotage s = st.getClone();
+				
+				pd.addMission(null, s);
+			}
 
 			st.onAssigned(null);
 
@@ -105,8 +111,10 @@ public abstract class Sabotage extends Mission {
 				for (Mission m : pd.getMissions())
 					if (m instanceof Sabotage && ((Sabotage) m).getId() == 0)
 						stm = (Sabotage) m;
-				if (stm != null)
+				if (stm != null) {
+					HandlerList.unregisterAll(stm);
 					pd.getMissions().remove(stm);
+				}
 			}
 		}
 
@@ -158,6 +166,13 @@ public abstract class Sabotage extends Mission {
 	public final void saboGeneralClear() {
 		for(Player ap : Bukkit.getOnlinePlayers()) {
 			if(gui_title.contains(ap.getOpenInventory().getTitle())) ap.closeInventory(Reason.PLUGIN);
+		}
+	}
+	
+	private static void registerSabo(Sabotage s) {
+		Bukkit.getPluginManager().registerEvents(s, Main.getInstance());
+		for(Location loc : s.getLocations()) {
+			
 		}
 	}
 
