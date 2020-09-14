@@ -18,7 +18,7 @@ import bepo.au.utils.Util;
 public class E_EmptyChute extends Mission {
 
 	int maxLeaves = 5; // 해야하는 나뭇잎 개수 HARD EASY 조절 가능. 최대 36개.
-	int remainingLeaves;
+	int remainingLeaves = 0;
 	int maxslot = 45;
 
 	public E_EmptyChute(MissionType mt, String name, String korean, int clear, Location loc) {
@@ -30,6 +30,33 @@ public class E_EmptyChute extends Mission {
 		assign(p);
 		uploadInventory(p, 45, "EmptyChute");
 		
+		gui.get(0).setMaxStackSize(1);
+		HashSet<Integer> leafSlots = new HashSet<Integer>();
+		while (true && remainingLeaves < 5) {
+			int leafslot = Util.random(3, 8) + 9 * Util.random(0, 4);
+			Util.debugMessage(leafslot + "에 나뭇잎");
+			leafSlots.add(leafslot);
+			remainingLeaves++;
+			if (leafSlots.size() == maxLeaves)
+				break;
+		}
+		
+		for (int slot = 0; slot < maxslot; slot++) {
+			int x = slot % 9, y = slot / 9;
+			if (x < 3) {
+				if (slot == 20)
+					Util.Stack(gui.get(0), slot, Material.HOPPER, 1, "§f이곳에 나뭇잎을 들고 클릭해주세요");
+				else if (slot == 18)
+					Util.Stack(gui.get(0), slot, Material.BOOK, 1, "§f산소 필터 청소하기", "§7나뭇잎을 들고 호퍼에 클릭하세요.");
+				else if (x > 0 && y > 0 && y <= 3)
+					Util.Stack(gui.get(0), slot, Material.WHITE_STAINED_GLASS_PANE, 1, " ");
+				else
+					Util.Stack(gui.get(0), slot, Material.GRAY_STAINED_GLASS_PANE, 1, " ");
+			} else if (leafSlots.contains(slot)) {
+
+				Util.Stack(gui.get(0), slot, Material.KELP, 1, "§f나뭇잎", "§7이것을 든 채로 호퍼를 클릭하세요.");
+			}
+		}
 	}
 	
 	@Override
@@ -49,33 +76,9 @@ public class E_EmptyChute extends Mission {
 	}
 
 	public void a_reset() {
-		gui.get(0).setMaxStackSize(1);
-		HashSet<Integer> leafSlots = new HashSet<Integer>();
-		remainingLeaves = maxLeaves;
-		while (true) {
-			int leafslot = Util.random(3, 8) + 9 * Util.random(0, 4);
-			Util.debugMessage(leafslot + "에 나뭇잎");
-			leafSlots.add(leafslot);
-			if (leafSlots.size() == maxLeaves)
-				break;
-		}
+		
 
-		for (int slot = 0; slot < maxslot; slot++) {
-			int x = slot % 9, y = slot / 9;
-			if (x < 3) {
-				if (slot == 20)
-					Util.Stack(gui.get(0), slot, Material.HOPPER, 1, "§f이곳에 나뭇잎을 들고 클릭해주세요");
-				else if (slot == 18)
-					Util.Stack(gui.get(0), slot, Material.BOOK, 1, "§f산소 필터 청소하기", "§7나뭇잎을 들고 호퍼에 클릭하세요.");
-				else if (x > 0 && y > 0 && y <= 3)
-					Util.Stack(gui.get(0), slot, Material.WHITE_STAINED_GLASS_PANE, 1, " ");
-				else
-					Util.Stack(gui.get(0), slot, Material.GRAY_STAINED_GLASS_PANE, 1, " ");
-			} else if (leafSlots.contains(slot)) {
-
-				Util.Stack(gui.get(0), slot, Material.KELP, 1, "§f나뭇잎", "§7이것을 든 채로 호퍼를 클릭하세요.");
-			}
-		}
+		
 		
 	}
 

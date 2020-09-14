@@ -129,7 +129,7 @@ public class E_Data extends Mission{
 					for (int i=slot;i>8;i--) if (9<=i&&i<18) Util.Stack(gui.get(pt), i, Material.GREEN_STAINED_GLASS_PANE, 1, "§f"+(percentage)+"%","§4클릭불가");
 					p.openInventory(gui.get(pt));
 				if (count==maxtimer) {//160틱 되면 클리어
-					clear();
+					clear(p, pt);
 				}
 				
 				}
@@ -201,13 +201,8 @@ public class E_Data extends Mission{
 		timer.StopTimer();
 		timer = null;
 	}
-	public void clear() {
-		if (part==1) {
-			Util.debugMessage("다운로드 완료");
-		}else {
-			Util.debugMessage("업로드 완료");
-			Util.debugMessage("클리어!");
-		}
+	public void clear(Player p, int pt) {
+		onClear(p, pt);
 	}
 	
 	

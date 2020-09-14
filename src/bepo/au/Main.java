@@ -39,9 +39,9 @@ public class Main extends JavaPlugin implements Listener{
 	public static int IMPOSTER_SIGHT_BLOCK = 24;
 	public static int KILL_COOLTIME_SEC = 20;
 	
-	public static int COMMON_MISSION_AMOUNT = 1;
-	public static int EASY_MISSION_AMOUNT = 2;
-	public static int HARD_MISSION_AMOUNT = 1;
+	public static int COMMON_MISSION_AMOUNT = 2;
+	public static int EASY_MISSION_AMOUNT = 8;
+	public static int HARD_MISSION_AMOUNT = 7;
 	
 	public static float MOVEMENT_SPEED = 1.0F;
 	
