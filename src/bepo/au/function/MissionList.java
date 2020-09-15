@@ -7,6 +7,7 @@ import org.bukkit.Location;
 
 import bepo.au.base.Mission;
 import bepo.au.base.Mission.MissionType;
+import bepo.au.base.Sabotage.SaboType;
 import bepo.au.base.Sabotage;
 import bepo.au.missions.*;
 import bepo.au.sabo.*;

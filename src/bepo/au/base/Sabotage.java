@@ -74,6 +74,7 @@ public abstract class Sabotage extends Mission {
 			Sabotage st = null;
 
 			for (Sabotage s : MissionList.SABOTAGE) {
+				Bukkit.broadcastMessage("사보타지 : " + s + ", " + type);
 				if (s.getType() == type) {
 					st = s.getClone();
 					break;

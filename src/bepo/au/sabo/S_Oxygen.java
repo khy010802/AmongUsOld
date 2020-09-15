@@ -1,10 +1,12 @@
 package bepo.au.sabo;
 
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.inventory.InventoryAction;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -16,10 +18,11 @@ public class S_Oxygen extends Sabotage {
 
 	public static boolean Activated = false;
 	public static int CLEARED = 0;
-
+	
 	private static int Oxygen_password[] = { 0, 0 };
-	private static int Oxygen_answer[] = { 0, 0 };
-	private static int Oxygen_count[] = { 0, 0 };
+	
+	private int Oxygen_answer[];
+	private int Oxygen_count[];
 
 	public S_Oxygen(MissionType mt2, String name, String korean, int clear, Location loc) {
 		super(mt2, name, korean, clear, loc, SaboType.OXYG, 0);
@@ -27,13 +30,16 @@ public class S_Oxygen extends Sabotage {
 
 	public void onAssigned(Player p) {
 		assign(p);
-		for(int i=0;i<2;i++) uploadInventory(p, 36, "Oxygen " + i);
+		Oxygen_answer = new int[2];
+		Oxygen_count = new int[2];
+		for(int i=0;i<2;i++) {
+			Oxygen_answer[i] = 0;
+			Oxygen_count[i] = 5;
+			uploadInventory(p, 36, "Oxygen " + i);
+		}
 		if(Activated == false) {
-			for (int i = 0; i < 2; i++) {
-				Oxygen_answer[i] = 0;
-				Oxygen_count[i] = 5;
-				Oxygen_password[i] = Util.random(10000, 99999); // 패스워드 지정 10000~99999
-			}
+			Oxygen_password[0] = Util.random(10000, 99999); // 패스워드 지정 10000~99999
+			Oxygen_password[1] = Util.random(10000, 99999);
 			CLEARED = 0;
 			Activated = true;
 		}
@@ -49,12 +55,8 @@ public class S_Oxygen extends Sabotage {
 	}
 
 	public void onClear(Player p, int i) {
-		CLEARED++;
 		saboGeneralClear(i);
-		if(CLEARED == 2) {
-			Activated = false;
-		}
-		
+		Activated = false;
 	}
 
 	public void resetInv(Player p, int code) {
@@ -112,8 +114,11 @@ public class S_Oxygen extends Sabotage {
 		if (!checkPlayer(e))
 			return;
 
+		if(!(e.getAction() == InventoryAction.PICKUP_ALL || e.getAction() == InventoryAction.PICKUP_HALF || e.getAction() == InventoryAction.PICKUP_ONE)) return;
+		
 		Player p = (Player) e.getWhoClicked();
 		int code = getCode(e.getView().getTitle());
+		
 		if (e.getCurrentItem() != null && e.getCurrentItem().getType() == Material.WHITE_WOOL) { // 흰 양털을 클릭하면 양털의 이름을 가져옴
 			e.setCancelled(true);
 			p.playSound(p.getLocation(), Sound.BLOCK_NOTE_BLOCK_PLING, 10, 1);
@@ -127,7 +132,7 @@ public class S_Oxygen extends Sabotage {
 					CLEARED++;
 					if(CLEARED == 2) {
 						Sabotage.saboClear(0);
-					} else onClear(p, code);
+					} else cleared.add(code);
 					
 					p.closeInventory();
 					return;
@@ -156,13 +161,13 @@ public class S_Oxygen extends Sabotage {
 				break;
 			}
 		}
-		if (e.getCurrentItem().getType() == Material.RED_WOOL) {
+		if (e.getCurrentItem() != null && e.getCurrentItem().getType() == Material.RED_WOOL) {
 			e.setCancelled(true);
 			p.playSound(p.getLocation(), Sound.BLOCK_NOTE_BLOCK_PLING, 10, 1);
 			Oxygen_answer[code] = 0;
 			Oxygen_count[code] = 5;
 		}
-		if (e.getCurrentItem().getType() == Material.PAPER) {
+		if (e.getCurrentItem() != null && e.getCurrentItem().getType() == Material.PAPER) {
 			e.setCancelled(true);
 		}
 
