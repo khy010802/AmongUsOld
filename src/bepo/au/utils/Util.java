@@ -157,6 +157,9 @@ public class Util implements Listener{
 	public static void Stack(Inventory inv, int slot, Material mat, int amount, String name, List<String> lore, boolean enchant) {							
 		inv.setItem(slot, createItem(mat, amount, name, lore, enchant));						
 	}
+	public static void Stack(Inventory inv, int slot, Material mat, int amount, String name, String lore, boolean enchant) {							
+		inv.setItem(slot, createItem(mat, amount, name, Arrays.asList(lore), enchant));						
+	}
 	public static void Stack(Inventory inv, int slot, Material mat, int amount, String name, List<String> lore) {							
 		inv.setItem(slot, createItem(mat, amount, name, lore));						
 	}
