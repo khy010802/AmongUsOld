@@ -12,6 +12,7 @@ import org.bukkit.Color;
 import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.craftbukkit.v1_16_R2.inventory.CraftItemStack;
+import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;								
 import org.bukkit.event.Listener;								
 import org.bukkit.inventory.Inventory;								
@@ -109,15 +110,22 @@ public class Util implements Listener{
 		return is;
 	}
 								
-	public static ItemStack createItem(Material mat, int amount, String name, List<String> lore) {							
+	public static ItemStack createItem(Material mat, int amount, String name, List<String> lore, boolean enchant) {							
 		ItemStack is = new ItemStack(mat, amount);
 		if(is.getType() == Material.AIR) return is;
 		ItemMeta ism = is.getItemMeta();						
 		ism.setDisplayName(name);						
-		ism.setLore(lore);						
+		ism.setLore(lore);	
+		if(enchant) {
+		ism.addEnchant(Enchantment.LURE, 1, true);
+		ism.addItemFlags(ItemFlag.HIDE_ENCHANTS);
+		}
 		is.setItemMeta(ism);						
 		return is;						
 	}							
+	public static ItemStack createItem(Material mat, int amount, String name, List<String> lore) {
+		return createItem(mat, amount, name, lore, false);
+	}
 	public static ItemStack createPotion(int amount,Color color, String name, List<String> lore) {							
 		ItemStack is = createItem(Material.POTION,amount,name,lore);						
 								
@@ -145,7 +153,10 @@ public class Util implements Listener{
 	public static void StackPotion(Inventory inv, int slot, Color color, int amount, String name) {							
 		inv.setItem(slot, createPotion(amount, color, name, null));						
 	}							
-								
+	
+	public static void Stack(Inventory inv, int slot, Material mat, int amount, String name, List<String> lore, boolean enchant) {							
+		inv.setItem(slot, createItem(mat, amount, name, lore, enchant));						
+	}
 	public static void Stack(Inventory inv, int slot, Material mat, int amount, String name, List<String> lore) {							
 		inv.setItem(slot, createItem(mat, amount, name, lore));						
 	}
