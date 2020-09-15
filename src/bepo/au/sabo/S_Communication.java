@@ -5,7 +5,7 @@ import java.util.List;
 
 import org.bukkit.Location;
 import org.bukkit.Material;
-
+import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 
@@ -42,7 +42,8 @@ public class S_Communication extends Sabotage {
 		Color[0] = Material.LIME_WOOL;
 		Color[1] = Material.ORANGE_WOOL;
 		Color[2] = Material.WHITE_WOOL;
-		if(p != null) initialize_s_communications(p);
+		assign(p);
+		initialize_s_communications(p);
 		
 	}
 	
@@ -56,7 +57,7 @@ public class S_Communication extends Sabotage {
 	
 	public void onClear(Player p, int i) {
 		Activated = false;
-		Sabotage.saboClear(0);
+		
 		saboGeneralClear();
 	}
 	
@@ -148,6 +149,7 @@ public class S_Communication extends Sabotage {
 	 * 레버를 토글
 	 */
 	private void toggleStatus(Player p, int idx, boolean increase) {
+		p.playSound(p.getLocation(), Sound.UI_BUTTON_CLICK, 1.0f, 1.0f);
 		Util.debugMessage("┌-------토글-------┐");
 		Util.debugMessage(idx + "번 주파수 토글");
 		if (increase) {
@@ -176,7 +178,7 @@ public class S_Communication extends Sabotage {
 				return;
 		}
 		Util.debugMessage("사보타주 클리어");
-		onClear(null, 0);
+		Sabotage.saboClear(0);
 	}
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

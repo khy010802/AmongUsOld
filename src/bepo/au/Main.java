@@ -7,6 +7,7 @@ import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.scoreboard.Scoreboard;
 
 import bepo.au.base.Mission;
 import bepo.au.function.MissionList;
@@ -14,6 +15,7 @@ import bepo.au.manager.CommandManager;
 import bepo.au.manager.EventManager;
 import bepo.au.manager.LocManager;
 import bepo.au.manager.TabCompleteManager;
+import bepo.au.utils.ColorUtil;
 import bepo.au.utils.PlayerUtil;
 import bepo.au.utils.Util;
 
@@ -116,6 +118,13 @@ public class Main extends JavaPlugin implements Listener{
 	public void onDisable() {
 		lm.saveLocs();
 		for(Player p : Bukkit.getOnlinePlayers()) PlayerUtil.resetGlowingBlock(p);
+
+		Scoreboard board = Bukkit.getScoreboardManager().getMainScoreboard();
+		for(ColorUtil c : ColorUtil.values()) {
+			String tname = "sh" + c.getChatColor().name();
+			if(board.getTeam(tname) != null) board.getTeam(tname).unregister();
+		}
+		
 	}
 
 }

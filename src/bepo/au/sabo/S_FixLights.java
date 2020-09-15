@@ -3,6 +3,7 @@ package bepo.au.sabo;
 import java.util.Arrays;
 import java.util.List;
 
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.HumanEntity;
@@ -23,6 +24,7 @@ public class S_FixLights extends Sabotage {
 
 	private static Inventory gui = null;
 	
+	private String guiName = "S_FixLights";
 	Random random = new Random();
 	int maxslot = 45;
 	
@@ -36,6 +38,7 @@ public class S_FixLights extends Sabotage {
 	}
 	
 	public void onAssigned(Player p) {
+		assign(p);
 		initialize_fixLights();
 		setGUI();
 	}
@@ -51,7 +54,6 @@ public class S_FixLights extends Sabotage {
 	public void onClear(Player p, int i) {
 		Activated = false;
 		gui = null;
-		Sabotage.saboClear(0);
 		saboGeneralClear();
 	}
 	
@@ -72,9 +74,12 @@ public class S_FixLights extends Sabotage {
 	 * 초기화 ; gui를 만듦.
 	 */
 	public void initialize_fixLights() {
-		Activated = true;
-		uploadInventory(null, maxslot, "S_FixLights");
-		gui.setMaxStackSize(1);
+		if(Activated == false) {
+			Activated = true;
+			gui = Bukkit.createInventory(null, maxslot, guiName);
+			gui.setMaxStackSize(1);
+		}
+		
 		for (int i = 0; i < 5; i++)
 			connected[i] = false;
 		int init_connected = 1 + random.nextInt(4); // 연결된 수가 적을 확률이 더 큼
@@ -129,9 +134,9 @@ public class S_FixLights extends Sabotage {
 				return;
 		}
 		Util.debugMessage("사보타주 클리어");
-		Activated=false;
-		Sabotage.saboClear(0);
 		for (HumanEntity he : gui.getViewers()) {((Player) he).closeInventory();}
+		Sabotage.saboClear(0);
+		
 	}
 
 	/*
@@ -153,7 +158,7 @@ public class S_FixLights extends Sabotage {
 	@EventHandler
 	public void onClick(InventoryClickEvent e) {
 		
-		if(!checkPlayer(e, false)) return;
+		if(!e.getView().getTitle().contains(guiName)) return;
 		
 			Util.debugMessage("클릭 인식됨");
 			int slot = e.getRawSlot();

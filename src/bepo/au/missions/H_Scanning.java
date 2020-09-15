@@ -75,12 +75,15 @@ public class H_Scanning extends Mission {
 				if (count % 2 == 0) {
 					Util.debugMessage("gui 인식됨");
 					ItemStack[] temp = gui.get(0).getContents();
-					gui.set(0, Bukkit.createInventory(p, 9, "Scanning " + ccount));
-					gui.get(0).setContents(temp);
+					
 					if (0 <= slot && slot <= 8)
 						Util.Stack(gui.get(0), slot, Material.GREEN_STAINED_GLASS_PANE, 1, "§f" + (10 - ccount) + "0%",
 								"§4클릭불가");
+					if (count % 20 == 0) {
+					gui.set(0, Bukkit.createInventory(p, 9, "Scanning " + ccount));
+					gui.get(0).setContents(temp);
 					p.openInventory(gui.get(0));
+					}
 				}
 			} else { // 아니면 캔슬
 				Util.debugMessage("인벤토리 닫음 확인");
@@ -124,7 +127,8 @@ public class H_Scanning extends Mission {
 
 	public void stopScan() {
 		status = false;
-		timer.StopTimer();
+		gui.get(0).clear();
+		if(timer != null && timer.GetTimerRunning()) timer.StopTimer();
 	}
 
 	@EventHandler

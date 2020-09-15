@@ -81,13 +81,11 @@ public abstract class Sabotage extends Mission {
 			}
 
 			Sabos[s_id] = st;
-			registerSabo(st);
 			for (PlayerData pd : PlayerData.getPlayerDataList()) {
 				Sabotage s = st.getClone();
 				pd.addMission(null, s);
+				s.shinePosition(false);
 			}
-
-			st.onAssigned(null);
 
 			Activated_Sabo = id;
 			if (id == 0 && (st.getType() == SaboType.COMM || st.getType() == SaboType.ELEC))
@@ -113,7 +111,13 @@ public abstract class Sabotage extends Mission {
 						stm = (Sabotage) m;
 				if (stm != null) {
 					HandlerList.unregisterAll(stm);
+					stm.shineReset();
 					pd.getMissions().remove(stm);
+					
+					if(stm.getPlayer() != null) {
+						Player p = stm.getPlayer();
+						if(p.getOpenInventory() != null && stm.getTitles().contains(p.getOpenInventory().getTitle())) p.closeInventory();
+					}
 				}
 			}
 			
@@ -125,8 +129,6 @@ public abstract class Sabotage extends Mission {
 		Sabos[s_id].onClear(null, id);
 		Sabos[s_id] = null;
 
-		
-		
 		Activated_Sabo = -1;
 		Remain_Tick[id] = -1;
 		Sabo_Cool[id] = 600;
@@ -168,19 +170,21 @@ public abstract class Sabotage extends Mission {
 		}
 	}
 	
+	public final void saboGeneralClear(int i) {
+		for(Player ap : Bukkit.getOnlinePlayers()) {
+			if(gui_title.get(i).contains(ap.getOpenInventory().getTitle())) {
+				ap.closeInventory(Reason.PLUGIN);
+			}
+			PlayerUtil.removeGlowingBlock(ap, locs.get(i));
+		}
+	}
+	
 	public final void saboGeneralClear() {
 		for(Player ap : Bukkit.getOnlinePlayers()) {
 			if(gui_title.contains(ap.getOpenInventory().getTitle())) {
 				ap.closeInventory(Reason.PLUGIN);
 			}
 			for(Location loc : locs) PlayerUtil.removeGlowingBlock(ap, loc);
-		}
-	}
-	
-	private static void registerSabo(Sabotage s) {
-		Bukkit.getPluginManager().registerEvents(s, Main.getInstance());
-		for(Location loc : s.getLocations()) {
-			for(Player ap : Bukkit.getOnlinePlayers()) PlayerUtil.spawnGlowingBlock(ap, loc, ColorUtil.RED);
 		}
 	}
 

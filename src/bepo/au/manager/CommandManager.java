@@ -84,6 +84,11 @@ public class CommandManager implements CommandExecutor{
 	
 	private void debug(Player p, String[] args) {
 		
+		if(args.length == 1) {
+			PlayerUtil.spawnGlowingBlock(p, p.getLocation(), ColorUtil.GREEN);
+			return;
+		}
+		
 		int i = Integer.parseInt(args[1]);
 		SaboType st;
 		switch(i) {

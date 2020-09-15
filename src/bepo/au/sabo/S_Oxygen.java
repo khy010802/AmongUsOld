@@ -15,6 +15,7 @@ import bepo.au.utils.Util;
 public class S_Oxygen extends Sabotage {
 
 	public static boolean Activated = false;
+	public static int CLEARED = 0;
 
 	private static int Oxygen_password[] = { 0, 0 };
 	private static int Oxygen_answer[] = { 0, 0 };
@@ -25,15 +26,16 @@ public class S_Oxygen extends Sabotage {
 	}
 
 	public void onAssigned(Player p) {
-
-		for (int i = 0; i < 2; i++) {
-			if (Activated == false) {
+		assign(p);
+		for(int i=0;i<2;i++) uploadInventory(p, 36, "Oxygen " + i);
+		if(Activated == false) {
+			for (int i = 0; i < 2; i++) {
 				Oxygen_answer[i] = 0;
 				Oxygen_count[i] = 5;
 				Oxygen_password[i] = Util.random(10000, 99999); // ÆÐ½º¿öµå ÁöÁ¤ 10000~99999
-				Activated = true;
 			}
-			uploadInventory(p, 36, "Oxygen " + (i + 1));
+			CLEARED = 0;
+			Activated = true;
 		}
 	}
 
@@ -47,9 +49,12 @@ public class S_Oxygen extends Sabotage {
 	}
 
 	public void onClear(Player p, int i) {
-		Activated = false;
-		Sabotage.saboClear(0);
-		saboGeneralClear();
+		CLEARED++;
+		saboGeneralClear(i);
+		if(CLEARED == 2) {
+			Activated = false;
+		}
+		
 	}
 
 	public void resetInv(Player p, int code) {
@@ -104,12 +109,12 @@ public class S_Oxygen extends Sabotage {
 	@EventHandler
 	public void Click(InventoryClickEvent e) {
 
-		if (checkPlayer(e))
+		if (!checkPlayer(e))
 			return;
 
 		Player p = (Player) e.getWhoClicked();
 		int code = getCode(e.getView().getTitle());
-		if (e.getCurrentItem().getType() == Material.WHITE_WOOL) { // Èò ¾çÅÐÀ» Å¬¸¯ÇÏ¸é ¾çÅÐÀÇ ÀÌ¸§À» °¡Á®¿È
+		if (e.getCurrentItem() != null && e.getCurrentItem().getType() == Material.WHITE_WOOL) { // Èò ¾çÅÐÀ» Å¬¸¯ÇÏ¸é ¾çÅÐÀÇ ÀÌ¸§À» °¡Á®¿È
 			e.setCancelled(true);
 			p.playSound(p.getLocation(), Sound.BLOCK_NOTE_BLOCK_PLING, 10, 1);
 			String numstr = e.getCurrentItem().getItemMeta().getDisplayName();
@@ -119,7 +124,11 @@ public class S_Oxygen extends Sabotage {
 				Oxygen_answer[code] += num;
 				Oxygen_count[code]--;
 				if (Oxygen_answer[code] == Oxygen_password[code]) {
-					Sabotage.saboClear(0);
+					CLEARED++;
+					if(CLEARED == 2) {
+						Sabotage.saboClear(0);
+					} else onClear(p, code);
+					
 					p.closeInventory();
 					return;
 				} else {

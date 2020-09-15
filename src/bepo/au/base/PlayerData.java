@@ -71,13 +71,12 @@ public class PlayerData {
 	}
 	
 	public void addMission(Player p, Mission m) {
+	
 		
-		Mission clone = m.getClone();
+		if(p != null) m.onAssigned(p);
+		else if(Bukkit.getPlayer(name) != null) m.onAssigned(Bukkit.getPlayer(name));
 		
-		if(p != null) clone.onAssigned(p);
-		else if(Bukkit.getPlayer(name) != null) clone.onAssigned(Bukkit.getPlayer(name));
-		
-		missions.add(clone);
+		missions.add(m);
 		
 	}
 	

@@ -37,7 +37,8 @@ public class E_Data extends Mission{
 	}
 	
 	public void onStart(Player p, int i) {
-		data(p, i);
+		if(i == 0) data(p, 0);
+		else if(cleared.contains(0)) data(p, 1);
 	}
 	
 	public void onStop(Player p, int i) {
@@ -198,7 +199,8 @@ public class E_Data extends Mission{
 	}
 	public void stop(int pt) {
 		gui.get(pt).remove(Material.PAPER);
-		timer.StopTimer();
+		gui.get(pt).remove(Material.GREEN_STAINED_GLASS_PANE);
+		if(timer != null && timer.GetTimerRunning()) timer.StopTimer();
 		timer = null;
 	}
 	public void clear(Player p, int pt) {

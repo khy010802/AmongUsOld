@@ -171,6 +171,7 @@ public class PlayerUtil {
 				
 				WorldServer ws = ((CraftWorld) loc.getWorld()).getHandle();
 				EntityMagmaCube es = new EntityMagmaCube(EntityTypes.MAGMA_CUBE, ws);
+				//EntityShulker es = new EntityShulker(EntityTypes.SHULKER, ws);
 				
 				es.setPosition(loc.getBlockX() + 0.5D, loc.getBlockY() + 0.25D, loc.getBlockZ() + 0.5D);
 				es.setInvulnerable(true);
@@ -186,6 +187,7 @@ public class PlayerUtil {
 				
 				if(c != ColorUtil.WHITE) {
 					Scoreboard board = Bukkit.getScoreboardManager().getMainScoreboard();
+					if(getPlayer().getScoreboard() != null) board = getPlayer().getScoreboard();
 					String tname = "sh" + c.getChatColor().name();
 					
 					Team team;
@@ -243,6 +245,7 @@ public class PlayerUtil {
 		if(!Shulkers.containsKey(p.getName())) return;
 		ShulkerInfo si = Shulkers.get(p.getName());
 		si.reset();
+		
 	}
 	
 	

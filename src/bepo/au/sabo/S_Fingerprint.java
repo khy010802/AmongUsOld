@@ -24,12 +24,10 @@ import java.util.UUID;
 
 public class S_Fingerprint extends Sabotage {
 	
-	private static Inventory[] gui = new Inventory[2];
-	
 	private final int maxslot = 54;
 	private final String guiName = "S_Fingerprint";
-	private static ArrayList<UUID> upperPlayerList= new ArrayList<>();
-	private static ArrayList<UUID> lowerPlayerList= new ArrayList<>();
+	public static ArrayList<UUID> upperPlayerList= new ArrayList<>();
+	public static ArrayList<UUID> lowerPlayerList= new ArrayList<>();
 
 	public static boolean Activated = false;
 	
@@ -38,7 +36,8 @@ public class S_Fingerprint extends Sabotage {
 	}
 	
 	public void onAssigned(Player p) {
-		initialize_Fingerprint();
+		assign(p);
+		initialize_Fingerprint(p);
 	}
 	
 	public void onStart(Player p, int i) {
@@ -51,8 +50,6 @@ public class S_Fingerprint extends Sabotage {
 	
 	public void onClear(Player p, int i) {
 		Activated = false;
-		gui[0] = null; gui[1] = null;
-		Sabotage.saboClear(0);
 		saboGeneralClear();
 	}
 	
@@ -61,7 +58,7 @@ public class S_Fingerprint extends Sabotage {
 	 */
 	public void s_fingerprintOpen(Player pl, boolean isLocationUpper) {
 		if (Activated) {
-			pl.openInventory(gui[isLocationUpper ? 0 : 1]);
+			pl.openInventory(gui.get(isLocationUpper ? 0 : 1));
 		} else {
 			Util.debugMessage("원자로 사보타주가 아직 시작되지 않았습니다");
 		}
@@ -71,11 +68,11 @@ public class S_Fingerprint extends Sabotage {
 	 * 명령어 쳤을 때 실행됨. 사보타주 시작.
 	 */
 
-	public void s_fingerprintStart() {
+	public void s_fingerprintStart(Player p) {
 		if (Activated) {
 			Util.debugMessage("원자로 사보타주는 이미 시작되었습니다.");
 		} else {
-			initialize_Fingerprint();
+			initialize_Fingerprint(p);
 			Util.debugMessage("원자로 사보타주 실행됨");
 		}
 	}
@@ -83,18 +80,21 @@ public class S_Fingerprint extends Sabotage {
 	/*
 	 * 초기화 ; GUI를 설정함.
 	 */
-	private void initialize_Fingerprint() {
+	private void initialize_Fingerprint(Player p) {
 		
-		if(gui[0] == null) {
+		if(gui.size() == 0) {
+			for(int i=0;i<2;i++) {
+				uploadInventory(p, maxslot, guiName + " " + i);
+				gui.get(i).setMaxStackSize(1);
+			}
+		}
+		
+		setGUI(true); setGUI(false);
+		
+		if(Activated == false) {
 			Activated = true;
 			upperPlayerList.clear();
 			lowerPlayerList.clear();
-			
-			for(int i=1;i<=2;i++) {
-					gui[i-1] = Bukkit.createInventory(null, maxslot, guiName + " " + i);
-					gui[i-1].setMaxStackSize(1);
-					setGUI(true); setGUI(false);
-			}
 		}
 		
 		
@@ -106,13 +106,11 @@ public class S_Fingerprint extends Sabotage {
 	 */
 
 	private void setGUI(boolean isUpper) {
-		
-		if((isUpper && upperPlayerList.size() == 0) || (!isUpper && lowerPlayerList.size() == 0)) {
+
 			List<String> lore = Arrays.asList("§7클릭해 활성화하세요");
 			for (int slot = 0; slot < maxslot; slot++) {
-				Util.Stack(gui[isUpper ? 0 : 1], slot, Material.RED_STAINED_GLASS, 1, "§4활성화 되어있지 않음", lore);
+				Util.Stack(gui.get(isUpper ? 0 : 1), slot, Material.RED_STAINED_GLASS, 1, "§4활성화 되어있지 않음", lore);
 			}
-		}
 		
 		
 	}
@@ -125,7 +123,7 @@ public class S_Fingerprint extends Sabotage {
 		Util.debugMessage(isUpper + " 활성화");
 		List<String> lore = Arrays.asList("§7인벤토리를 닫으면 활성화가 풀립니다.");
 		for (int slot = 0; slot < maxslot; slot++) {
-			Util.Stack(gui[0], slot, Material. BLUE_STAINED_GLASS, 1, "§4활성화 되어있지 않음",lore);
+			Util.Stack(gui.get(isUpper ? 0 : 1), slot, Material. BLUE_STAINED_GLASS, 1, "§4활성화 되어있지 않음",lore);
 			if(isUpper) {
 			upperPlayerList.add(id);
 			}else {
@@ -162,32 +160,33 @@ public class S_Fingerprint extends Sabotage {
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	@EventHandler
 	private void onClick(InventoryClickEvent e) {
-		if(!checkPlayer(e, false)) return;
+		if(!checkPlayer(e)) return;
 			Util.debugMessage("클릭 인식됨");
 			ItemStack itemstack = e.getCurrentItem();
 			Player p = (Player) e.getWhoClicked();
 			if (e.getClick().equals(ClickType.DOUBLE_CLICK) || e.isShiftClick() == true) { // 더블클릭,쉬프트클릭 금지
 				Util.debugMessage("더블 클릭 불가");
 				e.setCancelled(true);
+				return;
 			}
 			if (itemstack != null) {
 				if (itemstack.getType()==Material.RED_STAINED_GLASS) {
 						Util.debugMessage("빨간색 클릭");
-						activate(getCode(e.getView().getTitle()) == 1 ? true : false, p.getUniqueId());
+						activate(getCode(e.getView().getTitle()) == 0 ? true : false, p.getUniqueId());
+						e.setCancelled(true);
+					} else {
+						Util.debugMessage("클릭 불가");
 						e.setCancelled(true);
 					}
 
-				} else {
-					Util.debugMessage("클릭 불가");
-					e.setCancelled(true);
 				}
 		
 		}
 	
-@EventHandler
+	@EventHandler
 	private void onClose(InventoryCloseEvent e) {
 		if(Activated&&e.getView().getTitle().contains(guiName)) {
-			deactivate(getCode(e.getView().getTitle()) == 1 ? true : false, e.getPlayer().getUniqueId());
+			deactivate(getCode(e.getView().getTitle()) == 0 ? true : false, e.getPlayer().getUniqueId());
 		}
 	}
 
