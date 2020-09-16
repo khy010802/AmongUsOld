@@ -2,6 +2,7 @@ package bepo.au;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Random;
 
@@ -9,12 +10,16 @@ import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.HandlerList;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import bepo.au.base.Mission;
 import bepo.au.base.PlayerData;
 import bepo.au.base.Sabotage;
+import bepo.au.function.AdminMap;
+import bepo.au.function.ItemList;
 import bepo.au.function.MissionList;
+import bepo.au.function.SightTimer;
 import bepo.au.manager.ScoreboardManager;
 import bepo.au.utils.ColorUtil;
 import bepo.au.utils.PlayerUtil;
@@ -46,6 +51,7 @@ public class GameTimer extends BukkitRunnable{
 	public static List<String> PLAYERS = new ArrayList<String>();
 	public static List<String> IMPOSTER = new ArrayList<String>();
 	
+	public static List<Player> ALIVE_PLAYERS = new ArrayList<Player>();
 	public static List<String> ALIVE_IMPOSTERS = new ArrayList<String>();
 	
 	public static int REQUIRED_MISSION = 0;
@@ -84,6 +90,8 @@ public class GameTimer extends BukkitRunnable{
 		if(!this.isCancelled()) this.cancel();
 		stop_reset();
 		Mission.deactivateMission();
+		SightTimer.stop();
+		for(Player ap : Bukkit.getOnlinePlayers()) ap.removePotionEffect(PotionEffectType.BLINDNESS);
 	}
 	
 	private void setting() {
@@ -102,7 +110,7 @@ public class GameTimer extends BukkitRunnable{
 		}
 		
 		EMERG_REMAIN_TICK = Main.EMER_BUTTON_COOL_SEC * 20;
-		REQUIRED_MISSION = (Main.COMMON_MISSION_AMOUNT + Main.EASY_MISSION_AMOUNT + Main.HARD_MISSION_AMOUNT) * (PLAYERS.size() - Main.IMPOSTER_AMOUNT);
+		REQUIRED_MISSION = 0;
 	}
 	
 	private void stop_reset() {
@@ -146,6 +154,7 @@ public class GameTimer extends BukkitRunnable{
 			Player p = Bukkit.getPlayer(name);
 			PlayerData pd = PlayerData.getPlayerData(p.getName());
 			
+			//p.getInventory().clear();
 			p.setPlayerListName(pd.getColor().getChatColor() + p.getName());
 			
 			ItemStack[] ac = PlayerUtil.getColoredArmorContent(pd.getColor());
@@ -157,10 +166,15 @@ public class GameTimer extends BukkitRunnable{
 				p.sendMessage("§4당신은 임포스터입니다.");
 				p.sendMessage("§c2번 슬롯에 검을 지급해드렸습니다. 적절한 시기에 크루원을 죽이십시오. (쿨타임 " + Main.KILL_COOLTIME_SEC + "초)");
 				p.sendMessage("§c숫자 키 3번, 4번으로 사보타지를 선택할 수 있으며,");
-				p.sendMessage("§c5번을 누르면 현재 선택된 사보타지를 발동시킬 수 있습니다.");
+				p.sendMessage("§c손 바꾸기(기본 설정 F) 키를 눌러 사보타지를 발동할 수 있습니다.");
 				p.sendMessage("§c");
 				p.sendMessage("§c임포스터 플레이어 : §f" + imposter);
 				p.sendMessage("§f=======================");
+				
+				HashMap<Integer, ItemStack> islist = ItemList.getImposterSet();
+				for(int i : islist.keySet()) p.getInventory().setItem(i, islist.get(i));
+				
+				pd.nextSabo(p, false);
 			} else {
 				p.sendTitle("§f§l크루원", "§7모든 임포스터를 추방하십시오", 10, 100, 10);
 				p.sendMessage("§f=======================");
@@ -172,6 +186,7 @@ public class GameTimer extends BukkitRunnable{
 				p.sendMessage("§f=======================");
 			}
 			
+			p.getInventory().setItem(8, ItemList.VOTE_PAPER.clone());
 			
 			
 			random_mission(p);
@@ -204,7 +219,7 @@ public class GameTimer extends BukkitRunnable{
 			for(int index=0;index<a_hard.length;index++) pd.addMission(p, MissionList.HARD.get(a_hard[index]).getClone());
 		}
 		
-		
+		if(!IMPOSTER.contains(p.getName())) REQUIRED_MISSION += (Main.COMMON_MISSION_AMOUNT + Main.EASY_MISSION_AMOUNT + Main.HARD_MISSION_AMOUNT);
 		
 		assemble.start(5L);
 	}
@@ -242,9 +257,12 @@ public class GameTimer extends BukkitRunnable{
 			break;
 		case 420:
 			Bukkit.broadcastMessage(Main.PREFIX + "§a게임 시작!");
+			if(Main.CREW_SIGHT_BLOCK >= 0 && Main.IMPOSTER_SIGHT_BLOCK >= 0) SightTimer.start();
+			for(Player ap : Bukkit.getOnlinePlayers()) ALIVE_PLAYERS.add(ap);
 			Bukkit.getPluginManager().registerEvents(Main.getEventManager(), main);
 			status = Status.WORKING;
 			Sabotage.saboResetAll(true);
+			AdminMap.initializeGUI();
 			break;
 		}
 		

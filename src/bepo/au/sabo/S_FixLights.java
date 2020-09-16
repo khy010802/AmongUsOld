@@ -1,5 +1,6 @@
 package bepo.au.sabo;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -12,9 +13,14 @@ import org.bukkit.event.EventHandler;
 
 import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.inventory.InventoryCloseEvent.Reason;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
 
+import bepo.au.GameTimer;
+import bepo.au.base.PlayerData;
 import bepo.au.base.Sabotage;
 import bepo.au.utils.Util;
 
@@ -39,6 +45,7 @@ public class S_FixLights extends Sabotage {
 	
 	public void onAssigned(Player p) {
 		assign(p);
+		gui_title.add(guiName);
 		initialize_fixLights();
 		setGUI();
 	}
@@ -78,16 +85,24 @@ public class S_FixLights extends Sabotage {
 			Activated = true;
 			gui = Bukkit.createInventory(null, maxslot, guiName);
 			gui.setMaxStackSize(1);
+			for (int i = 0; i < 5; i++)
+				connected[i] = false;
+			int init_connected = 1 + random.nextInt(4); // 연결된 수가 적을 확률이 더 큼
+			for (int i = 0; i < init_connected; i++)
+				connected[random.nextInt(5)] = true; // 연결된 레버는 1~4개
+			for (int i = 0; i < 5; i++) {
+				leverStatus[i] = random.nextBoolean();
+			}
+			
+			for(Player ap : Bukkit.getOnlinePlayers()) {
+				PlayerData pd = PlayerData.getPlayerData(ap.getName());
+				if(pd != null) {
+					if(pd.isAlive() && !GameTimer.IMPOSTER.contains(ap.getName())) ap.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, 1000000, 0, true));
+				}
+			}
 		}
 		
-		for (int i = 0; i < 5; i++)
-			connected[i] = false;
-		int init_connected = 1 + random.nextInt(4); // 연결된 수가 적을 확률이 더 큼
-		for (int i = 0; i < init_connected; i++)
-			connected[random.nextInt(5)] = true; // 연결된 레버는 1~4개
-		for (int i = 0; i < 5; i++) {
-			leverStatus[i] = random.nextBoolean();
-		} // 레버의 상태는 랜덤
+		// 레버의 상태는 랜덤
 		setGUI(); // gui 만들기
 	}
 	/*
@@ -133,8 +148,15 @@ public class S_FixLights extends Sabotage {
 			if (!connection)
 				return;
 		}
+		for(Player ap : Bukkit.getOnlinePlayers()) {
+			ap.removePotionEffect(PotionEffectType.BLINDNESS);
+		}
 		Util.debugMessage("사보타주 클리어");
-		for (HumanEntity he : gui.getViewers()) {((Player) he).closeInventory();}
+		List<HumanEntity> helist = new ArrayList<HumanEntity>();
+		for (HumanEntity he : gui.getViewers()) {
+			helist.add(he);
+		}
+		for(HumanEntity he : helist) he.closeInventory(Reason.PLUGIN);
 		Sabotage.saboClear(0);
 		
 	}
@@ -157,8 +179,7 @@ public class S_FixLights extends Sabotage {
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	@EventHandler
 	public void onClick(InventoryClickEvent e) {
-		
-		if(!e.getView().getTitle().contains(guiName)) return;
+		if(!checkPlayer(e)) return;
 		
 			Util.debugMessage("클릭 인식됨");
 			int slot = e.getRawSlot();

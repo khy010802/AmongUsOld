@@ -64,7 +64,7 @@ public class ScoreboardManager implements AssembleAdapter{
 			}
 			
 			if(Sabotage.isActivating(0)) {
-				switch(Sabotage.Sabos[0].getType()) {
+				switch(Sabotage.Sabos.getType()) {
 				case COMM: line.add("§c통신 기기 파손"); return line;
 				case NUCL:
 					int i = (S_Fingerprint.lowerPlayerList.size() > 0 ? 1 : 0) + (S_Fingerprint.upperPlayerList.size() > 0 ? 1 : 0);

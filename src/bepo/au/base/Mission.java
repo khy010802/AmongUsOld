@@ -182,7 +182,6 @@ public abstract class Mission implements Listener, Cloneable {
 	}
 	
 	public void shinePosition(int i) {
-		if(this instanceof Sabotage) Bukkit.broadcastMessage("RED");
 		PlayerUtil.spawnGlowingBlock(getPlayer(), locs.get(i),
 				this instanceof Sabotage ? ColorUtil.RED : ColorUtil.WHITE);
 	}

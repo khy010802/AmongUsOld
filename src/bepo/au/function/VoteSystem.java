@@ -25,6 +25,7 @@ import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.LeatherArmorMeta;
+import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import bepo.au.GameTimer;
@@ -39,8 +40,8 @@ public class VoteSystem extends BukkitRunnable implements Listener {
 
 	public static VoteSystem PROGRESSED_VOTE = null;
 
-	public void start(String name, boolean reported) {
-		PROGRESSED_VOTE = this;
+	public static void start(String name, boolean reported) {
+		PROGRESSED_VOTE = new VoteSystem();
 		Main.gt.setStatus(Status.VOTING);
 		Bukkit.getPluginManager().registerEvents(PROGRESSED_VOTE, Main.getInstance());
 		for (Player ap : Bukkit.getOnlinePlayers()) {
@@ -54,7 +55,7 @@ public class VoteSystem extends BukkitRunnable implements Listener {
 						80, 20);
 
 			if (PlayerData.getPlayerData(ap.getName()) != null && PlayerData.getPlayerData(ap.getName()).isAlive()) {
-				onAssigned(ap);
+				PROGRESSED_VOTE.onAssigned(ap);
 			}
 		}
 
@@ -84,14 +85,46 @@ public class VoteSystem extends BukkitRunnable implements Listener {
 					}
 				}
 				*/
-				setSeats();
-				PROGRESSED_VOTE.runTaskTimer(main, 0L, 1L);
+				PROGRESSED_VOTE.setSeats();
+				PROGRESSED_VOTE.runTaskTimer(Main.getInstance(), 0L, 1L);
 			}
-		}.runTaskLater(Main.getInstance(), 100L);
+		}.runTaskLater(Main.getInstance(), 20L);
 	}
 
+	public static void voteover() {// 종료 페이즈
+		int maximum = -1;
+		int current;
+		boolean tied = false;
+
+		for(Player ap : Bukkit.getOnlinePlayers()) ap.closeInventory();
+		
+		HandlerList.unregisterAll(PROGRESSED_VOTE);
+		
+		for (String voted : voteMap.keySet()) {
+			current = voteMap.get(voted).size();
+			if (maximum < current) {
+				maximum = current;
+				top = voted;
+				tied = false;
+			} else if (maximum == current) {
+				tied = true;
+			}
+		}
+		if (tied) {
+			voteResult = resultType.TIE;
+			top = null;
+		} else if (top == "§fSKIP") {
+			voteResult = resultType.SKIP;
+		} else {
+			voteResult = resultType.CHOOSED;
+		}
+
+		// 여기에 투표 삽입
+		
+		
+	}
+	
 	String guiName = "투표";
-	private Main main;
 	private boolean isImposter;
 
 	private static HashMap<String, ItemStack[]> contents = new HashMap<String, ItemStack[]>();
@@ -116,7 +149,6 @@ public class VoteSystem extends BukkitRunnable implements Listener {
 	public static int voteTimer;
 
 	public VoteSystem() {
-		this.main = Main.getInstance();
 		voteTimer = Main.VOTE_SEC * 20;
 		
 		DATALIST = PlayerData.getPlayerDataList();
@@ -215,6 +247,7 @@ public class VoteSystem extends BukkitRunnable implements Listener {
 		for (int idx = 0; idx < DATALIST.size(); idx++) {
 			Player currentPlayer = Bukkit.getPlayer(DATALIST.get(idx).getName());
 			currentPlayer.teleport(SEATS.get(idx));// 플레이어를 각 자리로 이동
+			currentPlayer.removePotionEffect(PotionEffectType.BLINDNESS);
 			PlayerUtil.sitChair(currentPlayer, SEATS.get(idx));
 			/*
 			 * Vector dir = LocManager.getLoc("Center").get(0).clone().subtract(currentPlayer.getEyeLocation()).toVector();
@@ -286,38 +319,7 @@ public class VoteSystem extends BukkitRunnable implements Listener {
 
 	public static String top = null;
 
-	private void voteover() {// 종료 페이즈
-		int maximum = -1;
-		int current;
-		boolean tied = false;
 
-		for(Player ap : Bukkit.getOnlinePlayers()) ap.closeInventory();
-		
-		HandlerList.unregisterAll(PROGRESSED_VOTE);
-		
-		for (String voted : voteMap.keySet()) {
-			current = voteMap.get(voted).size();
-			if (maximum < current) {
-				maximum = current;
-				top = voted;
-				tied = false;
-			} else if (maximum == current) {
-				tied = true;
-			}
-		}
-		if (tied) {
-			voteResult = resultType.TIE;
-			top = null;
-		} else if (top == "§fSKIP") {
-			voteResult = resultType.SKIP;
-		} else {
-			voteResult = resultType.CHOOSED;
-		}
-
-		// 여기에 투표 삽입
-		
-		
-	}
 
 	/*
 	 * 시간관련

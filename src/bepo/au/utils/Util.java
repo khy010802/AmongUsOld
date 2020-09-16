@@ -8,10 +8,14 @@ import java.util.Random;
 import java.util.UUID;
 
 import org.bukkit.Bukkit;								
-import org.bukkit.Color;								
+import org.bukkit.Color;
+import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
+import org.bukkit.block.BlockState;
+import org.bukkit.block.data.type.Door;
 import org.bukkit.craftbukkit.v1_16_R2.inventory.CraftItemStack;
+import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;								
 import org.bukkit.event.Listener;								
 import org.bukkit.inventory.Inventory;								
@@ -47,6 +51,8 @@ public class Util implements Listener{
 		}
 		return a_int;					
 	}
+
+	
 	public static int[] difrandom(int min, int max) {	
 		return difrandom(min, max, max-min+1);
 	}
@@ -68,7 +74,8 @@ public class Util implements Listener{
 		if ((slot+x)/9!=slot/9) return -1;						
 		if (idx >53 || idx<0) return -1;						
 		return idx;						
-	}							
+	}		
+
 								
 	public static void debugMessage(String message) {  //디버그메세지							
 		if (debug == true) Bukkit.broadcastMessage("[Debug]"+buildLogMsg(message));						
@@ -97,6 +104,43 @@ public class Util implements Listener{
 		Util.debug = debug;						
 	}
 	
+	public static void fillBlock(Material mat, Location loc, Location loc2) {
+		
+		int x1 = Math.min(loc.getBlockX(), loc2.getBlockX());
+		int y1 = Math.min(loc.getBlockY(), loc2.getBlockY());
+		int z1 = Math.min(loc.getBlockZ(), loc2.getBlockZ());
+		
+		int x2 = Math.max(loc.getBlockX(), loc2.getBlockX());
+		int y2 = Math.max(loc.getBlockY(), loc2.getBlockY());
+		int z2 = Math.max(loc.getBlockZ(), loc2.getBlockZ());
+		
+		for(int x=x1;x<=x2;x++) {
+			for(int y=y1;y<=y2;y++) {
+				for(int z=z1;z<=z2;z++) {
+					loc.getWorld().getBlockAt(x, y, z).setType(mat);
+				}
+			}
+		}
+	}
+	
+	public static void setDoor(Location loc, boolean open) {
+		BlockState state = loc.getBlock().getState();
+		if(state instanceof Door) {
+			Door door = (Door) state.getData();
+			door.setOpen(open);
+			state.update();
+		}
+	}
+	
+	public static void toggleDoor(Location loc) {
+		BlockState state = loc.getBlock().getState();
+		if(state instanceof Door) {
+			Door door = (Door) state.getData();
+			door.setOpen(!door.isOpen());
+			state.update();
+		}
+	}
+
 	public static ItemStack createHead(String name) {
 		ItemStack is = new ItemStack(Material.PLAYER_HEAD);
 		SkullMeta sm = (SkullMeta) is.getItemMeta();
@@ -109,15 +153,7 @@ public class Util implements Listener{
 		return is;
 	}
 								
-	public static ItemStack createItem(Material mat, int amount, String name, List<String> lore) {							
-		ItemStack is = new ItemStack(mat, amount);
-		if(is.getType() == Material.AIR) return is;
-		ItemMeta ism = is.getItemMeta();						
-		ism.setDisplayName(name);						
-		ism.setLore(lore);						
-		is.setItemMeta(ism);						
-		return is;						
-	}							
+						
 	public static ItemStack createPotion(int amount,Color color, String name, List<String> lore) {							
 		ItemStack is = createItem(Material.POTION,amount,name,lore);						
 								
@@ -155,6 +191,30 @@ public class Util implements Listener{
 	public static void Stack(Inventory inv, int slot, Material mat, int amount, String name) {							
 		inv.setItem(slot, createItem(mat, amount, name, null));						
 	}
+	
+	public static void Stack(Inventory inv, int slot, Material mat, int amount, String name, List<String> lore, boolean enchant) {
+        inv.setItem(slot, createItem(mat, amount, name, lore, enchant));
+    }
+    public static void Stack(Inventory inv, int slot, Material mat, int amount, String name, String lore, boolean enchant) {
+        inv.setItem(slot, createItem(mat, amount, name, Arrays.asList(lore), enchant));
+    }
+    public static ItemStack createItem(Material mat, int amount, String name, List<String> lore, boolean enchant) {
+        ItemStack is = new ItemStack(mat, amount);
+        if(is.getType() == Material.AIR) return is;
+        ItemMeta ism = is.getItemMeta();
+        ism.setDisplayName(name);
+        ism.setLore(lore);
+        if(enchant) {
+        ism.addEnchant(Enchantment.LURE, 1, true);
+        ism.addItemFlags(ItemFlag.HIDE_ENCHANTS);
+        }
+        is.setItemMeta(ism);
+        return is;
+    }
+    
+    public static ItemStack createItem(Material mat, int amount, String name, List<String> lore) {
+        return createItem(mat, amount, name, lore, false);
+    }
 								
 //////////////////////////////								
 								

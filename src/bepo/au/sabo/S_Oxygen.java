@@ -12,6 +12,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
 import bepo.au.base.Sabotage;
+import bepo.au.utils.PlayerUtil;
 import bepo.au.utils.Util;
 
 public class S_Oxygen extends Sabotage {
@@ -132,7 +133,10 @@ public class S_Oxygen extends Sabotage {
 					CLEARED++;
 					if(CLEARED == 2) {
 						Sabotage.saboClear(0);
-					} else cleared.add(code);
+					} else {
+						for(Player ap : Bukkit.getOnlinePlayers())PlayerUtil.removeGlowingBlock(ap, locs.get(code));
+						cleared.add(code);
+					}
 					
 					p.closeInventory();
 					return;

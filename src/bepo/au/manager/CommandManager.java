@@ -19,6 +19,7 @@ import bepo.au.Main;
 import bepo.au.base.PlayerData;
 import bepo.au.base.Sabotage;
 import bepo.au.base.Sabotage.SaboType;
+import bepo.au.function.AdminMap;
 import bepo.au.function.MissionList;
 import bepo.au.utils.ColorUtil;
 import bepo.au.utils.PlayerUtil;
@@ -83,26 +84,10 @@ public class CommandManager implements CommandExecutor{
 	
 	
 	private void debug(Player p, String[] args) {
-		
-		if(args.length == 1) {
-			PlayerUtil.spawnGlowingBlock(p, p.getLocation(), ColorUtil.GREEN);
-			return;
-		}
-		
 		int i = Integer.parseInt(args[1]);
-		SaboType st;
-		switch(i) {
-		case 1: st = SaboType.COMM;
-			break;
-		case 2: st = SaboType.ELEC; break;
-		case 3: st = SaboType.NUCL; break;
-		case 4: st = SaboType.OXYG; break;
-		default: st = SaboType.DOOR; break;
-		}
-		int e = Sabotage.saboActivate(st, i > 4 ? Integer.parseInt(args[2]) : 0);
 		
-		if(e > 0) Bukkit.broadcastMessage("발동안됐대여 에베베베베벱ㅂ - " + e);
-		else if(e == 0) Bukkit.broadcastMessage("...");
+		int e = Sabotage.saboActivate(SaboType.DOOR, i);
+		Bukkit.broadcastMessage("" + e);
 	}
 	
 	private void config(Player p) {

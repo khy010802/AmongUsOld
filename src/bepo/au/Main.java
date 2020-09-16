@@ -17,7 +17,6 @@ import bepo.au.manager.LocManager;
 import bepo.au.manager.TabCompleteManager;
 import bepo.au.utils.ColorUtil;
 import bepo.au.utils.PlayerUtil;
-import bepo.au.utils.Util;
 
 public class Main extends JavaPlugin implements Listener{
 	
@@ -91,6 +90,7 @@ public class Main extends JavaPlugin implements Listener{
 		ml = new MissionList();
 		lm = new LocManager();
 		lm.loadLocs();
+		//Vent.loadVents();
 		
 		for(Mission m : Mission.MISSIONS) addLocation(m);
 		
@@ -117,7 +117,10 @@ public class Main extends JavaPlugin implements Listener{
 	
 	public void onDisable() {
 		lm.saveLocs();
-		for(Player p : Bukkit.getOnlinePlayers()) PlayerUtil.resetGlowingBlock(p);
+		for(Player p : Bukkit.getOnlinePlayers()) {
+			PlayerUtil.resetHidden(p);
+			PlayerUtil.resetGlowingBlock(p);
+		}
 
 		Scoreboard board = Bukkit.getScoreboardManager().getMainScoreboard();
 		for(ColorUtil c : ColorUtil.values()) {

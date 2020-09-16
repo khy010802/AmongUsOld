@@ -14,12 +14,16 @@ import org.bukkit.craftbukkit.v1_16_R2.util.CraftMagicNumbers;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.Damageable;
+import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.LeatherArmorMeta;
 import org.bukkit.scoreboard.Scoreboard;
 import org.bukkit.scoreboard.Team;
 import org.bukkit.util.Vector;
 
 import bepo.au.Main;
+import net.md_5.bungee.api.ChatMessageType;
+import net.md_5.bungee.api.chat.TextComponent;
 import net.minecraft.server.v1_16_R2.EntityFallingBlock;
 import net.minecraft.server.v1_16_R2.EntityMagmaCube;
 import net.minecraft.server.v1_16_R2.EntityPlayer;
@@ -292,11 +296,19 @@ public class PlayerUtil {
 		return drop;
 	}
 	
+	/*
+	 * 액션바
+	 */
+	
+	public static void sendActionBar(Player p, String string) {
+		p.sendActionBar(string);
+	}
 	
 	/*
 	 * 플레이어 숨기기
 	 */
 	private static HashMap<Player, List<Player>> hidden = new HashMap<Player, List<Player>>();
+	private static List<String> invisible = new ArrayList<String>();
 	
 	public static void hidePlayer(Player p, Player target) {
 		
@@ -313,7 +325,7 @@ public class PlayerUtil {
 	
 	public static void showPlayer(Player p, Player target) {
 		
-		p.showPlayer(Main.getInstance(), target);
+		if(!invisible.contains(target.getName())) p.showPlayer(Main.getInstance(), target);
 		
 		if(hidden.containsKey(p)) {
 			hidden.get(p).remove(target);
@@ -321,12 +333,22 @@ public class PlayerUtil {
 	}
 	
 	public static boolean isHidden(Player p, Player target) {
-		return hidden.containsKey(p) && hidden.get(p).contains(target);
+		return (hidden.containsKey(p) && hidden.get(p).contains(target) || invisible.contains(target.getName()));
 	}
 	
 	public static void resetHidden(Player p) {
 		for(Player ap : Bukkit.getOnlinePlayers()) if(!p.equals(ap)) p.showPlayer(Main.getInstance(), ap);
 		if(hidden.containsKey(p)) hidden.clear();
+		if(invisible.contains(p.getName())) invisible.remove(p.getName());
+	}
+	
+	public static void setInvisible(Player p, boolean inv) {
+		if(inv) {
+			if(!invisible.contains(p.getName())) invisible.add(p.getName());
+			for(Player ap : Bukkit.getOnlinePlayers()) ap.hidePlayer(Main.getInstance(), p);
+		} else {
+			invisible.remove(p.getName());
+		}
 	}
 	
 	
@@ -343,6 +365,22 @@ public class PlayerUtil {
 			ac[temp] = is;
 		}
 		return ac;
+	}
+	
+	public static void setItemDamage(Player p, int slot, double ratio) {
+		ItemStack is = p.getInventory().getItem(slot);
+		if(is == null || is.getType() == Material.AIR || !is.hasItemMeta() || !(is.getItemMeta() instanceof Damageable)) return;
+		
+		setItemDamage(p, slot, (int) (is.getType().getMaxDurability() * (1D-ratio)));
+	}
+	
+	public static void setItemDamage(Player p, int slot, int dam) {
+		ItemStack is = p.getInventory().getItem(slot);
+		if(is == null || is.getType() == Material.AIR || !is.hasItemMeta() || !(is.getItemMeta() instanceof Damageable)) return;
+		
+		Damageable ism = (Damageable) is.getItemMeta();
+		ism.setDamage(dam);
+		is.setItemMeta((ItemMeta) ism);
 	}
 
 }

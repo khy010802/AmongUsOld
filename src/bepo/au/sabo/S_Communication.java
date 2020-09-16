@@ -10,11 +10,13 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 
 import org.bukkit.event.inventory.ClickType;
+import org.bukkit.event.inventory.InventoryAction;
 import org.bukkit.event.inventory.InventoryClickEvent;
 
 import org.bukkit.inventory.ItemStack;
 
 import bepo.au.base.Sabotage;
+import bepo.au.function.AdminMap;
 import bepo.au.utils.Util;
 
 import java.util.Random;
@@ -98,7 +100,9 @@ public class S_Communication extends Sabotage {
 			if (!Arrays.equals(answerStatus, currentStatus))
 				break; // 정답과 현재의 값이 같으면 반복.
 		}
-
+		
+		if(p.getOpenInventory() != null && p.getOpenInventory().getTitle().contains(AdminMap.guiName)) p.closeInventory();
+		
 		Activated = true;
 		uploadInventory(p, maxslot, "Communication");
 		gui.get(0).setMaxStackSize(1);
@@ -186,6 +190,7 @@ public class S_Communication extends Sabotage {
 	public void onClick(InventoryClickEvent e) {
 		
 		if(!checkPlayer(e)) return;
+		if(!(e.getAction() == InventoryAction.PICKUP_ALL || e.getAction() == InventoryAction.PICKUP_HALF || e.getAction() == InventoryAction.PICKUP_ONE)) return;
 		Player p = (Player) e.getWhoClicked();
 			Util.debugMessage("클릭 인식됨");
 			int slot = e.getRawSlot();

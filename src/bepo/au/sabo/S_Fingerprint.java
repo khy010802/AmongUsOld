@@ -68,25 +68,13 @@ public class S_Fingerprint extends Sabotage {
 	 * 명령어 쳤을 때 실행됨. 사보타주 시작.
 	 */
 
-	public void s_fingerprintStart(Player p) {
-		if (Activated) {
-			Util.debugMessage("원자로 사보타주는 이미 시작되었습니다.");
-		} else {
-			initialize_Fingerprint(p);
-			Util.debugMessage("원자로 사보타주 실행됨");
-		}
-	}
-
 	/*
 	 * 초기화 ; GUI를 설정함.
 	 */
 	private void initialize_Fingerprint(Player p) {
-		
-		if(gui.size() == 0) {
-			for(int i=0;i<2;i++) {
-				uploadInventory(p, maxslot, guiName + " " + i);
-				gui.get(i).setMaxStackSize(1);
-			}
+		for(int i=0;i<2;i++) {
+			uploadInventory(p, maxslot, guiName + " " + i);
+			gui.get(i).setMaxStackSize(1);
 		}
 		
 		setGUI(true); setGUI(false);
@@ -106,11 +94,11 @@ public class S_Fingerprint extends Sabotage {
 	 */
 
 	private void setGUI(boolean isUpper) {
-
-			List<String> lore = Arrays.asList("§7클릭해 활성화하세요");
-			for (int slot = 0; slot < maxslot; slot++) {
-				Util.Stack(gui.get(isUpper ? 0 : 1), slot, Material.RED_STAINED_GLASS, 1, "§4활성화 되어있지 않음", lore);
-			}
+		
+		List<String> lore = Arrays.asList("§7클릭해 활성화하세요");
+		for (int slot = 0; slot < maxslot; slot++) {
+			Util.Stack(gui.get(isUpper ? 0 : 1), slot, Material.RED_STAINED_GLASS, 1, "§4활성화 되어있지 않음", lore);
+		}
 		
 		
 	}
@@ -122,13 +110,13 @@ public class S_Fingerprint extends Sabotage {
 	private void activate(boolean isUpper, UUID id) {
 		Util.debugMessage(isUpper + " 활성화");
 		List<String> lore = Arrays.asList("§7인벤토리를 닫으면 활성화가 풀립니다.");
-		for (int slot = 0; slot < maxslot; slot++) {
-			Util.Stack(gui.get(isUpper ? 0 : 1), slot, Material. BLUE_STAINED_GLASS, 1, "§4활성화 되어있지 않음",lore);
-			if(isUpper) {
+		if(isUpper) {
 			upperPlayerList.add(id);
-			}else {
+		} else {
 			lowerPlayerList.add(id);
-			}
+		}
+		for (int slot = 0; slot < maxslot; slot++) {
+			Util.Stack(gui.get(isUpper ? 0 : 1), slot, Material. BLUE_STAINED_GLASS, 1, "§b활성화 됨",lore);
 		}
 		check();
 	}
@@ -143,7 +131,6 @@ public class S_Fingerprint extends Sabotage {
 		} else {
 			lowerPlayerList.remove(id);
 		}
-		
 		setGUI(isUpper);
 	}
 	/*
@@ -178,16 +165,14 @@ public class S_Fingerprint extends Sabotage {
 						Util.debugMessage("클릭 불가");
 						e.setCancelled(true);
 					}
-
 				}
-		
 		}
 	
 	@EventHandler
 	private void onClose(InventoryCloseEvent e) {
-		if(Activated&&e.getView().getTitle().contains(guiName)) {
+		if(!Activated || !checkPlayer(e)) return;
+			Bukkit.broadcastMessage("닫기 발동 : " + e.getPlayer().getName());
 			deactivate(getCode(e.getView().getTitle()) == 0 ? true : false, e.getPlayer().getUniqueId());
-		}
 	}
 
 }

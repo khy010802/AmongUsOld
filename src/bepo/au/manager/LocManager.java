@@ -17,6 +17,7 @@ public class LocManager {
 	String[] locList= {
 			"SEATS",
 			"EmergencyButton",
+			"AdminMap",
 			"ImposterNotice",
 			"ImposterNoticeArmorStand",
 			"Desk",
@@ -41,6 +42,21 @@ public class LocManager {
 			"FixLights",
 			"Oxygen",
 			"Communication",
+			
+			"Door_UpperEngine",
+			"Door_LowerEngine",
+			"Door_Security",
+			"Door_MedBay",
+			"Door_Electrical",
+			"Door_Storage",
+			"Door_Cafeteria",
+			
+			"Vent_EES",
+			"Vent_RL",
+			"Vent_RU",
+			"Vent_CAH",
+			"Vent_NW",
+			"Vent_NS"
 			};
 	
 	public String locationCommand ="locate";
