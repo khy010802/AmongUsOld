@@ -36,7 +36,7 @@ public class H_ActivatingReactor extends Mission {
 		generalClear(p, i);
 	}
 
-	int[] ReactorPassword = new int[5];
+	int[] ReactorPassword;
 	int Count = 0;
 	int Tmp = 0;
 	int Case = 0;
@@ -44,6 +44,7 @@ public class H_ActivatingReactor extends Mission {
 	ActivatingReactorTimer Timer;
 
 	public void activatingReactor(Player p) {
+		ReactorPassword = new int[5];
 		for (int i = 0; i < 5; i++) {
 			ReactorPassword[i] = Util.random(1, 9);
 		}

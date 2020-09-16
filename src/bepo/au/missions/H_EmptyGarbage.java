@@ -8,6 +8,7 @@ import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
@@ -105,6 +106,16 @@ public class H_EmptyGarbage extends Mission {
 		p.openInventory(gui.get(1));
 	}
 
+	@EventHandler
+    public void View(InventoryCloseEvent e) {
+        if (playername != null && e.getPlayer().getName().equalsIgnoreCase(playername) && e.getView().getTitle().contains("EmptyGarbage")) {
+            if(Timer != null && Timer.GetTimerRunning()) {
+            	Timer.StopTimer();
+            	Timer = null;
+            }
+        }
+    }
+	
 	@EventHandler
 	public void Click(InventoryClickEvent e) {
 

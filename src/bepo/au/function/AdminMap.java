@@ -16,6 +16,9 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.inventory.Inventory;
 
+import bepo.au.base.PlayerData;
+import bepo.au.base.Sabotage;
+import bepo.au.base.Sabotage.SaboType;
 import bepo.au.utils.ColorUtil;
 import bepo.au.utils.Util;
 import net.minecraft.server.v1_16_R2.SlotShulkerBox;
@@ -35,7 +38,7 @@ public class AdminMap {
 		WEAPONS(7,"무기고",Material.FIREWORK_ROCKET, Material.BROWN_WOOL),
 		REACTOR(18,"원자로",Material.CRYING_OBSIDIAN, Material.BLACK_WOOL),
 		SECU(20,"보안실",Material.ENDER_EYE, Material.MAGENTA_WOOL),
-		ADMIN(23,"관리실",Material.MAP, Material.PURPLE_WOOL),
+		ADMIN(23,"관리실",Material.OAK_SIGN, Material.PURPLE_WOOL),
 		NAVI(26,"항해실",Material.LODESTONE, Material.GRAY_WOOL),
 		LE(37,"하부엔진",Material.DISPENSER, Material.LIGHT_BLUE_WOOL),
 		ELEC(30,"전기실",Material.COMPARATOR, Material.YELLOW_WOOL),
@@ -112,14 +115,15 @@ public class AdminMap {
 			if (ROOMS.slots.containsKey(slot)) {
 				ROOMS room = ROOMS.getROOM(slot);
 				Util.Stack(gui, slot, room.getMat(), 1, "§f" + room.getRoomname(), "§7현재인원 : 0");
-			} else if ((slot > 0 && slot < 8) || (slot > 36 && slot < 44) || slot % 9 == 1 || slot % 9 == 4
-					|| slot % 9 == 7) {
+			} else if (((slot > 0 && slot < 8) || (slot > 36 && slot < 44) || slot % 9 == 1 || slot % 9 == 4
+					|| slot % 9 == 7)&&slot<45) {
 				Util.Stack(gui, slot, Material.GREEN_STAINED_GLASS_PANE, 1, "§7통로");
 			}
 		}
 	}
 
 	public static void openGUI(Player p) {
+		if(Sabotage.isActivating(0) && Sabotage.Sabos.getType() == SaboType.COMM) return;
 		p.openInventory(gui);
 	}
 
@@ -154,7 +158,7 @@ public class AdminMap {
 			if (!r.getPlayers().contains(p.getName())&&r.getRoomblock() == mat) {
 				r.addPlayer(p.getName());
 				updateRoom(r);
-			} else if (r.getPlayers().contains(p.getName())) {
+			} else if (r.getPlayers().contains(p.getName()) && r.getRoomblock() != mat) {
 				r.deletePlayer(p.getName());
 				updateRoom(r);
 			}

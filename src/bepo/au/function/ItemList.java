@@ -16,6 +16,10 @@ public class ItemList {
 	public final static ItemStack I_SABOTAGE_CRIT;
 	public final static ItemStack I_SABOTAGE_DOOR;
 	
+	public final static ItemStack I_VENT_NEXT;
+	public final static ItemStack I_VENT_CONFIRM;
+	public final static ItemStack I_VENT_PREV;
+	
 	public final static ItemStack VOTE_PAPER;
 	
 	public final static HashMap<Integer, ItemStack> I_SET;
@@ -42,6 +46,11 @@ public class ItemList {
 		I_SET.put(1, I_SWORD.clone());
 		I_SET.put(2, I_SABOTAGE_CRIT.clone());
 		I_SET.put(3, I_SABOTAGE_DOOR.clone());
+		
+		
+		I_VENT_NEXT = Util.createItem(Material.RED_STAINED_GLASS, 1, "§c다음 위치", Arrays.asList(""));
+		I_VENT_CONFIRM = Util.createItem(Material.YELLOW_STAINED_GLASS, 1, "§e이 곳으로 이동", Arrays.asList("§7들고 우클릭 시 이 벤트로 나옵니다."));
+		I_VENT_PREV = Util.createItem(Material.BLUE_STAINED_GLASS, 1, "§b이전 위치", Arrays.asList(""));
 		
 	}
 	

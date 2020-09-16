@@ -53,9 +53,12 @@ public class VoteSystem extends BukkitRunnable implements Listener {
 				ap.sendTitle("§a긴급 소집",
 						PlayerData.getPlayerData(name).getColor().getChatColor() + name + "§f님께서 긴급 소집 버튼을 눌렀습니다.", 0,
 						80, 20);
-
-			if (PlayerData.getPlayerData(ap.getName()) != null && PlayerData.getPlayerData(ap.getName()).isAlive()) {
+			
+			PlayerData pd = PlayerData.getPlayerData(ap.getName());
+			
+			if (pd != null && pd.isAlive()) {
 				PROGRESSED_VOTE.onAssigned(ap);
+				pd.confirmVent(ap, true);
 			}
 		}
 

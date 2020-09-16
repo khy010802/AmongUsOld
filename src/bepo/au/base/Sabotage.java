@@ -63,11 +63,11 @@ public abstract class Sabotage extends Mission {
 	private final SaboType type;
 	private final int id;
 	
-	public static String getRoomById(int id) { return getRoomById(id, false); }
+	public static String getRoomById(int id) { return getRoomById(id, true); }
 	
 	public static String getRoomById(int id, boolean english) {
 		
-		if(english) {
+		if(!english) {
 			switch(id) {
 			case 1: return "상부 엔진";
 			case 2: return "보안실";
@@ -226,7 +226,7 @@ public abstract class Sabotage extends Mission {
 						Location loc1 = upper.clone();
 						Location loc2 = lower.clone();
 						loc1.setY(high_y); loc2.setY(high_y);
-						Util.fillBlock(Material.NETHERITE_BLOCK, loc1, loc2);
+						Util.fillBlock(Material.IRON_BLOCK, loc1, loc2);
 						
 						loc1.getWorld().playSound(loc1, Sound.ENTITY_ZOMBIE_ATTACK_IRON_DOOR, 0.2F, 1.0F);
 						
@@ -302,7 +302,7 @@ public abstract class Sabotage extends Mission {
 				if (Remain_Tick[id] > 0) {
 					Remain_Tick[id]--;
 					if (id == 0) {
-						if (Remain_Tick[id] % 40 == 0)
+						if (Remain_Tick[id] % 40 == 0 && (Sabos.getType() == SaboType.NUCL || Sabos.getType() == SaboType.OXYG))
 							for(Player ap : Bukkit.getOnlinePlayers()) ap.playSound(ap.getLocation(), Sound.ENTITY_WOLF_AMBIENT, 1.0F, 1.0F); // 치명적 사보타지 소리 효과
 						if (Remain_Tick[id] == 0)
 							; // 게임 종료

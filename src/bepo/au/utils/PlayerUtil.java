@@ -22,6 +22,7 @@ import org.bukkit.scoreboard.Team;
 import org.bukkit.util.Vector;
 
 import bepo.au.Main;
+import bepo.au.function.ItemList;
 import net.md_5.bungee.api.ChatMessageType;
 import net.md_5.bungee.api.chat.TextComponent;
 import net.minecraft.server.v1_16_R2.EntityFallingBlock;
@@ -297,6 +298,19 @@ public class PlayerUtil {
 	}
 	
 	/*
+	 * 플레이어 아이템 지급
+	 */
+	
+	public static void getImposterSet(Player p, boolean first) {
+		HashMap<Integer, ItemStack> islist = ItemList.getImposterSet();
+		for(int i : islist.keySet()) p.getInventory().setItem(i, islist.get(i));
+		
+		if(!first) {
+			// 내구도 갱신
+		}
+	}
+	
+	/*
 	 * 액션바
 	 */
 	
@@ -325,15 +339,18 @@ public class PlayerUtil {
 	
 	public static void showPlayer(Player p, Player target) {
 		
-		if(!invisible.contains(target.getName())) p.showPlayer(Main.getInstance(), target);
-		
-		if(hidden.containsKey(p)) {
-			hidden.get(p).remove(target);
+		if(!invisible.contains(target.getName())) {
+			p.showPlayer(Main.getInstance(), target);
+			if(hidden.containsKey(p)) {
+				hidden.get(p).remove(target);
+			}
 		}
+		
+		
 	}
 	
 	public static boolean isHidden(Player p, Player target) {
-		return (hidden.containsKey(p) && hidden.get(p).contains(target) || invisible.contains(target.getName()));
+		return ((hidden.containsKey(p) && hidden.get(p).contains(target)) || invisible.contains(target.getName()));
 	}
 	
 	public static void resetHidden(Player p) {
@@ -349,6 +366,12 @@ public class PlayerUtil {
 		} else {
 			invisible.remove(p.getName());
 		}
+		Bukkit.broadcastMessage("invisible toggle " + p.getName() + " " + inv);
+	}
+	
+	
+	public static void goVelocity(Player p1, Location lo, double value) {
+		p1.setVelocity(p1.getVelocity().add(lo.toVector().subtract(p1.getLocation().toVector()).normalize().multiply(value)));
 	}
 	
 	

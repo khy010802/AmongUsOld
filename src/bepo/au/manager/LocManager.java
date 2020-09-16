@@ -72,6 +72,7 @@ public class LocManager {
 	public void inputLoc(String locName, World w, int x, int y, int z) { //로케이션 맵에 넣기
 		Location loc = new Location(w,x,y,z);
 		inputALocation(locName, loc);
+		
 	}
 	public void inputLocation(String locName, Location location) {
 		inputALocation(locName, location);

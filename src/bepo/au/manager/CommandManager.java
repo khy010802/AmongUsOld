@@ -84,10 +84,9 @@ public class CommandManager implements CommandExecutor{
 	
 	
 	private void debug(Player p, String[] args) {
-		int i = Integer.parseInt(args[1]);
-		
-		int e = Sabotage.saboActivate(SaboType.DOOR, i);
-		Bukkit.broadcastMessage("" + e);
+		GameTimer.IMPOSTER.add(p.getName());
+		GameTimer.ALIVE_IMPOSTERS.add(p.getName());
+		PlayerUtil.getImposterSet(p, true);
 	}
 	
 	private void config(Player p) {

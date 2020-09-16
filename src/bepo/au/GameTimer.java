@@ -135,6 +135,7 @@ public class GameTimer extends BukkitRunnable{
 		
 		for(int i=0;i<PLAYERS.size();i++) {
 			if(Bukkit.getPlayer(PLAYERS.get(i)) == null) continue;
+			
 			String name = PLAYERS.get(i);
 			PlayerData pd = new PlayerData(name, Bukkit.getPlayer(PLAYERS.get(i)).getUniqueId());
 			if(i < Main.IMPOSTER_AMOUNT) {
@@ -171,8 +172,7 @@ public class GameTimer extends BukkitRunnable{
 				p.sendMessage("§c임포스터 플레이어 : §f" + imposter);
 				p.sendMessage("§f=======================");
 				
-				HashMap<Integer, ItemStack> islist = ItemList.getImposterSet();
-				for(int i : islist.keySet()) p.getInventory().setItem(i, islist.get(i));
+				PlayerUtil.getImposterSet(p, true);
 				
 				pd.nextSabo(p, false);
 			} else {

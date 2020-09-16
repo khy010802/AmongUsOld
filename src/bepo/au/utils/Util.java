@@ -12,7 +12,10 @@ import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
+import org.bukkit.block.Block;
 import org.bukkit.block.BlockState;
+import org.bukkit.block.data.BlockData;
+import org.bukkit.block.data.Openable;
 import org.bukkit.block.data.type.Door;
 import org.bukkit.craftbukkit.v1_16_R2.inventory.CraftItemStack;
 import org.bukkit.enchantments.Enchantment;
@@ -124,21 +127,26 @@ public class Util implements Listener{
 	}
 	
 	public static void setDoor(Location loc, boolean open) {
+		Block door = loc.getBlock();
+		BlockData doorData = door.getBlockData();
+		((Openable) doorData).setOpen(open);
+		door.setBlockData(doorData);
+		/*
 		BlockState state = loc.getBlock().getState();
 		if(state instanceof Door) {
 			Door door = (Door) state.getData();
 			door.setOpen(open);
 			state.update();
 		}
+		*/
 	}
 	
 	public static void toggleDoor(Location loc) {
-		BlockState state = loc.getBlock().getState();
-		if(state instanceof Door) {
-			Door door = (Door) state.getData();
-			door.setOpen(!door.isOpen());
-			state.update();
-		}
+		Block door = loc.getBlock();
+		BlockData doorData = door.getBlockData();
+		
+		((Openable) doorData).setOpen(!((Openable) doorData).isOpen());
+		door.setBlockData(doorData);
 	}
 
 	public static ItemStack createHead(String name) {
@@ -208,6 +216,9 @@ public class Util implements Listener{
         ism.addEnchant(Enchantment.LURE, 1, true);
         ism.addItemFlags(ItemFlag.HIDE_ENCHANTS);
         }
+		if(mat==Material.POTION){
+			ism.addItemFlags(ItemFlag.HIDE_POTION_EFFECTS);
+		}
         is.setItemMeta(ism);
         return is;
     }

@@ -2,6 +2,8 @@ package bepo.au.manager;
 
 import java.util.List;
 
+import javax.print.attribute.standard.PDLOverrideSupported;
+
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -21,6 +23,7 @@ import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.player.PlayerSwapHandItemsEvent;
 import org.bukkit.inventory.EquipmentSlot;
+import org.bukkit.inventory.ItemStack;
 
 import bepo.au.GameTimer.Status;
 import bepo.au.GameTimer;
@@ -60,6 +63,8 @@ public class EventManager implements Listener {
 			} else {
 				p.sendMessage(Main.PREFIX + "§f" + (tick / 20 + 1) + "§c초 뒤 발동할 수 있습니다.");
 			}
+			
+			event.setCancelled(true);
 		}
 	}
 	
@@ -71,14 +76,24 @@ public class EventManager implements Listener {
 		if(pd == null) return;
 		
 		if(GameTimer.IMPOSTER.contains(p.getName()) && Main.gt.getStatus() == Status.WORKING) {
-			boolean crit = false;
-			switch(event.getNewSlot()) {
-			case 2: crit = true;
-			case 3:
-				pd.nextSabo(p, crit);
-				event.setCancelled(true);
-				break;
+			
+			if(pd.getVent() != null) {
+				if(event.getNewSlot() != 4) {
+					pd.nextVent(p, event.getNewSlot() < 4 ? false : true);
+					event.setCancelled(true);
+				}
+			} else {
+				boolean crit = false;
+				switch(event.getNewSlot()) {
+				case 2: crit = true;
+				case 3:
+					pd.nextSabo(p, crit);
+					event.setCancelled(true);
+					break;
+				}
 			}
+			
+			
 		}
 		
 		
@@ -99,13 +114,26 @@ public class EventManager implements Listener {
 
 			return;
 		} else if (Main.gt.getStatus() == Status.WORKING) {
-
-			if(event.getItem() != null && event.getItem().equals(ItemList.VOTE_PAPER)) {
-				p.sendMessage(Main.PREFIX + "§c투표 시간이 아닙니다.");
+			ItemStack is = event.getItem();
+			if(is != null) {
+				
+				if(is.equals(ItemList.VOTE_PAPER)) {
+					p.sendMessage(Main.PREFIX + "§c투표 시간이 아닙니다.");
+					event.setCancelled(true);
+					return;
+				} else if(is.equals(ItemList.I_VENT_CONFIRM)) {
+					if(pd.getVent() != null) {
+						pd.confirmVent(p, false);
+					}
+					event.setCancelled(true);
+					return;
+				}
+			}
+			
+			if(pd.getVent() != null) {
 				event.setCancelled(true);
 				return;
 			}
-			
 			
 			boolean blockClick = event.getAction() == Action.RIGHT_CLICK_BLOCK;
 
@@ -115,7 +143,7 @@ public class EventManager implements Listener {
 				
 				if(loc.getBlock().getType() == Material.IRON_TRAPDOOR) {
 					if(GameTimer.IMPOSTER.contains(p.getName())) {
-						if(loc.distance(p.getLocation().getBlock().getLocation()) > 3.0D) {
+						if(loc.distance(p.getLocation().getBlock().getLocation()) > 3.5D) {
 							p.sendMessage(Main.PREFIX + "§c벤트와 가까이 붙어주세요.");
 						} else {
 							Util.toggleDoor(loc);
@@ -217,18 +245,37 @@ public class EventManager implements Listener {
 	
 	@EventHandler
 	public void onMove(PlayerMoveEvent event) {
+
+		Player p = event.getPlayer();
+		PlayerData pd = PlayerData.getPlayerData(p.getName());
+		if(pd == null || !pd.isAlive()) return;
+		
+		Location to = event.getTo();
+		Location from = event.getFrom();
+		
+		if(pd.getVent() != null) {
+			if(to.getX() != from.getX() || to.getZ() != from.getZ()) event.setCancelled(true);
+		}
+		
 		AdminMap.onMove(event);
 		String ventname = Vent.check(event.getTo());
 		if(ventname != null) {
+
 			Vent v = Vent.getVent(ventname);
-			Player p = event.getPlayer();
+			
+			if(!GameTimer.IMPOSTER.contains(p.getName())) {
+				p.teleport(p.getLocation().add(0, 3, 0));
+				return;
+			}
 			
 			Location loc = event.getTo().clone();
 			loc.setY(Vent.VENT_Y_VALUE);
 			Util.setDoor(loc, false);
 			
 			PlayerUtil.setInvisible(p, true);
-			p.teleport()
+			p.teleport(loc.add(0, 0.5D, 0));
+			
+			pd.setVent(p, v, loc);
 		}
 	}
 	

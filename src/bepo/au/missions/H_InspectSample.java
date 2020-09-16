@@ -36,11 +36,27 @@ public class H_InspectSample extends Mission{
 	}
 	
 	public void onClear(Player p, int code) {
+		if(timer != null && timer.GetTimerRunning()) timer.StopTimer();
+		timer = null;
 		generalClear(p, code);
 	}
 	
 	public void onStop(Player p, int code) {
 		
+	}
+	
+	@Override
+	public String getScoreboardMessage() {
+		
+		String s = getKoreanName();
+		if(timer != null) {
+			s += " (" + remain_time + "s)";
+			s = "§e" + s;
+		}
+		if (cleared.size() > 0) {
+			s = "§a" + s;
+		}
+		return s;
 	}
 	
 	public class Timer extends TimerBase {
@@ -61,7 +77,10 @@ public class H_InspectSample extends Mission{
 				gui.set(0, Bukkit.createInventory(p, 54, "InspectSample " + count));
 				gui.get(0).setContents(temp);
 				p.openInventory(gui.get(0));
+				
+				
 			}
+			remain_time = count;
 		}
 
 		@Override
@@ -126,7 +145,7 @@ public class H_InspectSample extends Mission{
 					p.playSound(p.getLocation(), Sound.ITEM_BUCKET_EMPTY, 1.0f, 1.2f);
 			}
 			if (p.getOpenInventory().getTitle().split(" ")[0].equals("InspectSample")) {
-				p.openInventory(gui.get(0));
+				//p.openInventory(gui.get(0));
 			}
 		}
 
@@ -142,7 +161,8 @@ public class H_InspectSample extends Mission{
 	PreparingTimer P_timer;
 	int status = 0; // 0 실행안됨 | 1,2 실행됨 | 3 시약분석중 | 4 분석가능 | 100 클리어 상태
 	int bad;
-	final int time = 5; // 기다림 시간
+	private int remain_time = 60;
+	final int time = 60; // 기다림 시간
 
 	private List<String> lore = Arrays.asList("§7", "§71. 오른쪽 아래 파란색 버튼을 누른다.", "§72. " + time + "초 동안 기다린다.",
 			"§73. 이상 표본을 선택한다.", "§7잘못된 표본을 선택하면 다시 시작합니다.", "§7기다리는 동안 다른 곳에 가도 됩니다.");

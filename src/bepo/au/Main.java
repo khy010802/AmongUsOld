@@ -11,6 +11,7 @@ import org.bukkit.scoreboard.Scoreboard;
 
 import bepo.au.base.Mission;
 import bepo.au.function.MissionList;
+import bepo.au.function.Vent;
 import bepo.au.manager.CommandManager;
 import bepo.au.manager.EventManager;
 import bepo.au.manager.LocManager;
@@ -90,7 +91,13 @@ public class Main extends JavaPlugin implements Listener{
 		ml = new MissionList();
 		lm = new LocManager();
 		lm.loadLocs();
-		//Vent.loadVents();
+		
+		Vent.uploadVent("NW");
+		Vent.uploadVent("RL");
+		Vent.uploadVent("RU");
+		Vent.uploadVent("NS");
+		Vent.uploadVent("EES");
+		Vent.uploadVent("CAH");
 		
 		for(Mission m : Mission.MISSIONS) addLocation(m);
 		
