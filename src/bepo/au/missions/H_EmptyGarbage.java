@@ -8,6 +8,7 @@ import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
@@ -117,6 +118,13 @@ public class H_EmptyGarbage extends Mission {
 			Timer.StartTimer(4);
 		} else {
 			e.setCancelled(true);
+		}
+	}
+	
+	@EventHandler
+	public void View(InventoryCloseEvent e) {
+		if (e.getView().getTitle() == "EmptyGarbage") {
+			Timer.StopTimer();
 		}
 	}
 
