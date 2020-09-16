@@ -33,6 +33,7 @@ import bepo.au.function.AdminMap;
 import bepo.au.function.ItemList;
 import bepo.au.function.Vent;
 import bepo.au.function.VoteSystem;
+import bepo.au.utils.PlayerUtil;
 import bepo.au.utils.Util;
 
 public class EventManager implements Listener {
@@ -220,12 +221,14 @@ public class EventManager implements Listener {
 		String ventname = Vent.check(event.getTo());
 		if(ventname != null) {
 			Vent v = Vent.getVent(ventname);
+			Player p = event.getPlayer();
 			
 			Location loc = event.getTo().clone();
 			loc.setY(Vent.VENT_Y_VALUE);
-			Util.toggleDoor(loc);
+			Util.setDoor(loc, false);
 			
-			
+			PlayerUtil.setInvisible(p, true);
+			p.teleport()
 		}
 	}
 	

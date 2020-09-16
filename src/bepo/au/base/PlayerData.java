@@ -6,12 +6,14 @@ import java.util.List;
 import java.util.UUID;
 
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffectType;
 
 import bepo.au.GameTimer;
 import bepo.au.Main;
 import bepo.au.base.Sabotage.SaboType;
+import bepo.au.function.Vent;
 import bepo.au.utils.ColorUtil;
 import bepo.au.utils.PlayerUtil;
 
@@ -44,6 +46,9 @@ public class PlayerData {
 	private SaboType sabo_selected = SaboType.COMM;
 	private int sabo_selected_door_id = 1;
 	
+	private Vent now_vent = null;
+	private int now_vent_loc = 0;
+	
 	public PlayerData(String name, UUID uuid) {
 		this.name = name;
 		this.uuid = uuid;
@@ -57,6 +62,7 @@ public class PlayerData {
 	public boolean isAlive() { return this.survive; }
 	public SaboType getSelectedSabo() { return this.sabo_selected; }
 	public int getSelectedSaboDoor() { return this.sabo_selected_door_id; }
+	public Vent getVent() { return now_vent; }
 	
 	public int getRemainEmerg() { return this.emerg_remain_time; }
 	public void subtractRemainEmerg() { this.emerg_remain_time--; }
@@ -64,6 +70,18 @@ public class PlayerData {
 	public int getKillCool() { return this.kill_remain_tick; }
 	public void resetKillCool(boolean after_vote) { this.kill_remain_tick = after_vote ? 100 : Main.KILL_COOLTIME_SEC * 20; }
 	public void subtractKillCool() { if(this.kill_remain_tick > 0) this.kill_remain_tick--; }
+	
+	public void setVent(Vent v, Location loc) {
+		this.now_vent = v;
+		now_vent_loc = v.indexOf(loc);
+	}
+	
+	public void nextVent() {
+		now_vent_loc++;
+		if(now_vent_loc > now_vent.getList().size()) {
+			now_vent_loc = 0;
+		}
+	}
 	
 	public void nextSabo(Player p, boolean door) {
 		String a_string = "";
