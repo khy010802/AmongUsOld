@@ -12,6 +12,7 @@ import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
+import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockState;
 import org.bukkit.block.data.BlockData;
@@ -19,17 +20,24 @@ import org.bukkit.block.data.Openable;
 import org.bukkit.block.data.type.Door;
 import org.bukkit.craftbukkit.v1_16_R2.inventory.CraftItemStack;
 import org.bukkit.enchantments.Enchantment;
-import org.bukkit.entity.Player;								
-import org.bukkit.event.Listener;								
+import org.bukkit.entity.ArmorStand;
+import org.bukkit.entity.EntityType;
+import org.bukkit.entity.Player;
+import org.bukkit.entity.ArmorStand.LockType;
+import org.bukkit.event.Listener;
+import org.bukkit.inventory.EntityEquipment;
+import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.Inventory;								
 import org.bukkit.inventory.InventoryView;								
 import org.bukkit.inventory.ItemFlag;								
-import org.bukkit.inventory.ItemStack;								
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.Damageable;
 import org.bukkit.inventory.meta.ItemMeta;								
 import org.bukkit.inventory.meta.PotionMeta;
 import org.bukkit.inventory.meta.SkullMeta;
 
 import bepo.au.base.PlayerData;
+import bepo.au.manager.LocManager;
 import net.minecraft.server.v1_16_R2.NBTTagCompound;
 import net.minecraft.server.v1_16_R2.NBTTagList;								
 								
@@ -126,6 +134,10 @@ public class Util implements Listener{
 		}
 	}
 	
+	public static void placeSkull(Location loc) {
+		
+	}
+	
 	public static void setDoor(Location loc, boolean open) {
 		Block door = loc.getBlock();
 		BlockData doorData = door.getBlockData();
@@ -155,7 +167,7 @@ public class Util implements Listener{
 		UUID uuid = null;
 		if(Bukkit.getPlayer(name) != null) uuid = Bukkit.getPlayer(name).getUniqueId();
 		else if(PlayerData.getPlayerData(name) != null) uuid = PlayerData.getPlayerData(name).getUUID();
-		if(uuid == null) return new ItemStack(Material.AIR);
+		if(uuid == null) return is;
 		sm.setOwningPlayer(Bukkit.getOfflinePlayer(uuid));
 		is.setItemMeta(sm);
 		return is;
@@ -206,16 +218,23 @@ public class Util implements Listener{
     public static void Stack(Inventory inv, int slot, Material mat, int amount, String name, String lore, boolean enchant) {
         inv.setItem(slot, createItem(mat, amount, name, Arrays.asList(lore), enchant));
     }
+    public static ItemStack enchantItem(ItemStack is) {
+    	is.addUnsafeEnchantment(Enchantment.LURE, 1);
+    	ItemMeta ism = is.getItemMeta();
+        ism.addItemFlags(ItemFlag.HIDE_ENCHANTS);
+        is.setItemMeta(ism);
+        return is;
+    }
+    
     public static ItemStack createItem(Material mat, int amount, String name, List<String> lore, boolean enchant) {
         ItemStack is = new ItemStack(mat, amount);
         if(is.getType() == Material.AIR) return is;
+        if(enchant) {
+        	is = enchantItem(is);
+        }
         ItemMeta ism = is.getItemMeta();
         ism.setDisplayName(name);
         ism.setLore(lore);
-        if(enchant) {
-        ism.addEnchant(Enchantment.LURE, 1, true);
-        ism.addItemFlags(ItemFlag.HIDE_ENCHANTS);
-        }
 		if(mat==Material.POTION){
 			ism.addItemFlags(ItemFlag.HIDE_POTION_EFFECTS);
 		}
@@ -226,6 +245,38 @@ public class Util implements Listener{
     public static ItemStack createItem(Material mat, int amount, String name, List<String> lore) {
         return createItem(mat, amount, name, lore, false);
     }
+    
+    public static ArmorStand spawnArmorStand(String name, ColorUtil color, Location loc, boolean dead) {
+    
+		ArmorStand arm = (ArmorStand) loc.getWorld().spawnEntity(loc,
+				EntityType.ARMOR_STAND);
+		
+		arm.setInvulnerable(true);
+		arm.setGravity(false);
+		arm.setArms(true);
+		arm.setBasePlate(false);
+		arm.setCustomName("§7" + name);
+		arm.addScoreboardTag("forVote");
+		
+		if(name == null) {
+			arm.setCustomName("§e§l스킵");
+			EntityEquipment armeq = arm.getEquipment();
+			armeq.setHelmet(new ItemStack(Material.MAGENTA_GLAZED_TERRACOTTA));
+			arm.setVisible(false);
+			return arm;
+		}
+		
+		EntityEquipment armeq = arm.getEquipment();
+		ItemStack[] islist = PlayerUtil.getColoredArmorContent(color);
+		armeq.setArmorContents(islist);
+		if(dead) {
+			armeq.setHelmet(Util.createHead(name));
+			
+		} else {
+			armeq.setHelmet(new ItemStack(Material.SKELETON_SKULL));
+		}
+		return arm;
+	}
 								
 //////////////////////////////								
 								
@@ -236,6 +287,35 @@ public class Util implements Listener{
 		InventoryView guiView = (InventoryView) gui;						
 		if(p.getOpenInventory().getTitle().equals(guiView.getTitle())) p.openInventory(gui);						
 		return gui;						
-	}							
+	}
+	
+	
+	private static ArmorStand emerg_as;
+	
+	public static void spawnEmergArmorStand(World w) {
+		if(emerg_as != null) emerg_as.remove();
+		emerg_as = (ArmorStand) w.spawnEntity(LocManager.getLoc("Desk_ArmorStand").get(0), EntityType.ARMOR_STAND);
+		emerg_as.setInvulnerable(true);
+		emerg_as.setGravity(false);
+		emerg_as.setAI(false);
+		emerg_as.setVisible(false);
+		emerg_as.setCustomNameVisible(true);
+		emerg_as.setCustomName("§c게임 시작 대기 중...");
+		emerg_as.getEquipment().setHelmet(new ItemStack(Material.GLASS));
+		emerg_as.addEquipmentLock(EquipmentSlot.HEAD, LockType.REMOVING_OR_CHANGING);
+	}
+	
+	public static void despawnEmergArmorStand() {
+		if(emerg_as != null) emerg_as.remove();
+	}
+	
+	public static ArmorStand getEmergArmorStand() {
+		return emerg_as;
+	}
+	
+	
+	public static void spawnCorpse() {
+		
+	}
 }								
 								

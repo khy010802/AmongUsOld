@@ -35,6 +35,10 @@ public class S_Fingerprint extends Sabotage {
 		super(mt2, name, korean, clear, loc, SaboType.NUCL, 0);
 	}
 	
+	public void onRestart() {
+		
+	}
+	
 	public void onAssigned(Player p) {
 		assign(p);
 		initialize_Fingerprint(p);

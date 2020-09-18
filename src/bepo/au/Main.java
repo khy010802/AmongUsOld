@@ -34,12 +34,16 @@ public class Main extends JavaPlugin implements Listener{
 	public static World w;
 	
 	public static int EMER_BUTTON_PER_PLAYER = 1;
-	public static int EMER_BUTTON_COOL_SEC = 60;
+	public static int EMER_BUTTON_COOL_SEC = 1;
 	public static int DISCUSS_SEC = 15;
-	public static int VOTE_SEC = 120;
+	public static int VOTE_SEC = 10;
 	public static int CREW_SIGHT_BLOCK = 16;
 	public static int IMPOSTER_SIGHT_BLOCK = 24;
 	public static int KILL_COOLTIME_SEC = 20;
+	public static int SABO_COOL_SEC = 30;
+	
+	public static boolean NOTICE_IMPOSTER = true;
+	public static boolean VISUAL_TASK = true;
 	
 	public static int COMMON_MISSION_AMOUNT = 2;
 	public static int EASY_MISSION_AMOUNT = 8;
@@ -127,12 +131,17 @@ public class Main extends JavaPlugin implements Listener{
 		for(Player p : Bukkit.getOnlinePlayers()) {
 			PlayerUtil.resetHidden(p);
 			PlayerUtil.resetGlowingBlock(p);
+			PlayerUtil.removeChair(p);
 		}
 
 		Scoreboard board = Bukkit.getScoreboardManager().getMainScoreboard();
 		for(ColorUtil c : ColorUtil.values()) {
 			String tname = "sh" + c.getChatColor().name();
 			if(board.getTeam(tname) != null) board.getTeam(tname).unregister();
+		}
+		
+		if(gt != null) {
+			gt.stop();
 		}
 		
 	}

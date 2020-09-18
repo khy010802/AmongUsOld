@@ -40,6 +40,10 @@ public class S_Communication extends Sabotage {
 		super(mt2, name, korean, clear, loc, SaboType.COMM, 0);
 	}
 	
+	public void onRestart() {
+		
+	}
+	
 	public void onAssigned(Player p) {
 		Color[0] = Material.LIME_WOOL;
 		Color[1] = Material.ORANGE_WOOL;

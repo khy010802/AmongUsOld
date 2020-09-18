@@ -10,9 +10,14 @@ import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.craftbukkit.v1_16_R2.CraftWorld;
 import org.bukkit.craftbukkit.v1_16_R2.entity.CraftPlayer;
+import org.bukkit.craftbukkit.v1_16_R2.util.CraftChatMessage;
 import org.bukkit.craftbukkit.v1_16_R2.util.CraftMagicNumbers;
+import org.bukkit.entity.ArmorStand;
+import org.bukkit.entity.ArmorStand.LockType;
+import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.Damageable;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -22,6 +27,8 @@ import org.bukkit.scoreboard.Team;
 import org.bukkit.util.Vector;
 
 import bepo.au.Main;
+import bepo.au.base.PlayerData;
+import bepo.au.events.PlayerEscapeChairEvent;
 import bepo.au.function.ItemList;
 import net.md_5.bungee.api.ChatMessageType;
 import net.md_5.bungee.api.chat.TextComponent;
@@ -30,12 +37,16 @@ import net.minecraft.server.v1_16_R2.EntityMagmaCube;
 import net.minecraft.server.v1_16_R2.EntityPlayer;
 import net.minecraft.server.v1_16_R2.EntityShulker;
 import net.minecraft.server.v1_16_R2.EntityTypes;
+import net.minecraft.server.v1_16_R2.EnumGamemode;
 import net.minecraft.server.v1_16_R2.IBlockData;
 import net.minecraft.server.v1_16_R2.PacketPlayOutEntityDestroy;
 import net.minecraft.server.v1_16_R2.PacketPlayOutEntityMetadata;
 import net.minecraft.server.v1_16_R2.PacketPlayOutEntityTeleport;
+import net.minecraft.server.v1_16_R2.PacketPlayOutPlayerListHeaderFooter;
 import net.minecraft.server.v1_16_R2.PacketPlayOutSpawnEntity;
 import net.minecraft.server.v1_16_R2.PacketPlayOutSpawnEntityLiving;
+import net.minecraft.server.v1_16_R2.PacketPlayOutPlayerInfo;
+import net.minecraft.server.v1_16_R2.PacketPlayOutPlayerInfo.EnumPlayerInfoAction;
 import net.minecraft.server.v1_16_R2.WorldServer;
 
 public class PlayerUtil {
@@ -257,12 +268,11 @@ public class PlayerUtil {
 	/*
 	 * 의자 기능
 	 */
-	private static HashMap<Player, Item> chair = new HashMap<Player, Item>();
+	private static HashMap<Player, ArmorStand> chair = new HashMap<Player, ArmorStand>();
 	
 	public static void sitChair(Player p, Location loc) {
-		if(isSitting(p)) removeChair(p);
-		p.eject();
-		Item item = dropSeat(loc.getBlock());
+		if(isSitting(p)) return;
+		ArmorStand item = dropSeat(loc.getBlock());
 		item.addPassenger(p);
 		chair.put(p, item);
 	}
@@ -274,7 +284,7 @@ public class PlayerUtil {
 				chair.remove(p);
 				return false;
 			}
-			return true;
+			if(chair.get(p).getPassengers().contains(p)) return true;
 		}
 		
 		return false;
@@ -282,18 +292,25 @@ public class PlayerUtil {
 	
 	public static void removeChair(Player p) {
 		if(isSitting(p)) {
-			p.eject();
-			chair.get(p).remove();
-			chair.remove(p);
+			PlayerEscapeChairEvent event = new PlayerEscapeChairEvent(p, chair.get(p));
+			Bukkit.getPluginManager().callEvent(event);
+			if(!event.isCancelled()) {
+				p.eject();
+				chair.get(p).remove();
+				chair.remove(p);
+			}
+			
 		}
 	}
 	
-	private static Item dropSeat(Block chair) {
-		Location location = chair.getLocation().add(0.5, 0.2, 0.5);
-		Item drop = location.getWorld().dropItemNaturally(location, new ItemStack(Material.PUMPKIN_STEM));
-		drop.setPickupDelay(Integer.MAX_VALUE);
+	private static ArmorStand dropSeat(Block chair) {
+		Location location = chair.getLocation().add(0.5, -1.0, 0.5);
+		ArmorStand drop = (ArmorStand) location.getWorld().spawnEntity(location, EntityType.ARMOR_STAND);
+		drop.setInvulnerable(true);
+		drop.setVisible(false);
+		drop.setGravity(false);
+		drop.hasEquipmentLock(EquipmentSlot.HAND, LockType.REMOVING_OR_CHANGING);
 		drop.teleport(location);
-		drop.setVelocity(new Vector(0, 0, 0));
 		return drop;
 	}
 	
@@ -306,7 +323,8 @@ public class PlayerUtil {
 		for(int i : islist.keySet()) p.getInventory().setItem(i, islist.get(i));
 		
 		if(!first) {
-			// 내구도 갱신
+			PlayerData pd = PlayerData.getPlayerData(p.getName());
+			if(pd != null) pd.updateItems(p);
 		}
 	}
 	
@@ -341,6 +359,7 @@ public class PlayerUtil {
 		
 		if(!invisible.contains(target.getName())) {
 			p.showPlayer(Main.getInstance(), target);
+			
 			if(hidden.containsKey(p)) {
 				hidden.get(p).remove(target);
 			}
@@ -354,7 +373,9 @@ public class PlayerUtil {
 	}
 	
 	public static void resetHidden(Player p) {
-		for(Player ap : Bukkit.getOnlinePlayers()) if(!p.equals(ap)) p.showPlayer(Main.getInstance(), ap);
+		for(Player ap : Bukkit.getOnlinePlayers()) if(!p.equals(ap)) {
+			p.showPlayer(Main.getInstance(), ap);
+		}
 		if(hidden.containsKey(p)) hidden.clear();
 		if(invisible.contains(p.getName())) invisible.remove(p.getName());
 	}
@@ -362,7 +383,10 @@ public class PlayerUtil {
 	public static void setInvisible(Player p, boolean inv) {
 		if(inv) {
 			if(!invisible.contains(p.getName())) invisible.add(p.getName());
-			for(Player ap : Bukkit.getOnlinePlayers()) ap.hidePlayer(Main.getInstance(), p);
+			for(Player ap : Bukkit.getOnlinePlayers()) {
+				showTabList(ap);
+				ap.hidePlayer(Main.getInstance(), p);
+			}
 		} else {
 			invisible.remove(p.getName());
 		}
@@ -405,5 +429,10 @@ public class PlayerUtil {
 		ism.setDamage(dam);
 		is.setItemMeta((ItemMeta) ism);
 	}
+	
+	public static void showTabList(Player player) {
+		PacketPlayOutPlayerInfo pack = new PacketPlayOutPlayerInfo(EnumPlayerInfoAction.ADD_PLAYER, ((CraftPlayer) player).getHandle());
+		for(Player ap : Bukkit.getOnlinePlayers()) ((CraftPlayer) ap).getHandle().playerConnection.sendPacket(pack);
+    }
 
 }

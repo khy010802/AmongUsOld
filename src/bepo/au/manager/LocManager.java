@@ -19,8 +19,11 @@ public class LocManager {
 			"EmergencyButton",
 			"AdminMap",
 			"ImposterNotice",
+			"VoteNotice",
+			"VoteNoticeArmorStand",
+			"VoteNoticeArmorStand_DIR",
 			"ImposterNoticeArmorStand",
-			"Desk",
+			"Desk", "Desk_ArmorStand",
 			"FixWiring",
 			"DivertPower",
 			"EmptyGarbage",
@@ -119,10 +122,10 @@ public class LocManager {
 		
 		try {
 			 for( String key : LocationMap.keySet() ){
-				 boolean yawpitch = key.equalsIgnoreCase("SEATS") || key.contains("ImposterNotice") || key.equalsIgnoreCase("Desk");
+				
 				 String value = "";
 				for(Location loc: LocationMap.get(key)) {
-					value=value+LocationToCoor(loc, yawpitch)+"/";
+					value=value+LocationToCoor(loc, getYawPitch(key))+"/";
 				}
 				location.set(key, value);
 				}
@@ -137,13 +140,16 @@ public class LocManager {
 		}
 		LocationMap.get(locName).add(loc);
 	}
+	
+	private boolean getYawPitch(String key) {
+		 return key.equalsIgnoreCase("SEATS") || key.contains("Imposter") || key.contains("Desk") || key.contains("Vent") || key.contains("Vote");
+	}
 	private void saveALocation(String locName) {
 		location = YamlConfiguration.loadConfiguration(file);
-		boolean yawpitch = locName.equalsIgnoreCase("SEATS") || locName.contains("ImposterNotice") || locName.equalsIgnoreCase("Desk");
 		try { 
 			 String value = "";
 			for(Location loc: LocationMap.get(locName)) {
-				value=value+LocationToCoor(loc, yawpitch)+"/";
+				value=value+LocationToCoor(loc, getYawPitch(locName))+"/";
 			}
 			location.set(locName, value);
 			location.save(file);
@@ -157,12 +163,12 @@ public class LocManager {
 		return coor;
 	}
 	private Location StringToLoc(String str) {
-		int x,y,z;
+		double x,y,z;
 		float yaw = 0F, pitch = 0F;
 		String[] xyz=str.split(",");
-		x=(int) Double.parseDouble(xyz[0]);
-		y=(int) Double.parseDouble(xyz[1]);
-		z=(int) Double.parseDouble(xyz[2]);
+		x= Double.parseDouble(xyz[0]);
+		y= Double.parseDouble(xyz[1]);
+		z= Double.parseDouble(xyz[2]);
 		if(xyz.length > 3) {
 			yaw = Float.parseFloat(xyz[3]);
 			pitch = Float.parseFloat(xyz[4]);

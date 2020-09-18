@@ -95,7 +95,7 @@ public class CommandManager implements CommandExecutor{
 	
 	private void start(Player p) {
 		if(Main.gt == null) {
-			Main.gt = new GameTimer(Main.getInstance());
+			Main.gt = new GameTimer(p.getWorld(), Main.getInstance());
 			Main.gt.start(p);
 		} else {
 			p.sendMessage(Main.PREFIX + "§c게임이 이미 시작되어있습니다.");

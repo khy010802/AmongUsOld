@@ -117,19 +117,16 @@ public class H_EmptyGarbage extends Mission {
     }
 	
 	@EventHandler
-	public void Click(InventoryClickEvent e) {
+    public void Close(InventoryCloseEvent e) {
 
-		if (!checkPlayer(e))
-			return;
+        if (!checkPlayer(e))
+            return;
 
-		if (e.getCurrentItem() != null && e.getCurrentItem().getType() == Material.GRAY_CONCRETE && Timer == null) {
-			e.setCancelled(true);
-			Timer = new EmptyGarbageTimer(getCode(e.getView().getTitle()));
-			Timer.StartTimer(4);
-		} else {
-			e.setCancelled(true);
-		}
-	}
+        if (Timer != null) {
+            Timer.StopTimer();
+            Timer = null;
+        }
+    }
 
 	public int getCoordinate(int x, int y) {
 		return x + 9 * y;

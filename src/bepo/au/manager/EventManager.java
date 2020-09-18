@@ -2,18 +2,19 @@ package bepo.au.manager;
 
 import java.util.List;
 
-import javax.print.attribute.standard.PDLOverrideSupported;
-
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Sound;
+import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
+import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.player.PlayerDropItemEvent;
@@ -24,6 +25,7 @@ import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.player.PlayerSwapHandItemsEvent;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
+import org.spigotmc.event.entity.EntityDismountEvent;
 
 import bepo.au.GameTimer.Status;
 import bepo.au.GameTimer;
@@ -40,6 +42,54 @@ import bepo.au.utils.PlayerUtil;
 import bepo.au.utils.Util;
 
 public class EventManager implements Listener {
+	
+	@EventHandler
+	public void onLeave(EntityDismountEvent event) {
+		
+		if(event.getDismounted() instanceof ArmorStand && event.getEntity() instanceof Player) {
+			Player p = (Player) event.getEntity();
+			if(PlayerUtil.isSitting(p)) event.getDismounted().remove();
+		}
+	}
+	
+	@EventHandler
+	public void onDamage(EntityDamageEvent event) {
+		if(event.getEntity() instanceof Player) {
+			Player p = (Player) event.getEntity();
+			if(GameTimer.ALIVE_PLAYERS.contains(p)) event.setCancelled(true);
+		}
+	}
+	
+	@EventHandler
+	public void onDamageByEntity(EntityDamageByEntityEvent event) {
+		if(event.getEntity() instanceof Player && event.getDamager() instanceof Player) {
+			Player p = (Player) event.getDamager();
+			Player e = (Player) event.getEntity();
+			
+			ItemStack is = p.getInventory().getItemInMainHand();
+			if(is != null && is.getType() == ItemList.I_SWORD.getType()) {
+				if(GameTimer.ALIVE_PLAYERS.contains(p) && GameTimer.ALIVE_PLAYERS.contains(e)) {
+					if(GameTimer.ALIVE_IMPOSTERS.contains(p.getName())) {
+						PlayerData pd = PlayerData.getPlayerData(p.getName());
+						PlayerData ed = PlayerData.getPlayerData(e.getName());
+						
+						if(pd.getKillCool() > 0) {
+							p.sendMessage(Main.PREFIX + "§c킬 쿨타임이 §f" + (pd.getKillCool()/20 + 1) + "§c초 남았습니다.");
+						} else {
+							pd.resetKillCool(false);
+							p.playSound(e.getLocation(), Sound.ENTITY_PLAYER_HURT	, 1.0F, 1.0F);
+							e.sendTitle("§c§l사망하셨습니다", "§cBy " + pd.getColor().getChatColor() + p.getName(), 0, 100, 20);
+							e.playSound(e.getLocation(), Sound.ENTITY_PLAYER_HURT	, 1.0F, 1.0F);
+							ed.kill(false);
+							
+						}
+					}
+				}
+			}
+			
+			
+		}
+	}
 	
 	@EventHandler
 	public void onChange(PlayerSwapHandItemsEvent event) {
@@ -110,8 +160,15 @@ public class EventManager implements Listener {
 			return;
 
 		if (Main.gt.getStatus() == Status.VOTING) {
+			ItemStack is = event.getItem();
+			if(is != null) {
+				if(is.equals(ItemList.VOTE_PAPER)) {
+					VoteSystem.PROGRESSED_VOTE.openGUI(p);
+					event.setCancelled(true);
+					return;
+				}
+			}
 			
-
 			return;
 		} else if (Main.gt.getStatus() == Status.WORKING) {
 			ItemStack is = event.getItem();
@@ -158,7 +215,7 @@ public class EventManager implements Listener {
 					} else if(Sabotage.isActivating(0)) {
 						p.sendMessage("§c위급 사보타지 발동 중에는 긴급 소집을 할 수 없습니다.");
 					} else {
-						VoteSystem.start(p.getName(), false);
+						VoteSystem.start(p.getWorld(), p.getName(), false);
 					}
 					return;
 				} else if(LocManager.getLoc("AdminMap").contains(loc)) {
@@ -239,7 +296,7 @@ public class EventManager implements Listener {
 		if(GameTimer.PLAYERS.contains(p.getName())) {
 			PlayerData pd = PlayerData.getPlayerData(p.getName());
 			Bukkit.broadcastMessage(Main.PREFIX + pd.getColor().getChatColor() + p.getName() + "§f님께서 중도 탈주로 탈락처리되었습니다.");
-			PlayerData.getPlayerData(p.getName()).kill();
+			PlayerData.getPlayerData(p.getName()).kill(false);
 		}
 	}
 	

@@ -1,14 +1,21 @@
 package bepo.au.function;
 
-import java.awt.Event;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
+import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.Sound;
+import org.bukkit.World;
+import org.bukkit.block.Block;
+import org.bukkit.block.BlockFace;
+import org.bukkit.block.Skull;
+import org.bukkit.block.data.Rotatable;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.EntityType;
@@ -18,6 +25,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.player.PlayerToggleFlightEvent;
 import org.bukkit.event.vehicle.VehicleExitEvent;
 import org.bukkit.inventory.EntityEquipment;
 import org.bukkit.inventory.Inventory;
@@ -25,25 +33,36 @@ import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.LeatherArmorMeta;
+import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.spigotmc.event.entity.EntityDismountEvent;
 
 import bepo.au.GameTimer;
 import bepo.au.GameTimer.Status;
 import bepo.au.Main;
 import bepo.au.base.PlayerData;
+import bepo.au.base.Sabotage;
 import bepo.au.manager.LocManager;
+import bepo.au.sabo.S_Communication;
+import bepo.au.sabo.S_Fingerprint;
+import bepo.au.utils.ColorUtil;
 import bepo.au.utils.PlayerUtil;
 import bepo.au.utils.Util;
 
 public class VoteSystem extends BukkitRunnable implements Listener {
 
 	public static VoteSystem PROGRESSED_VOTE = null;
+	private static World world;
 
-	public static void start(String name, boolean reported) {
+	public static void start(World w, String name, boolean reported) {
 		PROGRESSED_VOTE = new VoteSystem();
+		world = w;
+		Util.spawnEmergArmorStand(w);
+		GameTimer.EMERG_REMAIN_TICK = Main.EMER_BUTTON_COOL_SEC * 20;
 		Main.gt.setStatus(Status.VOTING);
 		Bukkit.getPluginManager().registerEvents(PROGRESSED_VOTE, Main.getInstance());
+		
 		for (Player ap : Bukkit.getOnlinePlayers()) {
 			if (reported)
 				ap.sendTitle("§c시체 발견",
@@ -54,11 +73,13 @@ public class VoteSystem extends BukkitRunnable implements Listener {
 						PlayerData.getPlayerData(name).getColor().getChatColor() + name + "§f님께서 긴급 소집 버튼을 눌렀습니다.", 0,
 						80, 20);
 			
+			
+			
 			PlayerData pd = PlayerData.getPlayerData(ap.getName());
 			
-			if (pd != null && pd.isAlive()) {
+			if (pd != null) {
 				PROGRESSED_VOTE.onAssigned(ap);
-				pd.confirmVent(ap, true);
+				
 			}
 		}
 
@@ -88,18 +109,52 @@ public class VoteSystem extends BukkitRunnable implements Listener {
 					}
 				}
 				*/
+				
+				
+				
 				PROGRESSED_VOTE.setSeats();
+				PROGRESSED_VOTE.user_setting();
 				PROGRESSED_VOTE.runTaskTimer(Main.getInstance(), 0L, 1L);
 			}
-		}.runTaskLater(Main.getInstance(), 20L);
+		}.runTaskLater(Main.getInstance(), 100L);
+	}
+	
+	public static void end_check() {
+		
+		if(top != null && voteResult == resultType.CHOOSED) PlayerData.getPlayerData(top).kill(true);
+		
+		if(GameTimer.WIN_REASON != null) return;
+		
+		for(int i=0;i<DATALIST.size();i++) {
+			PlayerData pd = DATALIST.get(i);
+			Location loc = LocManager.getLoc("SEATS").get(i);
+			Player p = Bukkit.getPlayer(pd.getName());
+			if(p != null) {
+				p.teleport(loc);
+				p.setGameMode(GameMode.SURVIVAL);
+				pd.resetKillCool(true);
+				if(pd.isAlive()) PlayerUtil.setInvisible(p, false);
+			}
+		}
+		
+		Sabotage.saboResetAll(false);
+		VoteSystem.PROGRESSED_VOTE = null;
+		Main.gt.setStatus(Status.WORKING);
+		
+		
 	}
 
-	public static void voteover() {// 종료 페이즈
+	public void voteover() {// 종료 페이즈
 		int maximum = -1;
 		int current;
 		boolean tied = false;
 
-		for(Player ap : Bukkit.getOnlinePlayers()) ap.closeInventory();
+		for(Player ap : Bukkit.getOnlinePlayers()) {
+			ap.closeInventory();
+			gui_list.remove(ap.getName());
+		}
+		
+		Util.spawnEmergArmorStand(world);
 		
 		HandlerList.unregisterAll(PROGRESSED_VOTE);
 		
@@ -116,21 +171,17 @@ public class VoteSystem extends BukkitRunnable implements Listener {
 		if (tied) {
 			voteResult = resultType.TIE;
 			top = null;
-		} else if (top == "§fSKIP") {
+		} else if (top == "SKIP") {
 			voteResult = resultType.SKIP;
 		} else {
 			voteResult = resultType.CHOOSED;
 		}
-
-		// 여기에 투표 삽입
 		
-		
+		startNotice();
 	}
 	
 	String guiName = "투표";
 	private boolean isImposter;
-
-	private static HashMap<String, ItemStack[]> contents = new HashMap<String, ItemStack[]>();
 
 	private static HashMap<String, Inventory> gui_list = new HashMap<String, Inventory>();
 	
@@ -141,7 +192,10 @@ public class VoteSystem extends BukkitRunnable implements Listener {
 	private static ArrayList<String> VOTERS;
 	private static int remainedVoter;
 	private static int guiSize;
+	
 	private static ArrayList<ArmorStand> armorstandList;
+	
+	public static VoteResultTimer vrt;
 
 	public static enum resultType {
 
@@ -153,8 +207,11 @@ public class VoteSystem extends BukkitRunnable implements Listener {
 
 	public VoteSystem() {
 		voteTimer = Main.VOTE_SEC * 20;
-		
+		SURVIVORS = new ArrayList<String>();
+		VOTERS = new ArrayList<String>();
 		DATALIST = PlayerData.getPlayerDataList();
+		voteMap = new HashMap<String, ArrayList<String>>();
+		voteMap.put("SKIP", new ArrayList<String>());
 		for (PlayerData pd : DATALIST) {
 			if (pd.isAlive()) {
 				SURVIVORS.add(pd.getName());
@@ -162,6 +219,8 @@ public class VoteSystem extends BukkitRunnable implements Listener {
 		}
 		remainedVoter = SURVIVORS.size();
 		VOTERS.clear();
+		top = null;
+		voteResult = null;
 	}
 
 	private static resultType voteResult = null;
@@ -170,17 +229,12 @@ public class VoteSystem extends BukkitRunnable implements Listener {
 	 * 투표 시작 관련
 	 */
 	public void onAssigned(Player p) {// p는 주체
-		
-		
+		PlayerData.getPlayerData(p.getName()).confirmVent(p, true);
+		p.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, 120, 0, true));
+		p.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 1000000, 10, true));
+		p.getInventory().setHeldItemSlot(8);
 		setGUI(p);
 		
-		contents.put(p.getName(), p.getInventory().getContents().clone());
-		p.getInventory().clear();
-		p.getInventory().setItem(8, getBook());
-	}
-	
-	private final ItemStack getBook() {
-		return Util.createItem(Material.BOOK, 1, "§f투표창 열기", Arrays.asList("§7들고 우클릭 시 투표창을 엽니다."));
 	}
 
 	public void setGUI(Player p) { // 투표할때 GUI용
@@ -188,16 +242,15 @@ public class VoteSystem extends BukkitRunnable implements Listener {
 		int idx = 0;
 		
 		Inventory gui = Bukkit.createInventory(p, guiSize, guiName);
-		voteMap = new HashMap<String, ArrayList<String>>();
 		for (PlayerData pd : DATALIST) {
 			String name = pd.getName();
-			ItemStack item = Util.getSkull(name);
+			ItemStack item = pd.isAlive() ? Util.getSkull(name) : new ItemStack(Material.SKELETON_SKULL);
 			ItemMeta meta = item.getItemMeta();
 			voteMap.put(pd.getName(), new ArrayList<String>());
 
 			isImposter = GameTimer.IMPOSTER.contains(p.getName());// 임포스터일시 서로 구별용
-			if (isImposter && GameTimer.IMPOSTER.contains(p.getName())) {
-				meta.setDisplayName("§4" + name);
+			if (isImposter && GameTimer.IMPOSTER.contains(name)) {
+				meta.setDisplayName(pd.getColor().getChatColor() + name);
 				meta.addEnchant(Enchantment.MENDING, idx, true);
 				meta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
 			} else
@@ -213,78 +266,90 @@ public class VoteSystem extends BukkitRunnable implements Listener {
 			gui.setItem(idx, item);
 			idx++;
 		}
-		Util.Stack(gui, guiSize - 2, Material.CLOCK, voteTimer / 20, "남은시간 : " + voteTimer / 20);
+		Util.Stack(gui, guiSize - 2, Material.CLOCK, voteTimer / 20 + 1, "남은시간 : " + (voteTimer / 20+1));
 		Util.Stack(gui, guiSize - 1, Material.MAGENTA_GLAZED_TERRACOTTA, 1, "§fSKIP", "§7투표");
 		gui_list.put(p.getName(), gui);
 	}
+	
+	public void updateGUI(Inventory inv) {
+		for (int i=0;i<inv.getSize();i++) {
+			ItemStack is = inv.getItem(i);
+			if(is != null && is.getType() == Material.PLAYER_HEAD) {
+				String name = ChatColor.stripColor(is.getItemMeta().getDisplayName());
+				if(VOTERS.contains(name)) {
+					inv.setItem(i, Util.enchantItem(is));
+				}
+			}
+		}
+	}
 
 	public void openGUI(Player p) {
+		if(!gui_list.containsKey(p.getName())) return;
+		
+		updateGUI(gui_list.get(p.getName()));
 		p.openInventory(gui_list.get(p.getName()));
 	}
 
+	//@EventHandler
+	public void onToggleFlight(PlayerToggleFlightEvent event) {
+		if(vrt != null && event.isFlying()) event.setCancelled(true);
+	}
+	
 	@EventHandler
 	public void onClick(InventoryClickEvent e) {
 		ItemStack its = e.getCurrentItem();
 		if(SURVIVORS.contains(e.getWhoClicked().getName())) e.setCancelled(true);
 		if (guiName == e.getView().getTitle() && its != null && voteResult == null) {
 			if (its.getItemMeta().hasLore() && its.getItemMeta().getLore().get(0).equals("§7투표")) {
-				putVoter(e.getWhoClicked().getName(), its.getItemMeta().getDisplayName());
+				putVoter((Player) e.getWhoClicked(), its);
 			}
-		}
-	}
-	
-	@EventHandler
-	public void onLeave(VehicleExitEvent event) {
-		if(event.getExited() instanceof Player && SURVIVORS.contains(((Player) event.getExited()).getName())) {
-			event.setCancelled(true);
 		}
 	}
 
 	Material[] clothes = { Material.LEATHER_BOOTS, Material.LEATHER_LEGGINGS, Material.LEATHER_CHESTPLATE };
-
+	
+	public void user_setting() {
+		for(Player ap : Bukkit.getOnlinePlayers()) {
+			PlayerData pd = PlayerData.getPlayerData(ap.getName());
+			if(pd != null && pd.isAlive()) PlayerUtil.setInvisible(ap, false);
+			for(Player ap2 : GameTimer.ALIVE_PLAYERS) {
+				ap.showPlayer(Main.getInstance(), ap2);
+			}
+			ap.removePotionEffect(PotionEffectType.BLINDNESS);
+			ap.removePotionEffect(PotionEffectType.SLOW);
+		}
+	}
+	
+	public void user_sit(boolean first) {
+		for (int idx = 0; idx < DATALIST.size(); idx++) {
+			Player currentPlayer = Bukkit.getPlayer(DATALIST.get(idx).getName());
+			if(currentPlayer != null && currentPlayer.getVehicle() == null) {
+				
+				if(first) currentPlayer.teleport(SEATS.get(idx));// 플레이어를 각 자리로 이동
+				
+				PlayerUtil.sitChair(currentPlayer, SEATS.get(idx));
+			}
+			
+		}
+	}
+	
+	
+	
 	public void setSeats() { // 투표가 시작될 때 자리 세팅
 		SEATS = LocManager.getLoc("SEATS");
 		if (DATALIST.size() > SEATS.size()) {
 			Util.debugMessage("플레이어 수보다 자리가 적습니다.");
 		}
+		
+		user_sit(true);
+		
 		for (int idx = 0; idx < DATALIST.size(); idx++) {
-			Player currentPlayer = Bukkit.getPlayer(DATALIST.get(idx).getName());
-			currentPlayer.teleport(SEATS.get(idx));// 플레이어를 각 자리로 이동
-			currentPlayer.removePotionEffect(PotionEffectType.BLINDNESS);
-			PlayerUtil.sitChair(currentPlayer, SEATS.get(idx));
-			/*
-			 * Vector dir = LocManager.getLoc("Center").get(0).clone().subtract(currentPlayer.getEyeLocation()).toVector();
-			 * Location loc = currentPlayer.getLocation().setDirection(dir);
-			 */
-
-			if (!DATALIST.get(idx).isAlive()) {// 플레이어가 유령상태일때
-				ArmorStand arm = (ArmorStand) currentPlayer.getWorld().spawnEntity(SEATS.get(idx),
-						EntityType.ARMOR_STAND);
-				arm.setInvulnerable(true);
-				arm.setCustomName("§7" + currentPlayer.getName());
-				arm.addScoreboardTag("forVote");
-				armorstandList.add(arm);
-				EntityEquipment armeq = arm.getEquipment();
-
-				armeq.setHelmet(new ItemStack(Material.SKELETON_SKULL));
-				for (int idx1 = 0; idx1 < 3; idx1++) // 옷입히기
-				{
-					ItemStack stack = new ItemStack(clothes[idx1]);
-					LeatherArmorMeta meta = (LeatherArmorMeta) stack.getItemMeta();
-					meta.setColor(DATALIST.get(idx).getColor().getDyeColor().getColor());
-					stack.setItemMeta(meta);
-					switch (idx1) {
-					case 0:
-						armeq.setBoots(stack);
-						break;
-					case 1:
-						armeq.setLeggings(stack);
-						break;
-					case 2:
-						armeq.setChestplate(stack);
-						break;
-					}
-				}
+			PlayerData pd = DATALIST.get(idx);
+			Player currentPlayer = Bukkit.getPlayer(pd.getName());
+			
+			armorstandList = new ArrayList<ArmorStand>();
+			if (!pd.isAlive()) {// 플레이어가 유령상태일때
+				armorstandList.add(Util.spawnArmorStand(currentPlayer.getName(), pd.getColor(), currentPlayer.getLocation(), false));
 			}
 		}
 	}
@@ -292,13 +357,21 @@ public class VoteSystem extends BukkitRunnable implements Listener {
 	/*
 	 * 투표 진행 관련
 	 */
-	private void putVoter(String voter, String voted) {
+	private void putVoter(Player p, ItemStack is) {
+		
+		String voter = p.getName();
+		String voted = is.getItemMeta().getDisplayName();
+		voted = ChatColor.stripColor(is.getItemMeta().getDisplayName());
+		
 		if (voteTimer <= 0)
 			return;
-		if (VOTERS.contains(voter))
+		if (VOTERS.contains(voter)) {
+			p.sendMessage(Main.PREFIX + "§c투표를 번복할 수 없습니다.");
 			return;
-
-		if (voted == "§fSKIP") {
+		}
+		
+		if (voted.equalsIgnoreCase("SKIP")) {
+			Bukkit.broadcastMessage("SKIP voted");
 			voteMap.get(voted).add(voter);
 			remainedVoter--;
 			VOTERS.add(voter);
@@ -306,9 +379,15 @@ public class VoteSystem extends BukkitRunnable implements Listener {
 			voteMap.get(voted).add(voter);
 			remainedVoter--;
 			VOTERS.add(voter);
-		} else
+		} else {
 			Util.debugMessage("죽은사람이 투표를 시도했습니다.");
-		if (remainedVoter == SURVIVORS.size()) {
+			return;
+		}
+		if(!voted.equalsIgnoreCase("SKIP")) p.sendMessage(Main.PREFIX + PlayerData.getPlayerData(voted).getColor().getChatColor() + voted + "§f에게 투표했습니다.");
+		else p.sendMessage(Main.PREFIX + "스킵에 투표했습니다.");
+		Util.enchantItem(is);
+		updateGUI(gui_list.get(p.getName()));
+		if (remainedVoter == 0) {
 			voteover();
 		}
 	}
@@ -330,25 +409,39 @@ public class VoteSystem extends BukkitRunnable implements Listener {
 	public int getRemainedTick() {
 		return voteTimer;
 	}
+	
+	private void startNotice() {
+		VoteResultTimer vrt = new VoteResultTimer();
+		vrt.runTaskTimer(Main.getInstance(), 0L, 1L);
+		VoteSystem.vrt = vrt;
+	}
 
 	@Override
 	public void run() {
 		voteTimer--;
 		
+		if(VoteSystem.vrt != null) {
+			this.cancel();
+			return;
+		}
+		
 		switch (voteTimer) {// 투표 종료 후 이벤트 관련
 		case 0:
 			timeover();
-			break;
-		case -25:// 투표 완전 종료.
-			for (ArmorStand arm : armorstandList) {
-				arm.remove();
-			}
 			this.cancel();
+			return;
 		}
 		
-		for(Inventory gui : gui_list.values()) {
-			Util.Stack(gui, guiSize - 2, Material.CLOCK, voteTimer / 20 + 1, "남은시간 : " + voteTimer / 20 + 1);
-			for(HumanEntity he : gui.getViewers()) if(he instanceof Player) ((Player) he).updateInventory();
+		if(voteTimer >= -1 && voteTimer % 20 == 0) {
+			Util.getEmergArmorStand().setCustomName("§f남은시간 : §a" + (voteTimer / 20 + 1) + "§f초");
+			user_sit(false);
+			for(Inventory gui : gui_list.values()) {
+				Util.Stack(gui, guiSize - 2, Material.CLOCK, voteTimer / 20 + 1, "§f남은시간 : §a" + (voteTimer / 20 + 1) + "§f초");
+				
+				for(HumanEntity he : gui.getViewers()) {
+					((Player) he).updateInventory();
+				}
+			}
 		}
 	}
 
@@ -358,5 +451,225 @@ public class VoteSystem extends BukkitRunnable implements Listener {
 
 	public static void setVoteResult(resultType voteResult) {
 		VoteSystem.voteResult = voteResult;
+	}
+	
+	public class VoteResultTimer extends BukkitRunnable {
+		
+		private HashMap<String, Location> prev_locs = new HashMap<String, Location>();
+		private Location tploc;
+		
+		private List<Location> locs;
+		private List<Location> changed_locs;
+		
+		private final int add_x_value;
+		private final int add_z_value;
+		
+		private BlockFace bf;
+		
+		public VoteResultTimer() {
+			tploc = LocManager.getLoc("VoteNotice").get(0);
+			locs = LocManager.getLoc("VoteNoticeArmorStand");
+			changed_locs = new ArrayList<Location>();
+			Location dirloc = LocManager.getLoc("VoteNoticeArmorStand_DIR").get(0);
+			Location arloc = locs.get(0);
+			add_x_value = dirloc.getBlockX() == arloc.getBlockX() ? 0 : (dirloc.getBlockX() > arloc.getBlockX() ? 1 : -1);
+			add_z_value = dirloc.getBlockZ() == arloc.getBlockZ() ? 0 : (dirloc.getBlockZ() > arloc.getBlockZ() ? 1 : -1);
+			
+			float f = tploc.getYaw();
+			
+			if(f >= 45 && f < 135) bf = BlockFace.WEST;
+			else if(f >= 135 && f < 225) bf = BlockFace.NORTH;
+			else if(f >= 225 && f >= 315) bf = BlockFace.EAST;
+			else bf = BlockFace.SOUTH;
+			
+			for(Player ap : Bukkit.getOnlinePlayers()) {
+				PlayerUtil.setInvisible(ap, true);
+				ap.setAllowFlight(true);
+				ap.setFlying(true);
+				ap.teleport(tploc);
+				ap.setGameMode(GameMode.SPECTATOR);
+				prev_locs.put(ap.getName(), ap.getLocation());
+			}
+			
+			for(int temp=0;temp<DATALIST.size();temp++) {
+				PlayerData pd = DATALIST.get(temp);
+				armorstandList.add(Util.spawnArmorStand(pd.getName(), pd.getColor(), locs.get(temp), pd.isAlive()));
+			}
+			
+			Location loc1 = locs.get(12).clone();
+			Location loc2 = locs.get(12).clone().add(0, 1, 0);
+			
+			loc1.getBlock().setType(Material.MAGENTA_GLAZED_TERRACOTTA);
+			loc2.clone().getBlock().setType(Material.MAGENTA_GLAZED_TERRACOTTA);
+			
+			changed_locs.add(loc1);
+			changed_locs.add(loc2);
+		}
+		
+		private String getGeneralTitle() {
+			if(Main.NOTICE_IMPOSTER) return "남은 임포스터 : §c" + getRemainImposters() + "명";
+			else return "";
+		}
+		
+		private int getRemainImposters() {
+			int r = GameTimer.ALIVE_IMPOSTERS.size();
+			if(top != null && GameTimer.ALIVE_IMPOSTERS.contains(top)) return r-1;
+			else return r;
+		}
+		
+		private void resetField() {
+			for(Location loc : changed_locs) {
+				loc.getBlock().setType(Material.AIR);
+			}
+			for(ArmorStand as : armorstandList) {
+				if(as != null) as.remove();
+			}
+			armorstandList.clear();
+		}
+		
+		private boolean placeVote(String name, Location loc, int temp) {
+			
+			if(!voteMap.containsKey(name) || voteMap.get(name).size() <= temp) return false;
+			
+			loc.add(add_x_value * (temp+1), 0, add_z_value * (temp+1));
+			Block wool = loc.getBlock();
+			Block head = loc.add(0, 1, 0).getBlock();
+			
+			PlayerData pd = PlayerData.getPlayerData(voteMap.get(name).get(temp));
+			wool.setType(Material.getMaterial(pd.getColor().getDyeColor().toString() + "_WOOL"));
+			
+			head.setType(Material.PLAYER_HEAD);
+			Skull skull = (Skull) head.getState();
+			skull.setOwningPlayer(Bukkit.getOfflinePlayer(pd.getUUID()));
+			
+			Rotatable bd = (Rotatable) skull.getBlockData();
+			bd.setRotation(bf);
+			skull.setBlockData(bd);
+			
+			skull.update();
+			
+			changed_locs.add(wool.getLocation());
+			changed_locs.add(head.getLocation());
+			
+			return true;
+		}
+		
+		private void end() {
+			for(ArmorStand as : armorstandList) if(as != null) as.remove();
+			this.cancel();
+			end_check();
+			
+		}
+		
+		private final int LETTER_DELAY = 2;
+		
+		private int timer = 0;
+		private boolean all_noticed = false;
+		private int reset_time = -1;
+		
+		private String title;
+		private String subtitle;
+		
+		private ArmorStand corpse;
+		
+		private int end_time = -1;
+		
+		public void run() {
+			
+			if(Main.gt == null || VoteSystem.PROGRESSED_VOTE == null || VoteSystem.vrt == null) {
+				resetField();
+				this.cancel();
+				return;
+			}
+			
+			timer++;
+			
+			for(Player ap : Bukkit.getOnlinePlayers()) ap.teleport(tploc);
+			
+			if(end_time > 0) {
+				if(end_time == timer) end();
+			}
+			
+			// 추방
+			if(reset_time > 0 && reset_time <= timer) {
+				if(timer == reset_time) {
+					resetField();
+				} else if(timer == reset_time+40) {
+					title = getGeneralTitle();
+					switch(voteResult) {
+					case TIE:
+						subtitle = "아무도 추방되지 않았습니다 (동점)";
+						break;
+					case SKIP:
+						subtitle = "아무도 추방되지 않았습니다 (투표 건너 뜀)";
+						break;
+					case CHOOSED:
+						subtitle = top + "님은 임포스터" + (GameTimer.ALIVE_IMPOSTERS.contains(top) ? "였습니다." : "가 아니었습니다.");
+						break;
+					}
+				} else if(timer > reset_time+40) {
+					int tick = timer-reset_time-40;
+					
+					if(voteResult == resultType.CHOOSED) {
+						
+						if(tick == 1) {
+							corpse = Util.spawnArmorStand(top, PlayerData.getPlayerData(top).getColor(), LocManager.getLoc("ImposterNoticeArmorStand").get(0), true);
+							armorstandList.add(corpse);
+						}
+						
+						Location tp = corpse.getLocation().clone();
+						tp.add(((double) add_x_value) * 0.15D, 0, ((double) add_z_value) * 0.15D);
+						tp.setYaw(tp.getYaw() + 10F);
+						corpse.teleport(tp);
+					}
+					
+					
+					
+					
+					if(timer % LETTER_DELAY == 0) {
+						int endindex = tick / LETTER_DELAY;
+						if(subtitle.length() > endindex) {
+							for(Player ap : Bukkit.getOnlinePlayers()) {
+								ap.sendTitle("", subtitle.substring(0, endindex), 0, 10, 0);
+								ap.playSound(ap.getLocation(), Sound.BLOCK_NOTE_BLOCK_BIT, 0.5F, 2.0F);
+							}
+							
+						} else {
+							
+							for(Player ap : Bukkit.getOnlinePlayers()) {
+								ap.sendTitle(title, subtitle, 0, 10, 0);
+							}
+							if(end_time == -1) end_time = timer + 80;
+						}
+					}
+					
+				}
+			}
+			
+			// 투표 결과 알림
+			if(timer % 20 == 0) {
+				if(timer >= 60) {
+					
+					if(all_noticed && reset_time < 0) {
+						reset_time = timer + 100;
+						return;
+					}
+					
+					int temp = (timer / 20) - 3;
+					all_noticed = true;
+					for(int i=0;i<DATALIST.size();i++) {
+						PlayerData pd = DATALIST.get(i);
+						Location loc = locs.get(i).clone().add(add_x_value, 0, add_z_value);
+						if(placeVote(pd.getName(), loc, temp)) all_noticed = false;
+					}
+					
+					if(placeVote("SKIP", locs.get(12).clone().add(add_x_value, 0, add_z_value), temp)) all_noticed = false;
+				}
+				
+			}
+			
+			
+		}
+		
 	}
 }

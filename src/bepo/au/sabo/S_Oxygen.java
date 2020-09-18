@@ -28,6 +28,10 @@ public class S_Oxygen extends Sabotage {
 	public S_Oxygen(MissionType mt2, String name, String korean, int clear, Location loc) {
 		super(mt2, name, korean, clear, loc, SaboType.OXYG, 0);
 	}
+	
+	public void onRestart() {
+		
+	}
 
 	public void onAssigned(Player p) {
 		assign(p);
@@ -64,16 +68,16 @@ public class S_Oxygen extends Sabotage {
 		
 		gui.get(code).clear();
 		
-		int number = 1;
+		int number = 9;
 		for (int i = 3; i >= 0; i--) {
-			for (int j = 0; j < 9; j++) {
+			for (int j = 8; j >= 0; j--) {
 				if (j >= 1 && j <= 3 && i < 3) {
 					ItemStack item = new ItemStack(Material.WHITE_WOOL);
 					ItemMeta meta = item.getItemMeta();
 					meta.setDisplayName("¡×f" + number);
 					item.setItemMeta(meta);
 					gui.get(code).setItem(j + 9 * i, new ItemStack(item));
-					number++;
+					number--;
 				} else if (j == 3) {
 					ItemStack item = new ItemStack(Material.BLACK_STAINED_GLASS_PANE);
 					gui.get(code).setItem(j + 9 * i, new ItemStack(item));

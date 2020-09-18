@@ -21,6 +21,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
 import bepo.au.GameTimer;
+import bepo.au.GameTimer.WinReason;
 import bepo.au.Main;
 import bepo.au.function.MissionList;
 import bepo.au.utils.ColorUtil;
@@ -223,7 +224,7 @@ public abstract class Mission implements Listener, Cloneable {
 		Bukkit.getPluginManager().registerEvents(this, Main.getInstance());
 	}
 
-	public  void generalClear(Player p, int code) {
+	public void generalClear(Player p, int code) {
 		Util.debugMessage("cleared " + code);
 		PlayerUtil.removeGlowingBlock(p, locs.get(code));
 		if(order) {
@@ -236,14 +237,14 @@ public abstract class Mission implements Listener, Cloneable {
 		PlayerData pd = PlayerData.getPlayerData(p.getName());
 		if (pd != null && cleared.size() == required_clear && !GameTimer.IMPOSTER.contains(p.getName())) {
 			GameTimer.CLEARED_MISSION++;
-
+			
+			for(Player ap : Bukkit.getOnlinePlayers()) {
+				ap.setExp(((float) GameTimer.CLEARED_MISSION) / ((float) GameTimer.REQUIRED_MISSION));
+			}
+			
 			if (GameTimer.CLEARED_MISSION == GameTimer.REQUIRED_MISSION) {
 
-				/*
-				 * 
-				 * »ýÁ¸ÀÚ ½Â¸®
-				 * 
-				 */
+				GameTimer.WIN_REASON = WinReason.CREW_MISSION;
 
 			}
 

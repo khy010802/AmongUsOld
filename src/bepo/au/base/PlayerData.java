@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.UUID;
 
 import org.bukkit.Bukkit;
+import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -15,6 +16,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 
 import bepo.au.GameTimer;
 import bepo.au.Main;
+import bepo.au.GameTimer.WinReason;
 import bepo.au.base.Sabotage.SaboType;
 import bepo.au.function.ItemList;
 import bepo.au.function.Vent;
@@ -77,6 +79,32 @@ public class PlayerData {
 	public void resetKillCool(boolean after_vote) { this.kill_remain_tick = after_vote ? 100 : Main.KILL_COOLTIME_SEC * 20; }
 	public void subtractKillCool() { if(this.kill_remain_tick > 0) this.kill_remain_tick--; }
 	
+	public void updateItems(Player p) {
+		if(survive) {
+			updateItem(p, 1);
+		}
+		updateItem(p, 2);
+		updateItem(p, 3);
+	}
+	
+	public void updateItem(Player p, int slot) {
+		
+		switch(slot) {
+		case 1:
+			PlayerUtil.setItemDamage(p, slot, 1D - ((double) kill_remain_tick) / ((double) Main.KILL_COOLTIME_SEC * 20));
+			break;
+		case 2:
+			PlayerUtil.setItemDamage(p, slot, 1D - ((double) Sabotage.Sabo_Cool[sabo_selected_door_id]) / ((double) Main.SABO_COOL_SEC * 20D));
+			break;
+		case 3:
+			if(Sabotage.isActivating(0)) PlayerUtil.setItemDamage(p, slot, 1.0D);
+			else PlayerUtil.setItemDamage(p, slot, 1D - ((double) Sabotage.Sabo_Cool[0]) / ((double) Main.SABO_COOL_SEC * 20D));
+			break;
+		
+		}
+		
+	}
+	
 	public void setVent(Player p, Vent v, Location loc) {
 		this.now_vent = v;
 		now_vent_loc = v.indexOf(loc);
@@ -126,7 +154,7 @@ public class PlayerData {
 			
 			loc.setY(Vent.CHECK_Y_VALUE+1);
 			p.teleport(loc);
-			PlayerUtil.goVelocity(p, loc.clone().add(0, 4, 0), 0.75D);
+			PlayerUtil.goVelocity(p, loc.clone().add(0, 4, 0), 0.7D);
 			
 			new BukkitRunnable() {
 				public void run() {
@@ -155,6 +183,7 @@ public class PlayerData {
 			}
 		}
 		PlayerUtil.sendActionBar(p, "§f§l선택한 사보타지 : " + a_string);
+		updateItem(p, door ? 2 : 3);
 	}
 	
 	
@@ -183,15 +212,34 @@ public class PlayerData {
 		
 	}
 	
-	public void kill() {
+	public void kill(boolean voted_kill) {
 		
 		survive = false;
 		
 		Player p = Bukkit.getPlayer(name);
 		GameTimer.ALIVE_PLAYERS.remove(p);
-		GameTimer.ALIVE_IMPOSTERS.remove(p.getName());
-		p.closeInventory();
-		p.removePotionEffect(PotionEffectType.BLINDNESS);
+		GameTimer.ALIVE_IMPOSTERS.remove(name);
+		
+		if(!voted_kill) {
+			p.closeInventory();
+			p.removePotionEffect(PotionEffectType.BLINDNESS);
+		}
+		
+		p.setGameMode(GameMode.ADVENTURE);
+		p.setAllowFlight(true);
+		p.setFlying(true);
+		p.setCollidable(false);
+		
+		PlayerUtil.resetHidden(p);
+		PlayerUtil.setInvisible(p, true);
+		
+		if(Main.gt != null) {
+			if(GameTimer.ALIVE_IMPOSTERS.size() * 2 >= GameTimer.ALIVE_PLAYERS.size()) {
+				GameTimer.WIN_REASON = WinReason.IMPO_KILLALL;
+			} else if(GameTimer.ALIVE_IMPOSTERS.size() == 0) {
+				GameTimer.WIN_REASON = WinReason.CREW_KILLALL;
+			}
+		}
 	}
 
 }

@@ -43,6 +43,15 @@ public class S_FixLights extends Sabotage {
 		super(mt2, name, korean, clear, loc, SaboType.ELEC, 0);
 	}
 	
+	public void onRestart() {
+		for(Player ap : Bukkit.getOnlinePlayers()) {
+			PlayerData pd = PlayerData.getPlayerData(ap.getName());
+			if(pd != null) {
+				if(pd.isAlive() && !GameTimer.IMPOSTER.contains(ap.getName())) ap.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, 1000000, 0, true));
+			}
+		}
+	}
+	
 	public void onAssigned(Player p) {
 		assign(p);
 		gui_title.add(guiName);
@@ -94,12 +103,7 @@ public class S_FixLights extends Sabotage {
 				leverStatus[i] = random.nextBoolean();
 			}
 			
-			for(Player ap : Bukkit.getOnlinePlayers()) {
-				PlayerData pd = PlayerData.getPlayerData(ap.getName());
-				if(pd != null) {
-					if(pd.isAlive() && !GameTimer.IMPOSTER.contains(ap.getName())) ap.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, 1000000, 0, true));
-				}
-			}
+			onRestart();
 		}
 		
 		// 레버의 상태는 랜덤

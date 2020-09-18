@@ -16,6 +16,8 @@ import bepo.au.Main;
 import bepo.au.GameTimer.Status;
 import bepo.au.function.MissionList;
 import bepo.au.manager.LocManager;
+import bepo.au.sabo.S_Communication;
+import bepo.au.sabo.S_FixLights;
 import bepo.au.utils.ColorUtil;
 import bepo.au.utils.PlayerUtil;
 import bepo.au.utils.Util;
@@ -101,6 +103,11 @@ public abstract class Sabotage extends Mission {
 		}
 		Remain_Tick = new int[] { 0, 0, 0, 0, 0, 0, 0, 0 };
 		Sabo_Cool = new int[] { 100, 100, 100, 100, 100, 100, 100, 100 };
+		if(S_Communication.Activated || S_FixLights.Activated) {
+			Sabos.onRestart();
+			Remain_Tick[0] = Integer.MAX_VALUE;
+			Sabo_Cool[0] = Main.SABO_COOL_SEC * 20;
+		}
 	}
 
 	// 발동 시 0, 발동 불가 시 남은 틱을 반환, 문에 의해 발동 불가 시 -1 반환
@@ -252,6 +259,8 @@ public abstract class Sabotage extends Mission {
 		locs.get(1).getWorld().playSound(locs.get(1), Sound.BLOCK_LAVA_EXTINGUISH, 1.0F, 1.0F);
 		
 	}
+	
+	public abstract void onRestart();
 	
 	@Override
 	public String getScoreboardMessage() {

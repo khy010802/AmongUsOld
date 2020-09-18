@@ -162,7 +162,7 @@ public class E_Data extends Mission{
 		timer = new Timer(p, pt);
 		// Color.AQUA, Color.BLUE, Color.GRAY, Color.GREEN, Color.ORANGE, Color.PURPLE, Color.RED, Color.WHITE, Color.YELLOW, Color.SILVER, Color.NAVY, Color.TEAL
 		// LIGHT_BLUE, BLUE, GRAY, GREEN, ORANGE, PURPLE, RED, WHITE, YELLOW, LIGHT_GRAY, NAVY, TEAL
-		if(false) color = PlayerData.getPlayerData(p.getName()).getColor().toString(); //<- 너가 합칠때 이런식으로 해주셈
+		color = PlayerData.getPlayerData(p.getName()).getColor().toString(); //<- 너가 합칠때 이런식으로 해주셈
 		
 		switch(color) {
 
@@ -181,7 +181,7 @@ public class E_Data extends Mission{
 		}
 		Material shulker = Material.getMaterial(color+"_SHULKER_BOX");
 		
-		if (pt==1) {
+		if (pt==0) {
 			Util.Stack(gui.get(pt), 0, Material.CHEST, 1, " ");
 			Util.Stack(gui.get(pt), 8,shulker , 1, " ");
 			start(p, pt);
