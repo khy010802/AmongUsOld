@@ -2,10 +2,13 @@ package bepo.au.missions;
 
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.scheduler.BukkitRunnable;
 
+import bepo.au.Main;
 import bepo.au.base.Mission;
 import bepo.au.utils.Util;
 
@@ -33,7 +36,11 @@ public class E_ChartCourse extends Mission {
 	}
 	
 	public void onStop(Player p, int i) {
-		p.getInventory().remove(Material.ELYTRA);
+		new BukkitRunnable() {
+			public void run() {
+				p.getInventory().remove(Material.ELYTRA);
+			}
+		}.runTaskLater(Main.getInstance(), 0L);
 		
 	}
 	
@@ -60,8 +67,10 @@ public class E_ChartCourse extends Mission {
 
 	private void updateCourse(Player p) {
 		Util.Stack(gui.get(0), routeArray[Cur_route], Material.GREEN_STAINED_GLASS_PANE, 1, " ");// 완료 표시
-		if (Cur_route != 3)
+		if (Cur_route != 3){
 			Util.Stack(gui.get(0), routeArray[Cur_route+1], Material.ELYTRA, 1, "§f항로");
+			p.playSound(p.getLocation(), Sound.UI_BUTTON_CLICK, 1.0f, 1.0f);
+		}
 		else {
 			Util.Stack(gui.get(0), routeArray[Cur_route], Material.GREEN_STAINED_GLASS_PANE, 1, " ");
 			onClear(p, 0);

@@ -3,6 +3,7 @@ package bepo.au.sabo;
 import java.util.Arrays;
 import java.util.List;
 
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Sound;
@@ -15,8 +16,14 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 
 import org.bukkit.inventory.ItemStack;
 
+import bepo.au.GameTimer;
+import bepo.au.Main;
+import bepo.au.base.Mission;
+import bepo.au.base.PlayerData;
 import bepo.au.base.Sabotage;
 import bepo.au.function.AdminMap;
+import bepo.au.manager.BossBarManager;
+import bepo.au.manager.BossBarManager.BossBarList;
 import bepo.au.utils.Util;
 
 import java.util.Random;
@@ -27,9 +34,9 @@ public class S_Communication extends Sabotage {
 	private final int maxslot = 27;
 	private final int maxNum = 10; // 주파수의 최대숫자임. 1 : 에러 | 2 : 한번클릭하면됨 | 3 : 최대 두번클릭 | 5~6 : 적당 | 10 : 해보니까 할 만하긴함
 								   // 20+ 오래걸릴듯
-	private int[] answerStatus = new int[5];
-	private int[] currentStatus = new int[5];
-	private Material[] Color = new Material[3];  // 각 인덱스는 정답과의 거리임.
+	private int[] answerStatus;
+	private int[] currentStatus;
+	private final Material[] Color ={Material.LIME_WOOL,Material.ORANGE_WOOL,Material.WHITE_WOOL};  // 각 인덱스는 정답과의 거리임.
 																									// 거리는 maxNum에 영향을
 																									// 받음. (예시)정답이 1이고
 																									// 현재 2 이라면 1번째 인덱스.
@@ -41,15 +48,29 @@ public class S_Communication extends Sabotage {
 	}
 	
 	public void onRestart() {
-		
+		BossBarManager.updateBossBar(BossBarList.TASKS, true);
 	}
 	
 	public void onAssigned(Player p) {
-		Color[0] = Material.LIME_WOOL;
-		Color[1] = Material.ORANGE_WOOL;
-		Color[2] = Material.WHITE_WOOL;
 		assign(p);
 		initialize_s_communications(p);
+		
+		BossBarManager.updateBossBar(BossBarList.TASKS, true);
+		
+		PlayerData pd = PlayerData.getPlayerData(p.getName());
+		
+		if(pd != null) {
+			
+			if(pd.isWatchingCCTV()) {
+				pd.exitCCTV(p);
+				p.sendMessage(Main.PREFIX + "§c통신 기기가 파손되어 CCTV를 확인할 수 없습니다.");
+			}
+			
+			if(GameTimer.IMPOSTER.contains(p.getName())) return;
+			for(Mission m : pd.getMissions()) {
+				if(!(m instanceof Sabotage)) m.shineReset();
+			}
+		}
 		
 	}
 	
@@ -65,6 +86,17 @@ public class S_Communication extends Sabotage {
 		Activated = false;
 		
 		saboGeneralClear();
+		
+		for(Player ap : Bukkit.getOnlinePlayers()) {
+			PlayerData pd = PlayerData.getPlayerData(ap.getName());
+			if(pd != null && !GameTimer.IMPOSTER.contains(ap.getName())) {
+				for(Mission m : pd.getMissions()) {
+					m.shinePosition(m.getOrdered());
+				}
+			}
+		}
+		
+		BossBarManager.updateBossBar(BossBarList.TASKS, false);
 	}
 	
 	
@@ -96,6 +128,10 @@ public class S_Communication extends Sabotage {
 	 * 초기화 ; GUI를 만듦.
 	 */
 	private void initialize_s_communications(Player p) {
+		
+		answerStatus = new int[5];
+		currentStatus = new int[5];
+		
 		while (true) {
 			for (int i = 0; i < 5; i++) {
 				answerStatus[i] = random.nextInt(maxNum); // 옳은 주파수 만들기, 주파수는 0~4값.

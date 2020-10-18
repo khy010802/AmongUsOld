@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 
@@ -14,7 +13,6 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
-import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
 import bepo.au.base.Sabotage;
@@ -175,7 +173,7 @@ public class S_Fingerprint extends Sabotage {
 	@EventHandler
 	private void onClose(InventoryCloseEvent e) {
 		if(!Activated || !checkPlayer(e)) return;
-			Bukkit.broadcastMessage("´Ý±â ¹ßµ¿ : " + e.getPlayer().getName());
+			//Bukkit.broadcastMessage("´Ý±â ¹ßµ¿ : " + e.getPlayer().getName());
 			deactivate(getCode(e.getView().getTitle()) == 0 ? true : false, e.getPlayer().getUniqueId());
 	}
 

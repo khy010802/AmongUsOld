@@ -12,9 +12,10 @@ import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.inventory.InventoryClickEvent;
-
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.scheduler.BukkitRunnable;
 
+import bepo.au.Main;
 import bepo.au.base.Mission;
 import bepo.au.base.TimerBase;
 import bepo.au.utils.Util;
@@ -70,14 +71,17 @@ public class H_InspectSample extends Mission{
 
 		@Override
 		public void EventRunningTimer(int count) {
-			Util.debugMessage(" 1ÃÊ °æ°ú");
 			Player p = getPlayer();
+
 			if (p != null && p.getOpenInventory().getTitle().split(" ")[0].equals("InspectSample")) {
 				ItemStack[] temp = gui.get(0).getContents();
 				gui.set(0, Bukkit.createInventory(p, 54, "InspectSample " + count));
 				gui.get(0).setContents(temp);
-				p.openInventory(gui.get(0));
-				
+				new BukkitRunnable() {
+					public void run() {
+						p.openInventory(gui.get(0));
+					}
+				}.runTaskLater(Main.getInstance(), 1L);
 				
 			}
 			remain_time = count;
@@ -268,7 +272,7 @@ public class H_InspectSample extends Mission{
 
 	@EventHandler
 	public void onClick(InventoryClickEvent e) {
-
+		
 		if(!checkPlayer(e)) return;
 		
 		Player p = (Player) e.getWhoClicked();
@@ -276,7 +280,7 @@ public class H_InspectSample extends Mission{
 		// Inventory inv = e.getClickedInventory();
 		// Player p = (Player) e.getWhoClicked();
 
-		if (e.getView().getTitle().split(" ")[0].equals("InspectSample") && e.getCurrentItem() != null) {
+		if (e.getCurrentItem() != null) {
 			Material item = e.getCurrentItem().getType();
 			if (item != Material.GREEN_STAINED_GLASS_PANE && item != Material.BLUE_STAINED_GLASS_PANE) {
 				e.setCancelled(true);

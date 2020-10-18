@@ -7,7 +7,6 @@ import org.bukkit.Location;
 
 import bepo.au.base.Mission;
 import bepo.au.base.Mission.MissionType;
-import bepo.au.base.Sabotage.SaboType;
 import bepo.au.base.Sabotage;
 import bepo.au.missions.*;
 import bepo.au.sabo.*;
@@ -39,13 +38,13 @@ public class MissionList {
 	public final static H_ActivatingReactor activatingreactor = new H_ActivatingReactor(MissionType.HARD, "ActivatingReactor", "원자로 가동하기", 1, (Location) null);
 	public final static H_AlignEngine alignengine =			new H_AlignEngine(MissionType.HARD, "AlignEngine", "엔진 출력 정렬시키기", 2, (Location) null);
 	public final static H_Gas gas = 								new H_Gas(MissionType.HARD, "Gas", "연료 공급하기", 4, (Location) null);
-	public final static H_Shooting shooting =					new H_Shooting(MissionType.HARD, "Shooting", "운석 파괴하기", 1, (Location) null);
+	public final static H_Shooting shooting =					new H_Shooting(MissionType.HARD, "Shooting", "소행성 파괴하기", 1, (Location) null);
 	public final static H_EmptyGarbage emptygarbage = 	new H_EmptyGarbage(MissionType.HARD, "EmptyGarbage", "쓰레기 버리기", 2, (Location) null);
 	
 	// SABOTAGE 5개
 	public final static S_Communication communication =	new S_Communication(MissionType.SABOTAGE, "Communication", "통신 기기 수리", 1, (Location) null);
 	public final static S_Fingerprint fingerprint	=				new S_Fingerprint(MissionType.SABOTAGE, "Fingerprint", "원자로 활성화", 1, (Location) null);
 	public final static S_FixLights fixlights = 					new S_FixLights(MissionType.SABOTAGE, "FixLights", "전기 수리", 1, (Location) null);
-	public final static S_Oxygen oxygen =						new S_Oxygen(MissionType.SABOTAGE, "Oxygen", "산소 활성화", 1, (Location) null);
+	public final static S_Oxygen oxygen =						new S_Oxygen(MissionType.SABOTAGE, "Oxygen", "산소 활성화", 2, (Location) null);
 
 }

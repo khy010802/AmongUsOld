@@ -25,6 +25,7 @@ public abstract class TimerBase {
 	public final int			GetCount()			{return Count;}
 	public final void		SetCount(int c)		{Count = c;}
 	public final boolean	GetTimerRunning()	{return Running;}
+	public final int			GetTaskNumber() { return this.timer.getTaskId(); }
 	
 	public final void StartTimer()				{StartTimer(MaxCount, ReverseTimer);}
 	public final void StartTimer(int MaxCount)	{StartTimer(MaxCount, false);}

@@ -1,5 +1,7 @@
 package bepo.au.missions;
 
+import java.util.List;
+
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -9,7 +11,10 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.Inventory;
 
+import bepo.au.Main.SETTING;
 import bepo.au.base.Mission;
+import bepo.au.base.VisualTask;
+import bepo.au.manager.LocManager;
 import bepo.au.utils.Util;
 
 
@@ -26,7 +31,6 @@ public class E_ActivatingShield extends Mission {
 	
 	public void onStart(Player p, int i) {
 		activatingShield(p);
-		uploadInventory(p, 36, "ActivatingShield");
 	}
 	
 	public void onStop(Player p, int i) {
@@ -35,6 +39,43 @@ public class E_ActivatingShield extends Mission {
 	
 	public void onClear(Player p, int i) {
 		generalClear(p, i);
+		if(SETTING.VISUAL_TASK.getAsBoolean()) {
+			VisualTask vt = new VisualTask() {
+				
+				private List<Location> locs;
+				
+				@Override
+				public void onStart() {
+					locs = LocManager.getLoc("ActivatingShield_POWER");
+					if(locs == null || locs.size() == 0) Finish(true);
+				}
+
+				@Override
+				public void onTicking(int count) {
+					if(count <= 40 && count % 10 == 0) {
+						toggleLight(count);
+					} else if(count > 40) {
+						this.Finish(false);
+					}
+				}
+
+				@Override
+				public void onFinished() {
+					
+				}
+				
+				@Override
+				public void Reset() {
+					toggleLight(10);
+				}
+				
+				private void toggleLight(int count) {
+					locs.forEach(l -> l.getBlock().setType(count % 20 == 0 ? Material.REDSTONE_BLOCK : Material.AIR));
+				}
+				
+			};
+			vt.StartTimer(p, false);
+		}
 	}
 
 	
@@ -80,7 +121,8 @@ public class E_ActivatingShield extends Mission {
 			Util.Stack(inv, dot, Material.WHITE_WOOL, 1, " ");
 			p.playSound(p.getLocation(), Sound.BLOCK_NOTE_BLOCK_PLING, 10, 1);
 			Shield_score++;
-			if(Shield_score >= 9) {      								//점수가 9점에 도달하면 gui가 닫히고 테스크 성공
+			
+			if(Shield_score >= 9) { //점수가 9점에 도달하면 gui가 닫히고 테스크 성공
 				p.closeInventory();
 				onClear(p, 0);
 				return;

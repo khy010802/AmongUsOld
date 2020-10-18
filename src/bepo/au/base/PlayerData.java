@@ -9,6 +9,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffectType;
@@ -17,13 +18,15 @@ import org.bukkit.scheduler.BukkitRunnable;
 import bepo.au.GameTimer;
 import bepo.au.Main;
 import bepo.au.GameTimer.WinReason;
+import bepo.au.Main.SETTING;
 import bepo.au.base.Sabotage.SaboType;
+import bepo.au.function.CCTV;
+import bepo.au.function.CCTV.E_cctv;
 import bepo.au.function.ItemList;
 import bepo.au.function.Vent;
 import bepo.au.utils.ColorUtil;
 import bepo.au.utils.PlayerUtil;
 import bepo.au.utils.Util;
-import net.minecraft.server.v1_16_R2.PlayerList;
 
 public class PlayerData {
 	
@@ -37,6 +40,15 @@ public class PlayerData {
 		return new ArrayList<PlayerData>(PLAYERDATA.values());
 	}
 	
+	public static void resetPlayerDataList() {
+		
+		for(PlayerData pd : PLAYERDATA.values()) {
+			pd.killDecoy();
+		}
+		
+		PLAYERDATA.clear();
+	}
+	
 	//임포 전용
 	private int kill_remain_tick = 100;
 	private int emerg_remain_time = 1;
@@ -48,6 +60,7 @@ public class PlayerData {
 	private boolean survive = true;
 	
 	private List<Mission> missions = new ArrayList<Mission>();
+	public int cleared_missions = 0;
 	
 	private List<String> scoreboard_line = new ArrayList<String>();
 	
@@ -57,17 +70,28 @@ public class PlayerData {
 	private Vent now_vent = null;
 	private int now_vent_loc = 0;
 	
+	private int now_cctv_loc = -1;
+	private ArmorStand cctv_decoy = null;
+	private boolean cctv_move = true;
+	
+	private ItemStack head = Util.createItem(Material.PLAYER_HEAD, 1, " ",null);
+
 	public PlayerData(String name, UUID uuid) {
 		this.name = name;
 		this.uuid = uuid;
+		this.head = Util.createHead(name);
 		PLAYERDATA.put(name.toLowerCase(), this);
-		emerg_remain_time = Main.EMER_BUTTON_PER_PLAYER;
+		emerg_remain_time = SETTING.EMER_BUTTON_PER_PLAYER.getAsInteger();
+		
 	}
 	
 	public String getName() { return this.name; }
 	public UUID getUUID() { return this.uuid; }
 	public ColorUtil getColor() { return this.color; }
 	public boolean isAlive() { return this.survive; }
+	public ItemStack getHead(){return this.head.clone();}//클론 반환
+	public ItemStack getHead(boolean clone){return (clone ? this.head.clone():this.head);}
+
 	public SaboType getSelectedSabo() { return this.sabo_selected; }
 	public int getSelectedSaboDoor() { return this.sabo_selected_door_id; }
 	public Vent getVent() { return now_vent; }
@@ -76,33 +100,115 @@ public class PlayerData {
 	public void subtractRemainEmerg() { this.emerg_remain_time--; }
 	
 	public int getKillCool() { return this.kill_remain_tick; }
-	public void resetKillCool(boolean after_vote) { this.kill_remain_tick = after_vote ? 100 : Main.KILL_COOLTIME_SEC * 20; }
+	public void resetKillCool(boolean after_vote) { this.kill_remain_tick = after_vote ? 100 : SETTING.KILL_COOLTIME_SEC.getAsInteger() * 20; }
 	public void subtractKillCool() { if(this.kill_remain_tick > 0) this.kill_remain_tick--; }
 	
+
 	public void updateItems(Player p) {
 		if(survive) {
-			updateItem(p, 1);
+			updateItem(p, ItemList.I_SWORD.getType());
 		}
-		updateItem(p, 2);
-		updateItem(p, 3);
+		updateItem(p, ItemList.I_SABOTAGE_CRIT.getType());
+		updateItem(p, ItemList.I_SABOTAGE_DOOR.getType());
 	}
 	
-	public void updateItem(Player p, int slot) {
+	public void updateItem(Player p, Material mat) {
 		
-		switch(slot) {
-		case 1:
-			PlayerUtil.setItemDamage(p, slot, 1D - ((double) kill_remain_tick) / ((double) Main.KILL_COOLTIME_SEC * 20));
-			break;
-		case 2:
-			PlayerUtil.setItemDamage(p, slot, 1D - ((double) Sabotage.Sabo_Cool[sabo_selected_door_id]) / ((double) Main.SABO_COOL_SEC * 20D));
-			break;
-		case 3:
-			if(Sabotage.isActivating(0)) PlayerUtil.setItemDamage(p, slot, 1.0D);
-			else PlayerUtil.setItemDamage(p, slot, 1D - ((double) Sabotage.Sabo_Cool[0]) / ((double) Main.SABO_COOL_SEC * 20D));
-			break;
+		int slot = p.getInventory().first(mat);
 		
+		if(slot == -1) return;
+		
+		if(mat == ItemList.I_SWORD.getType())
+			PlayerUtil.setItemDamage(p, slot, 1D - ((double) kill_remain_tick) / ((double) SETTING.KILL_COOLTIME_SEC.getAsInteger() * 20));
+		else if(mat == ItemList.I_SABOTAGE_CRIT.getType()) 
+		{
+			if(Sabotage.isActivating(0)) 
+				PlayerUtil.setItemDamage(p, slot, 1.0D);
+			else 
+				PlayerUtil.setItemDamage(p, slot, 1D - ((double) Sabotage.Sabo_Cool[0]) / ((double) SETTING.SABO_COOL_SEC.getAsInteger() * 20D));
+		}
+		else if(mat == ItemList.I_SABOTAGE_DOOR.getType()) 
+		{
+			PlayerUtil.setItemDamage(p, slot, 1D - ((double) Sabotage.Sabo_Cool[sabo_selected_door_id]) / ((double) SETTING.SABO_COOL_SEC.getAsInteger() * 20D));
 		}
 		
+	}
+	
+	public void moveCCTV(Player p, boolean next) {
+
+		if (!CCTV.watchingCCTVset.contains(p)) CCTV.watchingCCTVset.add(p);//보고있는 플레이어 추가
+
+		if(!cctv_move) return;
+		
+		if(!isWatchingCCTV() && isAlive()) {
+			ArmorStand as = PlayerUtil.spawnDecoy(p.getLocation(), this);
+			cctv_decoy = as;
+			
+			p.getInventory().setItem(13, ItemList.CCTV_EXIT);
+		}
+		
+		cctv_move = false;
+		new BukkitRunnable() {
+			public void run() {
+				cctv_move = true;
+			}
+		}.runTaskLater(Main.getInstance(), 3L);
+		
+		if(next)
+			now_cctv_loc++;
+		else
+			now_cctv_loc--;
+		
+		int length = E_cctv.values().length;
+		if(now_cctv_loc < 0) now_cctv_loc = length - 1;
+		if(now_cctv_loc == length) now_cctv_loc = 0;
+		
+		E_cctv cctv = E_cctv.values()[now_cctv_loc];
+		
+		p.setGameMode(GameMode.SPECTATOR);
+		p.setSpectatorTarget(cctv.getEntity());
+		
+		String ac = "";
+		for(E_cctv c : E_cctv.values()) {
+			if(c.getName() == cctv.getName())
+				ac += "§a";
+			else
+				ac += "§7";
+			ac += c.getName() + " ";
+			
+		}
+		p.sendTitle("", " " + ac, 0, 20000, 0);
+		p.sendActionBar("§eShift§f를 눌러 위치를 변경하고, §e인벤토리의 철 문 아이템§f을 눌러 중단합니다.");
+		
+	}
+	
+	public void exitCCTV(Player p) {
+		if (CCTV.watchingCCTVset.contains(p)) CCTV.watchingCCTVset.remove(p);//보고있는 목록에서 제거
+
+		now_cctv_loc = -1;
+		if(isAlive()) 
+			p.setGameMode(GameMode.SURVIVAL);
+		else
+			p.setSpectatorTarget(null);
+		if(cctv_decoy != null) p.teleport(cctv_decoy.getLocation());
+		p.resetTitle();
+		p.sendActionBar("");
+		p.getInventory().setItem(13, new ItemStack(Material.AIR));
+		
+		killDecoy();
+	}
+	
+	public void killDecoy() {
+		
+		if(cctv_decoy == null) return; 
+		
+		cctv_decoy.remove();
+		cctv_decoy = null;
+		cctv_move = true;
+	}
+	
+	public boolean isWatchingCCTV() {
+		return now_cctv_loc >= 0;
 	}
 	
 	public void setVent(Player p, Vent v, Location loc) {
@@ -150,11 +256,18 @@ public class PlayerData {
 			loc.setY(Vent.VENT_Y_VALUE);
 			loc.setX(loc.getBlockX() + 0.5D);
 			loc.setZ(loc.getBlockZ() + 0.5D);
+			loc.setYaw(p.getLocation().getYaw());
+			loc.setPitch(p.getLocation().getPitch());
 			Util.setDoor(loc, true);
 			
-			loc.setY(Vent.CHECK_Y_VALUE+1);
+			loc.setY(Vent.CHECK_Y_VALUE+1.5D);
 			p.teleport(loc);
-			PlayerUtil.goVelocity(p, loc.clone().add(0, 4, 0), 0.7D);
+			new BukkitRunnable() {
+				public void run() {
+					PlayerUtil.goVelocity(p, loc.clone().add(0, 4, 0), 0.6D);
+				}
+			}.runTaskLater(Main.getInstance(), 1L);
+			
 			
 			new BukkitRunnable() {
 				public void run() {
@@ -177,13 +290,22 @@ public class PlayerData {
 		} else {
 			switch(sabo_selected) {
 			case COMM: sabo_selected = SaboType.ELEC; a_string = "§e§l전등 파괴"; break;
-			case ELEC: sabo_selected = SaboType.NUCL; a_string = "§c§l원자로 용해";break;
-			case NUCL: sabo_selected = SaboType.OXYG; a_string = "§b§l산소 고갈";break;
+			case ELEC: sabo_selected = SaboType.NUCL; a_string = "§c§l원자로 용해"; break;
+			case NUCL: sabo_selected = SaboType.OXYG; a_string = "§b§l산소 고갈"; break;
 			case DOOR: case OXYG: sabo_selected = SaboType.COMM; a_string = "§a§l통신 제한"; break;
 			}
 		}
 		PlayerUtil.sendActionBar(p, "§f§l선택한 사보타지 : " + a_string);
-		updateItem(p, door ? 2 : 3);
+		updateItem(p, door ? ItemList.I_SABOTAGE_DOOR.getType() : ItemList.I_SABOTAGE_CRIT.getType());
+	}
+	
+	public void setSabo(Player p, SaboType st, int id, boolean door) {
+		if(door) {
+			sabo_selected = SaboType.DOOR;
+			sabo_selected_door_id = id;
+		} else {
+			sabo_selected = st;
+		}
 	}
 	
 	
@@ -221,25 +343,34 @@ public class PlayerData {
 		GameTimer.ALIVE_IMPOSTERS.remove(name);
 		
 		if(!voted_kill) {
+			if(SETTING.GENERATE_CORPSE.getAsBoolean()) {
+				Util.spawnCorpse(p.getLocation().getBlock().getLocation(), p);
+			}
 			p.closeInventory();
 			p.removePotionEffect(PotionEffectType.BLINDNESS);
 		}
 		
-		p.setGameMode(GameMode.ADVENTURE);
-		p.setAllowFlight(true);
-		p.setFlying(true);
+		p.setGameMode(GameMode.SPECTATOR);
 		p.setCollidable(false);
 		
 		PlayerUtil.resetHidden(p);
-		PlayerUtil.setInvisible(p, true);
+		
+		//Main.team.removeEntry(name);
+
+		
 		
 		if(Main.gt != null) {
+			
+			Util.debugMessage(GameTimer.ALIVE_IMPOSTERS.size() + " / " + GameTimer.ALIVE_PLAYERS.size());
+			
 			if(GameTimer.ALIVE_IMPOSTERS.size() * 2 >= GameTimer.ALIVE_PLAYERS.size()) {
 				GameTimer.WIN_REASON = WinReason.IMPO_KILLALL;
 			} else if(GameTimer.ALIVE_IMPOSTERS.size() == 0) {
 				GameTimer.WIN_REASON = WinReason.CREW_KILLALL;
 			}
 		}
+		
+		
 	}
 
 }
