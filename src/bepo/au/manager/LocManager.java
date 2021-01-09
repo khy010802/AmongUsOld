@@ -14,22 +14,39 @@ import org.bukkit.configuration.file.YamlConfiguration;
 
 
 public class LocManager {
-	String[] locList= {
-			"SEATS",
+	final String[] locList= {
+			"Lobby",
+			"Preview_LC",
+			"Preview_RB",
+			"StartButton",
+			
 			"EmergencyButton",
 			"AdminMap",
+			"CCTV",
+			"CCTVButton",
+			
+			"SEATS",
 			"ImposterNotice",
 			"VoteNotice",
 			"VoteNoticeArmorStand",
 			"VoteNoticeArmorStand_DIR",
 			"ImposterNoticeArmorStand",
 			"Desk", "Desk_ArmorStand",
+			
+			"EmptyGarbage",
+			"EmptyGarbage_TRASH",
+			"EmptyGarbage_TRASH_DIR",
+			
+			"Shooting",
+			"Shooting_FIREBALL",
+			"Shooting_FIREBALL_DIR",
+			
+			"ActivatingShield",
+			"ActivatingShield_POWER",
+			
+			"Card",
 			"FixWiring",
 			"DivertPower",
-			"EmptyGarbage",
-			"Card",
-			"Shooting",
-			"ActivatingShield",
 			"ActivatingReactor",
 			"OpenManifold",
 			"Gas",
@@ -102,7 +119,10 @@ public class LocManager {
 	        }
 	        location.load(file);
 	        for (String locName : locList) {
-	        	if(!location.contains(locName)) continue;
+	        	if(!location.contains(locName) || location.getString(locName).length() == 0) {
+	        		LocationMap.put(locName, new ArrayList<Location>());
+	        		continue;
+	        	}
 		        for (String coor : location.getString(locName).split("/")) {
 		        	if (coor==null) break;
 		        	if(LocationMap.get(locName)==null) {
@@ -142,7 +162,8 @@ public class LocManager {
 	}
 	
 	private boolean getYawPitch(String key) {
-		 return key.equalsIgnoreCase("SEATS") || key.contains("Imposter") || key.contains("Desk") || key.contains("Vent") || key.contains("Vote");
+		 return key.equalsIgnoreCase("SEATS") || key.contains("Imposter") || key.contains("Desk") || key.contains("Vent") || key.contains("Vote")
+				 || key.equalsIgnoreCase("CCTV");
 	}
 	private void saveALocation(String locName) {
 		location = YamlConfiguration.loadConfiguration(file);

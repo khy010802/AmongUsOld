@@ -4,15 +4,15 @@ import java.util.Arrays;
 
 import java.util.List;
 
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 
 import org.bukkit.event.EventHandler;
-
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryDragEvent;
+
+import org.bukkit.Sound;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -57,7 +57,7 @@ public class C_FixWriting extends Mission {
 	public void onStart(Player p, int i) {
 		
 		if(i != cleared.size()) return;
-		
+		for(int y=0;y<4;y++) connected[i][y] = false;
 		for (int slot = 0; slot < 54; slot++) {// gui인벤토리
 			int y = slot / 9, x = slot % 9;
 			if (y == 0 || y == 2 || y == 3 || y == 5) {
@@ -147,6 +147,7 @@ public class C_FixWriting extends Mission {
 							&& gui.get(code).getItem(slot).getType() == WIRECOLORARRAY[idx]) {
 						//Util.debugMessage("연결됨" + (slot + 2) + "에 노란 유리");
 						Util.Stack(gui.get(code), slot + 2, Material.YELLOW_STAINED_GLASS_PANE, 1, " ");// 전기 들어옴 표시
+						p.playSound(p.getLocation(), Sound.BLOCK_END_PORTAL_FRAME_FILL, 1.0f, 1.2f); //소리재생
 						connected[code][idx] = true;
 						for (int i = 0; i < 4; i++)
 							if (connected[code][i] == false) {

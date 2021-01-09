@@ -6,7 +6,7 @@ import org.bukkit.event.HandlerList;
 
 public class AssembleBoardCreatedEvent extends Event {
 
-    public static HandlerList handlerList = new HandlerList();
+    public static final HandlerList handlerList = new HandlerList();
 
     private boolean cancelled = false;
     private final AssembleBoard board;
@@ -18,5 +18,21 @@ public class AssembleBoardCreatedEvent extends Event {
     @Override
     public HandlerList getHandlers() {
         return handlerList;
+    }
+    
+    public static HandlerList getHandlerList() {
+        return handlerList;
+    }
+    
+    public void setCancelled(boolean c) {
+    	this.cancelled = c;
+    }
+    
+    public boolean getCancelled() {
+    	return this.cancelled;
+    }
+    
+    public AssembleBoard getBoard() {
+    	return this.board;
     }
 }

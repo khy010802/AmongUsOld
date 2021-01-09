@@ -1,6 +1,5 @@
 package bepo.au.missions;
 
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -9,9 +8,7 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.CompassMeta;
-import org.bukkit.scheduler.BukkitRunnable;
 
-import bepo.au.Main;
 import bepo.au.base.Mission;
 import bepo.au.base.TimerBase;
 import bepo.au.utils.Util;
@@ -70,9 +67,13 @@ public class E_DistributePower extends Mission {
 				;
 			}
 
-			else if (slot == 7 || slot == 25 || slot == 43) {
+			else if (slot == 7) {
 				Util.Stack(gui.get(0), slot, Material.REDSTONE_BLOCK, 1, " ");
-			} else {
+			}
+			else if(slot == 25 || slot == 43) {
+				Util.Stack(gui.get(0), slot, Material.GRAY_CONCRETE, 1, " ");
+			}
+			else {
 				Util.Stack(gui.get(0), slot, Material.GRAY_STAINED_GLASS_PANE, 1, " ");
 			}
 
@@ -109,9 +110,13 @@ public class E_DistributePower extends Mission {
 						Timer.StartTimer(-1, false, 2);
 						if (Case == 1) {
 							M = Material.YELLOW_STAINED_GLASS_PANE;
+							Util.Stack(gui.get(0), 7, Material.GRAY_CONCRETE, 1, " ");
+							Util.Stack(gui.get(0), 25, Material.REDSTONE_BLOCK, 1, " ");
 						}
 						if (Case == 2) {
 							M = Material.BLUE_STAINED_GLASS_PANE;
+							Util.Stack(gui.get(0), 25, Material.GRAY_CONCRETE, 1, " ");
+							Util.Stack(gui.get(0), 43, Material.REDSTONE_BLOCK, 1, " ");
 						}
 						if (Case == 3) {
 							M = Material.LIGHT_BLUE_STAINED_GLASS_PANE;

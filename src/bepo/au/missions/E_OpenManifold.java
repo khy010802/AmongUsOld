@@ -5,20 +5,16 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
-import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
-import org.bukkit.inventory.Inventory;
-import org.bukkit.inventory.ItemStack;
 
 import bepo.au.base.Mission;
-import bepo.au.base.Mission.MissionType;
 import bepo.au.base.TimerBase;
+import bepo.au.utils.Util;
 
 
 public class E_OpenManifold extends Mission {
@@ -54,10 +50,10 @@ public class E_OpenManifold extends Mission {
 		PassWord = difrandom(1, 10, 10);
 		for(int i = 0; i <= 9; i++) {
 			if(i/5 == 0) {
-				gui.get(0).setItem(i+2, new ItemStack(Material.WHITE_STAINED_GLASS_PANE, PassWord[i]));
+				Util.Stack(gui.get(0), i+2, Material.WHITE_STAINED_GLASS_PANE, PassWord[i], " ");
 			}
 			else {
-				gui.get(0).setItem(i+6, new ItemStack(Material.WHITE_STAINED_GLASS_PANE, PassWord[i]));
+				Util.Stack(gui.get(0), i+6, Material.WHITE_STAINED_GLASS_PANE, PassWord[i], " ");
 			}
 		}
 		Count = 1;
@@ -69,7 +65,6 @@ public class E_OpenManifold extends Mission {
 		
 		if(!checkPlayer(e)) return;
 		
-		Inventory inv = e.getClickedInventory();
 		Player P = (Player) e.getWhoClicked();
 		if(e.getView().getTitle().equals("Manifold")) {
 			if(e.getCurrentItem() != null && e.getCurrentItem().getType() == Material.WHITE_STAINED_GLASS_PANE) {
@@ -84,7 +79,7 @@ public class E_OpenManifold extends Mission {
 				}
 				if(PassWord[y] == Count) {
 					P.playSound(P.getLocation(), Sound.BLOCK_NOTE_BLOCK_CHIME, 10, 1);
-					inv.setItem(x, new ItemStack(Material.GREEN_STAINED_GLASS_PANE, Count));
+					Util.Stack(gui.get(0), x, Material.GREEN_STAINED_GLASS_PANE, Count, " ");
 					Count++;
 					if(Count == 11) {
 						P.closeInventory();
@@ -117,10 +112,10 @@ public class E_OpenManifold extends Mission {
 			// TODO Auto-generated method stub
 			for(int i = 0; i <= 9; i++) {
 				if(i/5 == 0) {
-					gui.get(0).setItem(i+2, new ItemStack(Material.WHITE_STAINED_GLASS_PANE, PassWord[i]));
+					Util.Stack(gui.get(0), i+2, Material.WHITE_STAINED_GLASS_PANE, PassWord[i], " ");
 				}
 				else {
-					gui.get(0).setItem(i+6, new ItemStack(Material.WHITE_STAINED_GLASS_PANE, PassWord[i]));
+					Util.Stack(gui.get(0), i+6, Material.WHITE_STAINED_GLASS_PANE, PassWord[i], " ");
 				}
 				Count = 1;
 			}
@@ -140,10 +135,10 @@ public class E_OpenManifold extends Mission {
 				P.playSound(P.getLocation(), Sound.BLOCK_NOTE_BLOCK_SNARE, 10, 1);
 				for(int i = 0; i <= 9; i++) {
 					if(i/5 == 0) {
-						gui.get(0).setItem(i+2, new ItemStack(Material.RED_STAINED_GLASS_PANE, PassWord[i]));
-					}
-					else {
-						gui.get(0).setItem(i+6, new ItemStack(Material.RED_STAINED_GLASS_PANE, PassWord[i]));
+					Util.Stack(gui.get(0), i+2, Material.RED_STAINED_GLASS_PANE, PassWord[i], " ");
+				}
+				else {
+					Util.Stack(gui.get(0), i+6, Material.RED_STAINED_GLASS_PANE, PassWord[i], " ");
 					}
 				}
 			}

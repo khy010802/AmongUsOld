@@ -6,21 +6,16 @@ import java.util.List;
 import org.bukkit.entity.Player;
 
 import bepo.au.GameTimer;
-import bepo.au.base.Mission;
 import bepo.au.base.PlayerData;
 import bepo.au.base.Sabotage;
-import bepo.au.base.Sabotage.SaboType;
 import bepo.au.sabo.S_Fingerprint;
 import bepo.au.sabo.S_Oxygen;
 import io.github.thatkawaiisam.assemble.AssembleAdapter;
 
 public class ScoreboardManager implements AssembleAdapter{
-
-	private int count = 0;
 	
 	@Override
 	public void tick() {
-		count++;
 	}
 	
 	@Override

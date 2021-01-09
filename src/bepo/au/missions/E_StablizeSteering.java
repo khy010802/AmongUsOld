@@ -15,6 +15,7 @@ import org.bukkit.event.inventory.InventoryDragEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 
+import bepo.au.Main;
 import bepo.au.base.Mission;
 import bepo.au.utils.Util;
 
@@ -38,8 +39,6 @@ public class E_StablizeSteering extends Mission {
 	public void onAssigned(Player p) {
 		assign(p);
 		uploadInventory(p, maxslot, guiName);
-		
-
 	}
 	
 	@Override
@@ -58,7 +57,12 @@ public class E_StablizeSteering extends Mission {
 	
 	@Override
 	public void onStop(Player p, int code) {
-		p.getInventory().remove(Material.ELYTRA);
+		new BukkitRunnable() {
+			public void run() {
+				p.getInventory().remove(Material.ELYTRA);
+			}
+		}.runTaskLater(Main.getInstance(), 0L);
+		
 	}
 	
 	@Override

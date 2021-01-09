@@ -1,33 +1,31 @@
 package bepo.au;
 
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Random;
-
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
-import org.bukkit.Material;
+import org.bukkit.GameRule;
+import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
 import org.bukkit.World;
-import org.bukkit.entity.ArmorStand;
-import org.bukkit.entity.ArmorStand.LockType;
-import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.event.HandlerList;
-import org.bukkit.inventory.EquipmentSlot;
-import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 
+import bepo.au.Main.SETTING;
 import bepo.au.base.Mission;
 import bepo.au.base.PlayerData;
 import bepo.au.base.Sabotage;
 import bepo.au.function.AdminMap;
-import bepo.au.function.ItemList;
-import bepo.au.function.MissionList;
+import bepo.au.function.CCTV;
+import bepo.au.function.SabotageGUI;
 import bepo.au.function.SightTimer;
+import bepo.au.function.Vent;
 import bepo.au.function.VoteSystem;
+import bepo.au.games.AGameTicker;
+import bepo.au.manager.BossBarManager;
+import bepo.au.manager.BossBarManager.BossBarList;
 import bepo.au.manager.LocManager;
 import bepo.au.manager.ScoreboardManager;
 import bepo.au.utils.ColorUtil;
@@ -36,116 +34,154 @@ import bepo.au.utils.Util;
 import io.github.thatkawaiisam.assemble.Assemble;
 import io.github.thatkawaiisam.assemble.AssembleStyle;
 
-public class GameTimer extends BukkitRunnable{
-	
+public class GameTimer extends BukkitRunnable {
+
 	public enum Status {
-		READY,
-		GAME_SETTING,
-		WORKING,
-		VOTING,
-		END;
+		READY, GAME_SETTING, WORKING, VOTING, END;
 	}
-	
+
 	public enum WinReason {
-		IMPO_OXYG,
-		IMPO_NUCL,
-		IMPO_KILLALL,
-		CREW_MISSION,
-		CREW_KILLALL;
+		IMPO_OXYG, IMPO_NUCL, IMPO_KILLALL, CREW_MISSION, CREW_KILLALL;
 	}
-	
-	public final ColorUtil[] COLORLIST 			= { ColorUtil.CYAN, ColorUtil.BLUE, ColorUtil.GRAY, ColorUtil.GREEN, ColorUtil.ORANGE, ColorUtil.PURPLE, ColorUtil.RED, ColorUtil.WHITE, ColorUtil.YELLOW, ColorUtil.PINK, ColorUtil.BLACK, ColorUtil.LIGHT_GRAY };
-	public List<ColorUtil> COLORS = new ArrayList<ColorUtil>();
-	
+
+	public enum GameType {
+		NORMAL("일반", 137), CHASETAG("술래잡기", 113); //HIDENSEEK("역술래잡기", 373);
+
+		private String name;
+		private int preview_map_id;
+		private AGameTicker gameticker;
+		public static ArrayList<String> TYPES = new ArrayList<String>();
+
+		GameType(String name, int preview_map_id) {
+			this.name = name;
+			this.preview_map_id = preview_map_id;
+		}
+
+		public String getName() {
+			return this.name;
+		}
+		
+		public int getPreviewMapId() {
+			return this.preview_map_id;
+		}
+
+		public void setGameTicker(AGameTicker gt) {
+			this.gameticker = gt;
+		}
+
+		public AGameTicker getGameTicker() {
+			return this.gameticker;
+		}
+
+		static {
+			for (GameType type : GameType.values()){
+					TYPES.add(type.toString());
+			}
+		}
+	}
+
+	public static final ColorUtil[] COLORLIST = { ColorUtil.CYAN, ColorUtil.BLUE, ColorUtil.GRAY, ColorUtil.GREEN,
+			ColorUtil.ORANGE, ColorUtil.PURPLE, ColorUtil.RED, ColorUtil.WHITE, ColorUtil.YELLOW, ColorUtil.PINK,
+			ColorUtil.BLACK, ColorUtil.LIGHT_GRAY };
+	public static final List<ColorUtil> COLORS = new ArrayList<ColorUtil>();
+
 	private int timer = 0;
 	private int win_timer = 0;
-	
+
 	private Main main;
-	
+
 	private Status status = Status.READY;
 	private boolean pause = false;
+
+	public static GameType gamemode;
+	private AGameTicker game_ticker;
 
 	public static List<String> OBSERVER = new ArrayList<String>();
 	public static List<String> PLAYERS = new ArrayList<String>();
 	public static List<String> IMPOSTER = new ArrayList<String>();
-	
+
 	public static List<Player> ALIVE_PLAYERS = new ArrayList<Player>();
 	public static List<String> ALIVE_IMPOSTERS = new ArrayList<String>();
-	
+
 	public static int REQUIRED_MISSION = 0;
 	public static int CLEARED_MISSION = 0;
-	
+
 	public static int EMERG_REMAIN_TICK = 0;
-	
+
 	public static WinReason WIN_REASON = null;
-	
+
 	private World world;
-	private Assemble assemble;
-	
+	public static Assemble assemble;
+
 	public GameTimer(World world, Main main) {
 		this.main = main;
 		assemble = new Assemble(main, new ScoreboardManager());
-		assemble.setAssembleStyle(AssembleStyle.KOHI);
-		this.world = world;
+		assemble.setAssembleStyle(AssembleStyle.MODERN);
 		
+		this.world = world;
+
 	}
-	
+
 	public static final int getRemainImposter() {
 		int i = 0;
-		for(String name : IMPOSTER) {
-			if(PlayerData.getPlayerData(name) != null && PlayerData.getPlayerData(name).isAlive()) i++;
+		for (String name : IMPOSTER) {
+			if (PlayerData.getPlayerData(name) != null && PlayerData.getPlayerData(name).isAlive())
+				i++;
 		}
 		return i;
 	}
-	
-	public Status getStatus() { return this.status; }
-	public void setStatus(Status s) { this.status = s; }
-	
-	
+
+	public Status getStatus() {
+		return this.status;
+	}
+
+	public void setStatus(Status s) {
+		this.status = s;
+	}
+
 	public void start(Player p) {
 		Bukkit.broadcastMessage(Main.PREFIX + "§e" + p.getName() + "§f님께서 게임을 시작하셨습니다!");
+		gamemode = SETTING.GAMEMODE.getAsGameType();
+		game_ticker = gamemode.getGameTicker();
+		game_ticker.setting(p.getWorld());
 		status = Status.GAME_SETTING;
 		this.runTaskTimer(main, 0L, 1L);
 	}
-	
+
 	public void stop() {
-		if(!this.isCancelled()) this.cancel();
-		for(Player ap : Bukkit.getOnlinePlayers()) {
+		if (!this.isCancelled())
+			this.cancel();
+		for (Player ap : Bukkit.getOnlinePlayers()) {
 			ap.removePotionEffect(PotionEffectType.BLINDNESS);
-			if(ap.getGameMode() == GameMode.ADVENTURE || ap.getGameMode() == GameMode.SURVIVAL) {
+			if (ap.getGameMode() == GameMode.ADVENTURE || ap.getGameMode() == GameMode.SURVIVAL) {
 				ap.setAllowFlight(false);
 				ap.setFlying(false);
 			}
-			if(PLAYERS.contains(ap.getName())) ap.getInventory().clear();
-		}
-		stop_reset();
-		Mission.deactivateMission();
-		SightTimer.stop();
-		Util.despawnEmergArmorStand();
-	}
-	
-	private void setting(World w) {
-		for(Player ap : Bukkit.getOnlinePlayers()) {
-			if(!GameTimer.OBSERVER.contains(ap.getName().toLowerCase())) {
-				PLAYERS.add(ap.getName());
-				//ap.getInventory().clear();
-				ap.setExp(0F);
-				ap.setLevel(0);
+			PlayerUtil.toggleRedEffect(ap, false);
+			PlayerUtil.resetHidden(ap);
+			PlayerUtil.resetGlowingBlock(ap);
+			ap.setPlayerListName(ap.getName());
+			ap.setWalkSpeed(0.2F);
+			if (PLAYERS.contains(ap.getName())) {
+				ap.setGameMode(GameMode.ADVENTURE);
+				ap.getInventory().clear();
 			}
 		}
-		
-		Util.spawnEmergArmorStand(w);
-		
-		if(Main.COMMON_MISSION_AMOUNT > 0) {
-			int[] a_common = Util.difrandom(0, MissionList.COMMON.size()-1, Main.COMMON_MISSION_AMOUNT);
-			for(int index=0;index<a_common.length;index++) Commons[index] = MissionList.COMMON.get(a_common[index]).getClone();
-		}
-		
-		EMERG_REMAIN_TICK = Main.EMER_BUTTON_COOL_SEC * 20;
-		REQUIRED_MISSION = 0;
+		stop_reset(world);
+
 	}
 	
-	private void stop_reset() {
+	public static void module_reset() {
+		PlayerUtil.resetChairs();
+		Util.despawnEmergArmorStand();
+		Util.resetCorpse();
+		
+		BossBarManager.resetAllBossBar();
+		if(assemble != null) assemble.cleanup();
+	}
+
+	private void stop_reset(World w) {
+		
 		Main.gt = null;
 		Commons = new Mission[2];
 		PLAYERS.clear();
@@ -154,155 +190,67 @@ public class GameTimer extends BukkitRunnable{
 		ALIVE_IMPOSTERS.clear();
 		CLEARED_MISSION = 0;
 		WIN_REASON = null;
+		setStatus(Status.GAME_SETTING);
+		// VisualTask.resetAllTasks();
 		SightTimer.stop();
-		PlayerData.getPlayerDataList().clear();
+		PlayerData.resetPlayerDataList();
+		Sabotage.saboStopAll();
+		SabotageGUI.stopTimer();
+		Util.toggleDescriptionArmorStand(w, true);
+		CCTV.deactivateCCTV(world);
+		CCTV.watchingCCTVset.clear();
 		HandlerList.unregisterAll(Main.getEventManager());
+		if (VoteSystem.PROGRESSED_VOTE != null)
+			VoteSystem.PROGRESSED_VOTE.cancel();
 		VoteSystem.PROGRESSED_VOTE = null;
+		VoteSystem.resetArmorStand();
 		VoteSystem.vrt = null;
 		Mission.deactivateMission();
-		assemble.cleanup();
+		module_reset();
 		/*
-		List<PlayerData> lists = new ArrayList<PlayerData>(PlayerData.getPlayerDataList());
-		for(PlayerData pd : lists) {
-			PlayerData.getPlayerDataList().remove(pd);
-		}
-		*/
+		 * List<PlayerData> lists = new
+		 * ArrayList<PlayerData>(PlayerData.getPlayerDataList()); for(PlayerData pd :
+		 * lists) { PlayerData.getPlayerDataList().remove(pd); }
+		 */
 	}
-	
-	private void team_split() {
-		String imposter = "";
-		
-		long seed = System.currentTimeMillis();
-		Random rn = new Random(seed);
-		
-		Collections.shuffle(PLAYERS, rn);
-		COLORS.clear();
-		for(ColorUtil cu : COLORLIST) COLORS.add(cu);
-		Collections.shuffle(COLORS, rn);
-		
-		for(int i=0;i<PLAYERS.size();i++) {
-			if(Bukkit.getPlayer(PLAYERS.get(i)) == null) continue;
-			
-			String name = PLAYERS.get(i);
-			PlayerData pd = new PlayerData(name, Bukkit.getPlayer(PLAYERS.get(i)).getUniqueId());
-			if(i < Main.IMPOSTER_AMOUNT) {
-				IMPOSTER.add(name);
-				imposter = imposter + name + " ";
-			}
-			pd.setColor(COLORS.get(i));
-		}
-		
-		give_item(imposter);
-	}
-	
-	private void give_item(String imposter) {
-		
-		for(String name : PLAYERS) {
-			if(Bukkit.getPlayer(name) == null) return;
-			Player p = Bukkit.getPlayer(name);
-			PlayerData pd = PlayerData.getPlayerData(p.getName());
-			
-			//p.getInventory().clear();
-			p.setPlayerListName(pd.getColor().getChatColor() + p.getName());
-			
-			ItemStack[] ac = PlayerUtil.getColoredArmorContent(pd.getColor());
-			p.getInventory().setArmorContents(ac);
-			
-			if(IMPOSTER.contains(p.getName())) {
-				p.sendTitle("§4§l임포스터", "§c모든 크루원을 죽이십시오", 10, 100, 10);
-				p.sendMessage("§f=======================");
-				p.sendMessage("§4당신은 임포스터입니다.");
-				p.sendMessage("§c2번 슬롯에 검을 지급해드렸습니다. 적절한 시기에 크루원을 죽이십시오. (쿨타임 " + Main.KILL_COOLTIME_SEC + "초)");
-				p.sendMessage("§c숫자 키 3번, 4번으로 사보타지를 선택할 수 있으며,");
-				p.sendMessage("§c손 바꾸기(기본 설정 F) 키를 눌러 사보타지를 발동할 수 있습니다.");
-				p.sendMessage("§c");
-				p.sendMessage("§c임포스터 플레이어 : §f" + imposter);
-				p.sendMessage("§f=======================");
-				
-				PlayerUtil.getImposterSet(p, true);
-				
-				pd.nextSabo(p, false);
-			} else {
-				p.sendTitle("§f§l크루원", "§7모든 임포스터를 추방하십시오", 10, 100, 10);
-				p.sendMessage("§f=======================");
-				p.sendMessage("§f당신은 크루원입니다.");
-				p.sendMessage("§7배정받은 일과를 수행하고, 일과 진행도를 100%까지 채우십시오.");
-				p.sendMessage("§7모든 임포스터가 사망하거나 일과 진행도가 100%에 도달하면 크루원의 승리입니다.");
-				p.sendMessage("§7");
-				p.sendMessage("§f일과는 우측 스코어보드에 표기되며, 진행도는 경험치 바에 표기됩니다.");
-				p.sendMessage("§f=======================");
-			}
-			
-			p.getInventory().setItem(8, ItemList.VOTE_PAPER.clone());
-			
-			
-			random_mission(p);
-		}
-		
-		
-	}
-	
-	private Mission[] Commons = new Mission[2];
-	
-	private void random_mission(Player p) {
-		PlayerData pd = PlayerData.getPlayerData(p.getName());
-		
-		if(Main.COMMON_MISSION_AMOUNT > 0) {
-			for(int index=0;index<Commons.length;index++) if(Commons[index] != null) {
-				pd.addMission(p, Commons[index].getClone());
-			}
-		}
-		
-		if(Main.EASY_MISSION_AMOUNT > 0) {
-			int[] a_easy = Util.difrandom(0, MissionList.EASY.size()-1, Main.EASY_MISSION_AMOUNT);
-			
-			for(int index=0;index<a_easy.length;index++) {
-				pd.addMission(p, MissionList.EASY.get(a_easy[index]).getClone());
-			}
-		}
-		
-		if(Main.HARD_MISSION_AMOUNT > 0) {
-			int[] a_hard = Util.difrandom(0, MissionList.HARD.size()-1, Main.HARD_MISSION_AMOUNT);
-			for(int index=0;index<a_hard.length;index++) pd.addMission(p, MissionList.HARD.get(a_hard[index]).getClone());
-		}
-		
-		if(!IMPOSTER.contains(p.getName())) REQUIRED_MISSION += (Main.COMMON_MISSION_AMOUNT + Main.EASY_MISSION_AMOUNT + Main.HARD_MISSION_AMOUNT);
-		
-		assemble.start(5L);
-	}
-	
-	
+
+	public static Mission[] Commons = new Mission[2];
+
 	public void run() {
-		
-		if(WIN_REASON != null) {
-			switch(win_timer) {
+
+		if (WIN_REASON != null) {
+			switch (win_timer) {
 			case 0:
 				String imposters = "";
-				for(String imp : GameTimer.IMPOSTER) imposters += PlayerData.getPlayerData(imp).getColor().getChatColor() + imp + " ";
-				
-				for(Player ap : Bukkit.getOnlinePlayers()) {
-					if(WIN_REASON.toString().contains("CREW")) ap.sendTitle("§f크루원 승리", "§c임포스터 : " + imposters, 20, 100, 20);
-					else ap.sendTitle("§c임포스터 승리", "§c임포스터 : " + imposters, 20, 100, 20);
+				for (String imp : GameTimer.IMPOSTER)
+					imposters += PlayerData.getPlayerData(imp).getColor().getChatColor() + imp + " ";
+
+				for (Player ap : Bukkit.getOnlinePlayers()) {
+					if (WIN_REASON.toString().contains("CREW"))
+						ap.sendTitle("§f크루원 승리", "§c임포스터 : " + imposters, 20, 100, 20);
+					else
+						ap.sendTitle("§c임포스터 승리", "§c임포스터 : " + imposters, 20, 100, 20);
 				}
+				setStatus(Status.END);
 				break;
-				
+
 			case 40:
+				for (Player ap : Bukkit.getOnlinePlayers())
+					ap.teleport(LocManager.getLoc("Lobby").get(0));
 				stop();
+
 				break;
 			}
 			win_timer++;
 			return;
 		}
-		
-		switch(timer) {
-		case 0:
-			setting(world);
-			break;
+
+		switch (timer) {
 		case 60:
 			Bukkit.broadcastMessage(Main.PREFIX + "§f=====================");
 			Bukkit.broadcastMessage(Main.PREFIX + "§e게임 참가자 목록");
-			for(int i=0;i<PLAYERS.size();i++) {
-				Bukkit.broadcastMessage(Main.PREFIX + "§f" + (i+1) + ". §a" + PLAYERS.get(i));
+			for (int i = 0; i < PLAYERS.size(); i++) {
+				Bukkit.broadcastMessage(Main.PREFIX + "§f" + (i + 1) + ". §a" + PLAYERS.get(i));
 			}
 			Bukkit.broadcastMessage(Main.PREFIX + "§f=====================");
 			break;
@@ -310,7 +258,7 @@ public class GameTimer extends BukkitRunnable{
 			Bukkit.broadcastMessage(Main.PREFIX + "§f직업을 분배합니다...");
 			break;
 		case 200:
-			team_split();
+			game_ticker.team_split();
 			break;
 		case 300:
 			Bukkit.broadcastMessage(Main.PREFIX + "§f직업 분배가 완료되었습니다. 5초 뒤 게임을 시작합니다.");
@@ -320,44 +268,44 @@ public class GameTimer extends BukkitRunnable{
 		case 360:
 		case 380:
 		case 400:
-			Bukkit.broadcastMessage(Main.PREFIX + "§c" + ((420-timer)/20) + "초 전");
+			Bukkit.broadcastMessage(Main.PREFIX + "§c" + ((420 - timer) / 20) + "초 전");
 			break;
 		case 420:
 			Bukkit.broadcastMessage(Main.PREFIX + "§a게임 시작!");
-			if(Main.CREW_SIGHT_BLOCK >= 0 && Main.IMPOSTER_SIGHT_BLOCK >= 0) SightTimer.start();
-			for(Player ap : Bukkit.getOnlinePlayers()) ALIVE_PLAYERS.add(ap);
-			Bukkit.getPluginManager().registerEvents(Main.getEventManager(), main);
+			if (SETTING.CREW_SIGHT_BLOCK.getAsInteger() >= 0 && SETTING.IMPOSTER_SIGHT_BLOCK.getAsInteger() >= 0)
+				SightTimer.start();
+			
 			status = Status.WORKING;
+			PlayerUtil.setSeats(true);
+			world.setTime(18000L);
+			world.setGameRule(GameRule.DO_DAYLIGHT_CYCLE, false);
+			Bukkit.getPluginManager().registerEvents(Main.getEventManager(), main);
+			Vent.closeAll();
 			Sabotage.saboResetAll(true);
-			AdminMap.initializeGUI();
+			SabotageGUI.startTimer();
+			CCTV.activateCCTV(world);
+			AdminMap.gui = AdminMap.initializeGUI(true);
+			BossBarManager.registerBossBar(BossBarList.TASKS);
+			game_ticker.onGameStart(world);
+			for (int i = 1; i < 8; i++)
+				Sabotage.openDoor(i);
 			break;
 		}
-		
-		if(status == Status.WORKING) {
-			for(String name : ALIVE_IMPOSTERS) {
-				PlayerData pd = PlayerData.getPlayerData(name);
-				pd.subtractKillCool();
+
+		// 소리 방해
+		if (SETTING.BLOCK_PLAYER_SOUND.getAsBoolean() && !Main.isProtocolHooked) {
+			for (Player p : GameTimer.ALIVE_PLAYERS) {
+				float v = (float) timer / 200F;
+				p.playSound(p.getLocation(), Sound.ENTITY_GHAST_SCREAM, SoundCategory.PLAYERS, v, 1.0F);
+				p.playSound(p.getLocation().add(0, 0, 1.0), Sound.ENTITY_CAT_BEG_FOR_FOOD, SoundCategory.PLAYERS, v, 1.0F);
+				p.playSound(p.getLocation().add(1.0, 0, 0), Sound.ENTITY_WOLF_HOWL, SoundCategory.PLAYERS, v, 1.0F);
 			}
-			for(String name : IMPOSTER) {
-				if(Bukkit.getPlayer(name) != null) {
-					PlayerData pd = PlayerData.getPlayerData(name);
-					pd.updateItems(Bukkit.getPlayer(name));
-				}
-			}
-			if(EMERG_REMAIN_TICK > 0) {
-				EMERG_REMAIN_TICK--;
-				ArmorStand emerg_button_as = Util.getEmergArmorStand();
-				emerg_button_as.setCustomName("회의 소집 가능까지 §c" + (EMERG_REMAIN_TICK/20+1) + "§f초");
-				
-				if(EMERG_REMAIN_TICK == 0) {
-					emerg_button_as.getEquipment().setHelmet(new ItemStack(Material.AIR));
-					emerg_button_as.teleport(emerg_button_as.getLocation().clone().add(0, -1.0D, 0));
-					emerg_button_as.setCustomNameVisible(false);
-				}
-			} 
 		}
-		
-		if(!pause) timer++;
+
+		game_ticker.tick(status, timer);
+
+		if (!pause)
+			timer++;
 	}
 
 }

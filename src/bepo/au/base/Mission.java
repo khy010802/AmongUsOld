@@ -6,6 +6,7 @@ import java.util.List;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
@@ -22,8 +23,11 @@ import org.bukkit.inventory.meta.ItemMeta;
 
 import bepo.au.GameTimer;
 import bepo.au.GameTimer.WinReason;
+import bepo.au.base.Sabotage.SaboType;
 import bepo.au.Main;
 import bepo.au.function.MissionList;
+import bepo.au.manager.BossBarManager;
+import bepo.au.manager.BossBarManager.BossBarList;
 import bepo.au.utils.ColorUtil;
 import bepo.au.utils.PlayerUtil;
 import bepo.au.utils.Util;
@@ -149,6 +153,10 @@ public abstract class Mission implements Listener, Cloneable {
 	public String getKoreanName() {
 		return this.korean;
 	}
+	
+	public boolean getOrdered() {
+		return this.order;
+	}
 
 	public List<Location> getLocations() {
 		return this.locs;
@@ -174,17 +182,24 @@ public abstract class Mission implements Listener, Cloneable {
 	}
 
 	public void shinePosition(boolean order) {
-		if (getPlayer() == null) return;
+		if (getPlayer() == null || cleared.size() >= required_clear) return;
+		
 		for (int i = (order ? cleared.size() : 0); i < (order ? cleared.size()+1 : locs.size()); i++) {
 			if (!cleared.contains((Integer) i)) {
-				shinePosition(i);
+				shinePosition(i, order);
 			}
 		}
 	}
 	
-	public void shinePosition(int i) {
-		PlayerUtil.spawnGlowingBlock(getPlayer(), locs.get(i),
-				this instanceof Sabotage ? ColorUtil.RED : ColorUtil.WHITE);
+	public void shinePosition(int i, boolean order) {
+		
+		Location loc = locs.get(i).clone();
+		if(this.getMissionName().equalsIgnoreCase("Gas")) {
+			loc = loc.getBlock().getLocation().add(0.4D, 0, 0.6D);
+		} else loc = loc.getBlock().getLocation().add(0.5D, 0, 0.5D);
+		
+		PlayerUtil.spawnGlowingBlock(getPlayer(), loc,
+				this instanceof Sabotage ? ColorUtil.RED : (order && i > 0 ? ColorUtil.YELLOW : ColorUtil.WHITE));
 	}
 	
 	public void shineReset() {
@@ -192,6 +207,7 @@ public abstract class Mission implements Listener, Cloneable {
 	}
 
 	public  Player getPlayer() {
+		if(playername == null) return null;
 		return Bukkit.getPlayer(playername);
 	}
 
@@ -228,26 +244,33 @@ public abstract class Mission implements Listener, Cloneable {
 		Util.debugMessage("cleared " + code);
 		PlayerUtil.removeGlowingBlock(p, locs.get(code));
 		if(order) {
-			if(locs.size() > code+1) shinePosition(code+1);
+			if(locs.size() > code+1) shinePosition(code+1, true);
 		}
 		
 		cleared.add(code);
 		p.closeInventory();
 		p.sendMessage(Main.PREFIX + "임무 완료!");
+		
 		PlayerData pd = PlayerData.getPlayerData(p.getName());
-		if (pd != null && cleared.size() == required_clear && !GameTimer.IMPOSTER.contains(p.getName())) {
-			GameTimer.CLEARED_MISSION++;
-			
-			for(Player ap : Bukkit.getOnlinePlayers()) {
-				ap.setExp(((float) GameTimer.CLEARED_MISSION) / ((float) GameTimer.REQUIRED_MISSION));
+		
+		if(cleared.size() == required_clear) {
+			p.playSound(p.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 1.0F, 1.2F);
+			shineReset();
+			if (pd != null && !GameTimer.IMPOSTER.contains(p.getName())) {
+				GameTimer.CLEARED_MISSION++;
+				pd.cleared_missions++;
+				
+				BossBarManager.updateBossBar(BossBarList.TASKS, Sabotage.Sabos != null && Sabotage.Sabos.getType() == SaboType.COMM);
+				
+				
+				if (GameTimer.CLEARED_MISSION == GameTimer.REQUIRED_MISSION) {
+
+					GameTimer.WIN_REASON = WinReason.CREW_MISSION;
+
+				}
 			}
-			
-			if (GameTimer.CLEARED_MISSION == GameTimer.REQUIRED_MISSION) {
-
-				GameTimer.WIN_REASON = WinReason.CREW_MISSION;
-
-			}
-
+		} else {
+			p.playSound(p.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 1.0F, 0.8F);
 		}
 	}
 
@@ -271,7 +294,7 @@ public abstract class Mission implements Listener, Cloneable {
 		}
 
 	}
-
+	
 	public  boolean isCleared(int code) {
 		return cleared.contains(code);
 	}
@@ -349,5 +372,11 @@ public abstract class Mission implements Listener, Cloneable {
 	public abstract void onClear(Player p, int i);
 
 	public abstract void onStop(Player p, int i);
+	
+	/*
+	public void onClear_VisualTask() {
+		
+	}
+	*/
 
 }

@@ -1,29 +1,26 @@
 package bepo.au.missions;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 
 import org.bukkit.event.EventHandler;
 
-import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryDragEvent;
-import org.bukkit.inventory.Inventory;
 
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 
+import bepo.au.Main;
 import bepo.au.base.Mission;
 import bepo.au.utils.Util;
 
 public class E_DivertPower extends Mission {
 
-	int roomNum = -1;
+	protected int roomNum;
 
 	final Material[] material = { Material.RED_STAINED_GLASS, // 레버0
 			Material.REDSTONE_BLOCK, // 활성화된 레버1
@@ -52,10 +49,13 @@ public class E_DivertPower extends Mission {
 		uploadInventory(p, 54, "DivertPower 0");
 		uploadInventory(p, 27, "DivertPower 1");
 		roomNum = Util.random(1, 8);
-		// 1 2 3 4 ㅁ 6 7 8 9
+		//   0 1 2 3 4 5 6 7 8 roomnum 목록. 4는 X
+		// 0 1 2 3 4   5 6 7 8 loc 목록
+		//   1 2 3 4   5 6 7 8 랜덤배정 목록
 		Location elec = locs.get(0);
 		Location loc1 = locs.get(roomNum);
-		if(roomNum >= 4) roomNum++;
+		
+		if(roomNum <5) roomNum--;
 		locs = Arrays.asList(elec, loc1);
 	}
 	
@@ -65,8 +65,11 @@ public class E_DivertPower extends Mission {
 	}
 	
 	public void onStop(Player p, int i) {
-		p.getInventory().remove(Material.REDSTONE_BLOCK);
-		p.setItemOnCursor(new ItemStack(Material.AIR, 1));
+		new BukkitRunnable() {
+			public void run() {
+				p.getInventory().remove(Material.REDSTONE_BLOCK);
+			}
+		}.runTaskLater(Main.getInstance(), 0L);
 	}
 	
 	public void onClear(Player p, int i) {
@@ -76,7 +79,6 @@ public class E_DivertPower extends Mission {
 	public void reset1(Player p) {
 		for (int slot = 0; slot < 54; slot++) {// gui인벤토리
 			int y = slot / 9, x = slot % 9;
-			Util.debugMessage(slot + "에 아이템을 채웁니다" + x + "," + y);
 			if (y == 3 || y == 5)
 				Util.Stack(gui.get(0), slot, x == roomNum ? Material.AIR : material[3], 1, " "); // 배경 가로줄 채우기
 			else if (x == 4) {
@@ -125,7 +127,6 @@ public class E_DivertPower extends Mission {
 			clear(p, 1); // 클리어
 		}
 		if (num / 9 == 4) {
-			Util.debugMessage("1번");
 			for (int slot = 0; slot < 27; slot++) {
 				if (slot / 9 == 0)
 					Util.Stack(gui.get(0), slot, material[5], 1, " ");// 전기 2단계
@@ -133,7 +134,6 @@ public class E_DivertPower extends Mission {
 					Util.Stack(gui.get(0), slot, material[2], 1, " ");
 			}
 		} else if (num / 9 == 5) {
-			Util.debugMessage("2번");
 			Util.Stack(gui.get(0), num - 36, material[5], 1, " ");
 			Util.Stack(gui.get(0), num - 45, material[5], 1, " ");
 			for (int slot = 0; slot < 18; slot++)
@@ -202,8 +202,12 @@ public class E_DivertPower extends Mission {
 		if(!checkPlayer(e)) return;
 		
 		if (!e.getRawSlots().isEmpty()) {
+			
 			Util.debugMessage("드래그 인식됨");
 			for (int slot : e.getRawSlots()) {
+				
+				if (slot>54) continue;
+
 				if (gui.get(0).getItem(slot) == null) {
 					checkLever((Player) e.getWhoClicked(), slot);
 					break;

@@ -4,10 +4,10 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
 
 import bepo.au.manager.LocManager;
+import bepo.au.utils.Util;
 
 public class Vent {
 	
@@ -19,7 +19,7 @@ public class Vent {
 	public static void uploadVent(String name) {
 		Vent v = new Vent(name);
 		for(Location loc : LocManager.getLoc("Vent_" + name)) {
-			Bukkit.getConsoleSender().sendMessage("name : " + name);
+			//Bukkit.getConsoleSender().sendMessage("name : " + name);
 			v.addLoc(loc);
 		}
 		vents.put(name, v);
@@ -44,6 +44,16 @@ public class Vent {
 		}
 		
 		return null;
+	}
+	
+	public static void closeAll() {
+		for(Vent v : vents.values()) {
+			for(Location loc : v.locs) {
+				Location c = loc.clone();
+				c.setY(VENT_Y_VALUE);
+				Util.setDoor(c, false);
+			}
+		}
 	}
 	
 	private List<Location> locs = new ArrayList<Location>();

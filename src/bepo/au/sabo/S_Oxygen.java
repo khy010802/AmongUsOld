@@ -1,6 +1,5 @@
 package bepo.au.sabo;
 
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Sound;
@@ -8,11 +7,8 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.inventory.InventoryAction;
 import org.bukkit.event.inventory.InventoryClickEvent;
-import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
 
 import bepo.au.base.Sabotage;
-import bepo.au.utils.PlayerUtil;
 import bepo.au.utils.Util;
 
 public class S_Oxygen extends Sabotage {
@@ -42,9 +38,12 @@ public class S_Oxygen extends Sabotage {
 			Oxygen_count[i] = 5;
 			uploadInventory(p, 36, "Oxygen " + i);
 		}
+		
+		int answer = Util.random(10000, 99999);
+		
 		if(Activated == false) {
-			Oxygen_password[0] = Util.random(10000, 99999); // 패스워드 지정 10000~99999
-			Oxygen_password[1] = Util.random(10000, 99999);
+			Oxygen_password[0] = answer; // 패스워드 지정 10000~99999
+			Oxygen_password[1] = answer;
 			CLEARED = 0;
 			Activated = true;
 		}
@@ -61,7 +60,6 @@ public class S_Oxygen extends Sabotage {
 
 	public void onClear(Player p, int i) {
 		saboGeneralClear(i);
-		Activated = false;
 	}
 
 	public void resetInv(Player p, int code) {
@@ -72,39 +70,20 @@ public class S_Oxygen extends Sabotage {
 		for (int i = 3; i >= 0; i--) {
 			for (int j = 8; j >= 0; j--) {
 				if (j >= 1 && j <= 3 && i < 3) {
-					ItemStack item = new ItemStack(Material.WHITE_WOOL);
-					ItemMeta meta = item.getItemMeta();
-					meta.setDisplayName("§f" + number);
-					item.setItemMeta(meta);
-					gui.get(code).setItem(j + 9 * i, new ItemStack(item));
+					Util.Stack(gui.get(code), j + 9 * i, Material.WHITE_WOOL, 1, "§f" + number);
 					number--;
-				} else if (j == 3) {
-					ItemStack item = new ItemStack(Material.BLACK_STAINED_GLASS_PANE);
-					gui.get(code).setItem(j + 9 * i, new ItemStack(item));
 				} else if (j <= 4) {
-					ItemStack item = new ItemStack(Material.WHITE_STAINED_GLASS_PANE);
-					gui.get(code).setItem(j + 9 * i, new ItemStack(item));
+					Util.Stack(gui.get(code), j + 9 * i, Material.WHITE_STAINED_GLASS_PANE, 1, " ");
 				}
 			}
 		}
-		ItemStack item = new ItemStack(Material.RED_WOOL);
-		ItemMeta meta = item.getItemMeta();
-		meta.setDisplayName("§c" + "CANCEL");
-		item.setItemMeta(meta);
-		gui.get(code).setItem(28, new ItemStack(item));
-
-		item = new ItemStack(Material.WHITE_WOOL);
-		meta = item.getItemMeta();
-		meta.setDisplayName("§f" + 0);
-		item.setItemMeta(meta);
-		gui.get(code).setItem(29, new ItemStack(item));
-
-		item = new ItemStack(Material.PAPER);
-		meta = item.getItemMeta();
-		meta.setDisplayName("§f" + Oxygen_password[code]);
-		item.setItemMeta(meta);
-		gui.get(code).setItem(16, new ItemStack(item));
-
+		Util.Stack(gui.get(code), 30, Material.BLACK_STAINED_GLASS_PANE, 1, " ");
+		Util.Stack(gui.get(code), 29, Material.WHITE_WOOL, 1, "§f" + "0");
+		Util.Stack(gui.get(code), 28, Material.RED_WOOL, 1, "§c" + "CANCEL");
+		Util.Stack(gui.get(code), 16, Material.PAPER, 1, "§f" + Oxygen_password[code]);
+		
+		Oxygen_count[code] = 5;
+		Oxygen_answer[code] = 0;
 	}
 
 	public void sabo_Oxygen(Player p, int i) {
@@ -135,13 +114,10 @@ public class S_Oxygen extends Sabotage {
 				Oxygen_count[code]--;
 				if (Oxygen_answer[code] == Oxygen_password[code]) {
 					CLEARED++;
+					onClear(null, code);
 					if(CLEARED == 2) {
 						Sabotage.saboClear(0);
-					} else {
-						for(Player ap : Bukkit.getOnlinePlayers())PlayerUtil.removeGlowingBlock(ap, locs.get(code));
-						cleared.add(code);
 					}
-					
 					p.closeInventory();
 					return;
 				} else {

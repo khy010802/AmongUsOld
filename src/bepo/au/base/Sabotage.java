@@ -12,13 +12,17 @@ import org.bukkit.event.HandlerList;
 import org.bukkit.event.inventory.InventoryCloseEvent.Reason;
 import org.bukkit.scheduler.BukkitRunnable;
 
+import bepo.au.GameTimer;
 import bepo.au.Main;
+import bepo.au.Main.SETTING;
 import bepo.au.GameTimer.Status;
+import bepo.au.GameTimer.WinReason;
 import bepo.au.function.MissionList;
 import bepo.au.manager.LocManager;
 import bepo.au.sabo.S_Communication;
+import bepo.au.sabo.S_Fingerprint;
 import bepo.au.sabo.S_FixLights;
-import bepo.au.utils.ColorUtil;
+import bepo.au.sabo.S_Oxygen;
 import bepo.au.utils.PlayerUtil;
 import bepo.au.utils.Util;
 
@@ -90,14 +94,33 @@ public abstract class Sabotage extends Mission {
 			case 7: return "Storage";
 			}
 		}
-		
-		
 		return null;
+	}
+	
+	public static boolean saboActivate(Player p) {
+		PlayerData pd = PlayerData.getPlayerData(p.getName());
+		int id = 0;
+		if(pd.getSelectedSabo() == SaboType.DOOR) id = pd.getSelectedSaboDoor();
+		boolean crit = Sabotage.isActivating(0);
+		int tick = Sabotage.saboActivate(pd.getSelectedSabo(), id);
+		
+		if(tick == 0 && !crit) {
+			p.playSound(p.getLocation(), Sound.BLOCK_GLASS_BREAK, 1.0F, 1.0F);
+			return true;
+		} else if(crit){
+			p.sendMessage(Main.PREFIX + "§c치명적 사보타지 발동 중엔 발동할 수 없습니다.");
+		} else if(tick < 0) {
+			p.sendMessage(Main.PREFIX + "§c문을 닫았을 때는 치명적 사보타지를 발동할 수 없습니다.");
+		} else {
+			p.sendMessage(Main.PREFIX + "§f" + (tick / 20 + 1) + "§c초 뒤 발동할 수 있습니다.");
+		}
+		return false;
 	}
 
 	// 게임 시작 및 회의 종료 후
 	public static void saboResetAll(boolean first) {
 		if (first) {
+			
 			smt = new SaboMainTimer();
 			smt.runTaskTimer(Main.getInstance(), 1L, 1L);
 		}
@@ -106,12 +129,22 @@ public abstract class Sabotage extends Mission {
 		if(S_Communication.Activated || S_FixLights.Activated) {
 			Sabos.onRestart();
 			Remain_Tick[0] = Integer.MAX_VALUE;
-			Sabo_Cool[0] = Main.SABO_COOL_SEC * 20;
+			Sabo_Cool[0] = SETTING.SABO_COOL_SEC.getAsInteger() * 20;
 		}
+	}
+	
+	public static void saboStopAll() {
+		if(smt != null && !smt.isCancelled()) smt.cancel();
+		smt = null;
+		Sabos = null;
+		S_Fingerprint.Activated = false;
+		S_Oxygen.Activated = false;
+		S_FixLights.Activated = false;
+		S_Communication.Activated = false;
 	}
 
 	// 발동 시 0, 발동 불가 시 남은 틱을 반환, 문에 의해 발동 불가 시 -1 반환
-	public static final int saboActivate(SaboType type, int id) {
+	private static final int saboActivate(SaboType type, int id) {
 		if (canActivate(id)) {
 
 			int s_id = id == 0 ? 0 : 1;
@@ -119,11 +152,21 @@ public abstract class Sabotage extends Mission {
 				Sabotage st = null;
 
 				for (Sabotage s : MissionList.SABOTAGE) {
-					Bukkit.broadcastMessage("사보타지 : " + s + ", " + type);
 					if (s.getType() == type) {
 						st = s.getClone();
 						break;
 					}
+				}
+
+				Activated_Sabo = id;
+				if (id == 0 && (st.getType() == SaboType.COMM || st.getType() == SaboType.ELEC))
+					Remain_Tick[id] = Integer.MAX_VALUE;
+				else if(id == 0) {
+					Remain_Tick[id] = SETTING.SABO_CRIT_DURA_SEC.getAsInteger() * 20;
+					Sabo_Cool[id] = SETTING.SABO_COOL_SEC.getAsInteger() * 20;
+				} else {
+					Remain_Tick[id] = 10 * 20;
+					Sabo_Cool[id] = 30 * 20;
 				}
 				
 				if(s_id == 0) {
@@ -135,15 +178,6 @@ public abstract class Sabotage extends Mission {
 					}
 				} else closeDoor(id);
 				
-
-				Activated_Sabo = id;
-				if (id == 0 && (st.getType() == SaboType.COMM || st.getType() == SaboType.ELEC))
-					Remain_Tick[id] = Integer.MAX_VALUE;
-				else if(id == 0)
-					Remain_Tick[id] = 30 * 20;
-				else
-					Remain_Tick[id] = 10 * 20;
-				Sabo_Cool[id] = 30 * 20;
 				return 0;
 			} else {
 				if(id == 0 && Sabo_Cool[id] == 0) return -1;
@@ -154,6 +188,8 @@ public abstract class Sabotage extends Mission {
 	public static final void saboClear(int id) {
 		// 미션 제거, 쿨타임 돌리기
 
+		
+		
 		if (id == 0) {
 			for (PlayerData pd : PlayerData.getPlayerDataList()) {
 				Sabotage stm = null;
@@ -172,15 +208,14 @@ public abstract class Sabotage extends Mission {
 				}
 			}
 			
+			for(Player ap : Bukkit.getOnlinePlayers()) PlayerUtil.toggleRedEffect(ap, false);
 			Sabos.onClear(null, id);
 			Sabos = null;
-			Sabo_Cool[id] = 600;
+			Sabo_Cool[id] = SETTING.SABO_COOL_SEC.getAsInteger() * 20;
 		} else {
 			openDoor(id);
 		}
-
 		
-
 		Activated_Sabo = -1;
 		Remain_Tick[id] = -1;
 		
@@ -250,13 +285,21 @@ public abstract class Sabotage extends Mission {
 		List<Location> locs = LocManager.getLoc("Door_" + getRoomById(id));
 		if(locs == null || locs.size() < 2) return;
 		
+		boolean opened = true;
+		if(locs.get(0).getBlock().getType() == Material.IRON_BLOCK||locs.get(locs.size()-1).getBlock().getType() == Material.IRON_BLOCK){
+				 opened = false;
+		}
+		if(opened) return;
+		
 		for(int i=0;i<locs.size();i+=2) {
 			if(locs.size() > i+1) {
-				Util.fillBlock(Material.AIR, locs.get(i), locs.get(i+1));
 				
+				Util.fillBlock(Material.AIR, locs.get(i), locs.get(i+1));
+				locs.get(i+1).getWorld().playSound(locs.get(i+1), Sound.BLOCK_LAVA_EXTINGUISH, 1.0F, 1.0F);
 			}
+		
 		}
-		locs.get(1).getWorld().playSound(locs.get(1), Sound.BLOCK_LAVA_EXTINGUISH, 1.0F, 1.0F);
+		
 		
 	}
 	
@@ -287,11 +330,23 @@ public abstract class Sabotage extends Mission {
 	
 	public final void saboGeneralClear(int i) {
 		for(Player ap : Bukkit.getOnlinePlayers()) {
-			if(gui_title.get(i).contains(ap.getOpenInventory().getTitle())) {
-				ap.closeInventory(Reason.PLUGIN);
+
+			PlayerData pd = PlayerData.getPlayerData(ap.getName());
+			if(pd != null) {
+				for(Mission m : pd.getMissions()) {
+					if(m.getMissionName().equalsIgnoreCase(name)) {
+						if(ap.getOpenInventory() != null && m.gui_title.get(i).contains(ap.getOpenInventory().getTitle())) {
+							ap.closeInventory(Reason.PLUGIN);
+						}
+						m.cleared.add(i);
+						break;
+					}
+				}
 			}
+			
 			PlayerUtil.removeGlowingBlock(ap, locs.get(i));
 		}
+		
 	}
 	
 	public final void saboGeneralClear() {
@@ -307,14 +362,38 @@ public abstract class Sabotage extends Mission {
 	public static class SaboMainTimer extends BukkitRunnable {
 
 		public void run() {
+			
+			if(Main.gt.getStatus() == Status.VOTING) {
+				if(Sabos != null && (Sabos.getType() == SaboType.NUCL || Sabos.getType() == SaboType.OXYG)) {
+					Sabotage.saboClear(0);
+				}
+				for(int i=1;i<8;i++) {
+					openDoor(i);
+				}
+				return;
+			}
+			
 			for (int id = 0; id < 8; id++) {
 				if (Remain_Tick[id] > 0) {
 					Remain_Tick[id]--;
 					if (id == 0) {
 						if (Remain_Tick[id] % 40 == 0 && (Sabos.getType() == SaboType.NUCL || Sabos.getType() == SaboType.OXYG))
-							for(Player ap : Bukkit.getOnlinePlayers()) ap.playSound(ap.getLocation(), Sound.ENTITY_WOLF_AMBIENT, 1.0F, 1.0F); // 치명적 사보타지 소리 효과
-						if (Remain_Tick[id] == 0)
-							; // 게임 종료
+							for(Player ap : Bukkit.getOnlinePlayers()) {
+								ap.playSound(ap.getLocation(), Sound.BLOCK_NOTE_BLOCK_BIT, 1.0F, 0.5F);
+								ap.playSound(ap.getLocation(), Sound.BLOCK_NOTE_BLOCK_DIDGERIDOO, 1.0F, 0.6F);
+								ap.playSound(ap.getLocation(), Sound.BLOCK_NOTE_BLOCK_DIDGERIDOO, 1.0F, 0.9F);
+								PlayerUtil.toggleRedEffect(ap, true);
+							} // 치명적 사보타지 소리 효과
+						else if(Remain_Tick[id] % 40 == 20 && (Sabos.getType() == SaboType.NUCL || Sabos.getType() == SaboType.OXYG))
+							for(Player ap : Bukkit.getOnlinePlayers()) PlayerUtil.toggleRedEffect(ap, false);
+						if (Remain_Tick[id] == 0) {
+							switch(Sabos.getType()) {
+							case OXYG: GameTimer.WIN_REASON = WinReason.IMPO_OXYG; break;
+							case NUCL: GameTimer.WIN_REASON = WinReason.IMPO_NUCL; break;
+							default: break;
+							}
+							
+						}
 					} else if (Remain_Tick[id] == 0) {
 						saboClear(id);
 					}

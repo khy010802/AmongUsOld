@@ -1,6 +1,5 @@
 package bepo.au.missions;
 
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -33,7 +32,7 @@ public class H_AlignEngine extends Mission {
 			for (int slot = 0; slot < 9; slot++)
 				Util.Stack(gui.get(i), slot,
 						(slot == 4 ? Material.GREEN_STAINED_GLASS_PANE : Material.WHITE_STAINED_GLASS_PANE), 1, " ");
-			Util.Stack(gui.get(i), 9, m, 1, "§f이것을 가운데에 두세요.");
+			
 			for (int slot = 18; slot < 27; slot++)
 				Util.Stack(gui.get(i), slot,
 						(slot == 4 ? Material.GREEN_STAINED_GLASS_PANE : Material.WHITE_STAINED_GLASS_PANE), 1, " ");
@@ -43,6 +42,8 @@ public class H_AlignEngine extends Mission {
 	@Override
 	public void onStart(Player p, int i) {
 		p.openInventory(gui.get(i));
+		Util.Stack(gui.get(i), 9, m, 1, "§f이것을 가운데에 두세요.");
+		for (int slot = 10; slot < 18; slot++) gui.get(i).clear(slot);
 	}
 
 	@Override
@@ -93,28 +94,25 @@ public class H_AlignEngine extends Mission {
 		
 		if(!checkPlayer(e)) return;
 		
-		if (!e.getRawSlots().isEmpty() && e.getCursor() != null &&
-				e.getCursor().getType() == m) {
-			for (int slot : e.getRawSlots())
-				if (slot == 13) {
-					for (int i = 0; i < 2; i++) {
-						final int c = i;
-						Bukkit.broadcastMessage(Namelore[i]);
-						if (e.getView().getTitle().split(" ")[1].equals(Namelore[i])) {
-							new BukkitRunnable() {
-								public void run() {
-									if(gui.get(c).getItem(13).getType()==m) {
-										Util.debugMessage("클리어!");
-										onClear((Player) e.getWhoClicked(), c);
-									}
+		if (!e.getRawSlots().isEmpty()) {
+			Util.debugMessage("드래그인식됨");
+			
+			if (e.getRawSlots().contains(13)) {
+				Util.debugMessage("13번 슬롯 인식됨");
+				for (int i = 0; i < 2; i++) {
+					final int c = i;
+					if (e.getView().getTitle().split(" ")[1].equals(Namelore[i])) {
+						new BukkitRunnable() {
+							public void run() {
+								if(gui.get(c).getItem(13).getType()==m) {
+									Util.debugMessage("클리어!");
+									onClear((Player) e.getWhoClicked(), c);
 								}
-							}.runTaskLater(main, 0L);
-
-						}
+							}
+						}.runTaskLater(main, 0L);
 					}
-
 				}
-
+			}
 		}
 	}
 }

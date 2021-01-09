@@ -1,7 +1,8 @@
 name: AmongUs
-version: 1.0
+version: 20201020a
 main: bepo.au.Main
 author: JonJAr
+softdepend: [ProtocolLib]
 api-version: 1.13
 commands:
   au:
