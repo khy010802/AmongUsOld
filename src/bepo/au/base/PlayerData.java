@@ -244,7 +244,7 @@ public class PlayerData {
 		HashMap<Integer, ItemStack> hash = ItemList.getImposterSet();
 		for(int i=0;i<9;i++) {
 			if(hash.containsKey(i)) p.getInventory().setItem(i, hash.get(i));
-			else if(i == 8) p.getInventory().setItem(i, ItemList.VOTE_PAPER.clone());
+			else if(i == 8) p.getInventory().setItem(i, ItemList.MINIMAP.clone());
 			else p.getInventory().setItem(i, new ItemStack(Material.AIR, 1));
 		}
 		

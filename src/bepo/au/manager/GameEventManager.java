@@ -23,6 +23,7 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.event.player.PlayerDropItemEvent;
+import org.bukkit.event.player.PlayerInteractAtEntityEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerItemHeldEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
@@ -266,6 +267,19 @@ public class GameEventManager implements Listener {
 
 	
 	@EventHandler
+	public void onInteractAt(PlayerInteractAtEntityEvent event) {
+		Player p = event.getPlayer();
+		PlayerData pd = PlayerData.getPlayerData(p.getName());
+		
+		if(pd == null)
+			return;
+		
+		if(event.getRightClicked() instanceof ArmorStand) {
+			event.setCancelled(true);
+		}
+	}
+	
+	@EventHandler
 	public void onInteract(PlayerInteractEvent event) {
 		Player p = event.getPlayer();
 		PlayerData pd = PlayerData.getPlayerData(p.getName());
@@ -344,8 +358,10 @@ public class GameEventManager implements Listener {
 				} else if(LocManager.getLoc("CCTVButton").contains(loc)){
 					if(Sabotage.isActivating(0) && Sabotage.Sabos.getType() == SaboType.COMM) {
 						p.sendMessage(Main.PREFIX + "§c통신 사보타지 발동 중엔 확인하실 수 없습니다.");
-					} else {
+					} else if(p.getGameMode() != GameMode.SPECTATOR){
 						pd.moveCCTV(p, true);
+					} else {
+						p.sendMessage(Main.PREFIX + "§c유령은 CCTV를 확인하실 수 없습니다.");
 					}
 				} else if (LocManager.getLoc("EmergencyButton").contains(loc)) {
 					if(!pd.isAlive()) {
@@ -577,7 +593,8 @@ public class GameEventManager implements Listener {
 		PlayerData pd = PlayerData.getPlayerData(p.getName());
 		
 		if(pd != null) {
-			if(p.getGameMode() == GameMode.SPECTATOR) if(p.getGameMode() == GameMode.SPECTATOR) event.setCancelled(false);
+			if(p.getGameMode() == GameMode.SPECTATOR && !pd.isWatchingCCTV()) 
+				event.setCancelled(false);
 			if(pd.isWatchingCCTV() && event.getCurrentItem() != null && event.getCurrentItem().getType() == ItemList.CCTV_EXIT.getType()) {
 				pd.exitCCTV(p);
 				event.setCancelled(true);

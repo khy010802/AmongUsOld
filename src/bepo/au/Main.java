@@ -168,8 +168,8 @@ public class Main extends JavaPlugin implements Listener{
         
         
         Bukkit.getConsoleSender().sendMessage(PREFIX + "§f버전 확인 중...");
-        if(!bv.contains("1.16.3")) {
-        	Bukkit.getConsoleSender().sendMessage(PREFIX + "§c주의. 해당 플러그인은 1.16.3에서 설계되었습니다. 기능에 이상이 있을 수 있습니다.");
+        if(!bv.contains("1.16.5")) {
+        	Bukkit.getConsoleSender().sendMessage(PREFIX + "§c주의. 해당 플러그인은 1.16.5에서 설계되었습니다. 기능에 이상이 있을 수 있습니다.");
         }
         if(!v.contains("Paper")) {
         	Bukkit.getConsoleSender().sendMessage(PREFIX + "§4주의. Paper 버킷이 아닙니다. 플러그인이 작동하지 않습니다.");

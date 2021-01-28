@@ -107,7 +107,7 @@ public abstract class AGameTicker {
 				p.sendMessage("§f=======================");
 				p.sendMessage("§4당신은 임포스터입니다.");
 				p.sendMessage("§c2번 슬롯에 검을 지급해드렸습니다. 적절한 시기에 크루원을 죽이십시오. (쿨타임 " + SETTING.KILL_COOLTIME_SEC.getAsInteger() + "초)");
-				p.sendMessage("§c숫자 키 3번, 4번으로 사보타지를 선택할 수 있으며,");
+				p.sendMessage("§c숫자 키 4번, 6번으로 사보타지를 선택할 수 있으며,");
 				p.sendMessage("§c손 바꾸기(기본 설정 F) 키를 눌러 사보타지를 발동할 수 있습니다.");
 				p.sendMessage("§c");
 				p.sendMessage("§c임포스터 플레이어 : §f" + imposter);
