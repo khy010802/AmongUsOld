@@ -132,7 +132,7 @@ public class Main extends JavaPlugin implements Listener{
 			}else if(obj instanceof Integer){
 				int num = (int) obj;
 				if(num<min) obj=0;
-				else if (num>max) obj=max;
+				else if (num>max && max!=-1) obj=max;
 			}
 		}
 		
