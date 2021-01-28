@@ -2,6 +2,8 @@ package bepo.au;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import bepo.au.manager.*;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -20,18 +22,15 @@ import bepo.au.function.SoundRemover;
 import bepo.au.function.Vent;
 import bepo.au.games.ChaseTag;
 import bepo.au.games.Normal;
-import bepo.au.manager.CommandManager;
-import bepo.au.manager.ConfigManager;
-import bepo.au.manager.GameEventManager;
-import bepo.au.manager.LocManager;
-import bepo.au.manager.TabCompleteManager;
 import bepo.au.utils.ColorUtil;
 import bepo.au.utils.PlayerUtil;
 import bepo.au.utils.SettingUtil;
 import bepo.au.utils.SettingUtil.ARMORSTANDS;
 
 public class Main extends JavaPlugin implements Listener{
-	
+
+
+
 	public enum SETTING {
 		
 		GAMEMODE("게임 종류", GameTimer.GameType.NORMAL, GameTimer.GameType.class),
@@ -47,9 +46,9 @@ public class Main extends JavaPlugin implements Listener{
 		NOTICE_IMPOSTER("추방 시 임포스터 여부 공개",true, Boolean.class),
 		VISUAL_TASK("시각 미션 보이기", true, Boolean.class),
 		BLOCK_PLAYER_SOUND("플레이어 소리 차단", true, Boolean.class),
-		COMMON_MISSION_AMOUNT("공통 임무", 1, Integer.class),
-		EASY_MISSION_AMOUNT("간단한 임무", 2, Integer.class),
-		HARD_MISSION_AMOUNT("어려운 임무", 1, Integer.class),
+		COMMON_MISSION_AMOUNT("공통 임무", 1, Integer.class,0,2),
+		EASY_MISSION_AMOUNT("간단한 임무", 2, Integer.class,0,8),
+		HARD_MISSION_AMOUNT("어려운 임무", 1, Integer.class,0,7),
 		IMPOSTER_AMOUNT("임포스터 수", 1, Integer.class),
 		MOVEMENT_SPEED("이동속도", 0.2D, Double.class),
 		
@@ -62,16 +61,31 @@ public class Main extends JavaPlugin implements Listener{
 		private Object obj;
 		private String name;
 		private Class<?> type;
+		public int min,max;
 		public static ArrayList<String> SETTING_LIST = new ArrayList<String>();
-		
+
 		SETTING(String name, Object obj, Class<?> type) {
 			this.obj = obj.toString();
 			this.type = type;
 			this.name = name;
+			this.min = 0;
+			this.max = -1;
+		}
+
+		SETTING(String name, Object obj, Class<?> type,int min,int max) {
+			this.obj = obj.toString();
+			this.type = type;
+			this.name = name;
+			this.min = min;
+			this.max = max;
 		}
 		
 		public String getName() {
 			return this.name;
+		}
+
+		public String getUnderscoreedName(){
+			return this.name.replace(' ','_');
 		}
 		
 		public Object get() {
@@ -108,13 +122,17 @@ public class Main extends JavaPlugin implements Listener{
 		}
 		
 		private void checkLimit() {
-			if(this == IMPOSTER_MOVEMENT_SPEED) {
+
 		
 				
-				if(obj instanceof Double) {
-					Double d = (Double) obj;
-					if(d > 1.0D) obj = 1.0D; else if(d < -1.0D) obj = -1.0D;
-				}
+			if(obj instanceof Double) {
+				Double d = (Double) obj;
+				if(d > 1.0D) obj = 1.0D; else if(d < -1.0D) obj = -1.0D;
+
+			}else if(obj instanceof Integer){
+				int num = (int) obj;
+				if(num<min) obj=0;
+				else if (num>max) obj=max;
 			}
 		}
 		
@@ -136,7 +154,6 @@ public class Main extends JavaPlugin implements Listener{
 	private static MissionList ml;
 	private static LocManager lm;
 	private static EventManager em;
-	
 	public static boolean isProtocolHooked = false;
 
 	
@@ -229,7 +246,7 @@ public class Main extends JavaPlugin implements Listener{
 		getCommand("au").setTabCompleter(new TabCompleteManager());
 		
 		Bukkit.getPluginManager().registerEvents(em, this);
-		
+
 		GameType.NORMAL.setGameTicker(new Normal());
 		GameType.CHASETAG.setGameTicker(new ChaseTag());
 		
@@ -263,7 +280,7 @@ public class Main extends JavaPlugin implements Listener{
 				//SettingUtil.logo_Frames();
 			}
 		}.runTaskLater(this, 20L);
-		
+
 		Bukkit.getConsoleSender().sendMessage(PREFIX + "§fAmongUs 활성화. By Team JonJAr");
 	}
 	

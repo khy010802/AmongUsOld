@@ -193,7 +193,8 @@ public class CommandManager implements CommandExecutor {
 	
 	private void config(Player p, String[] args) {
 		if (args.length < 3) {
-			p.sendMessage(Main.PREFIX + "§c올바른 명령어 : /au config [설정] [값]");
+//			p.sendMessage(Main.PREFIX + "§c올바른 명령어 : /au config [설정] [값]");
+			ConfigScreenManager.openGUI(p);
 			return;
 		}else{
 			Object obj = null;

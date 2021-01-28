@@ -604,6 +604,7 @@ public class GameEventManager implements Listener {
 		}
 		SabotageGUI.onClick(event);
 		AdminMap.onClick(event);
+
 	}
 
 }

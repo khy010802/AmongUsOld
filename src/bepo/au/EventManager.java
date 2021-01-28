@@ -1,5 +1,6 @@
 package bepo.au;
 
+import bepo.au.manager.ConfigScreenManager;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.block.Block;
@@ -12,8 +13,10 @@ import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.FoodLevelChangeEvent;
 import org.bukkit.event.hanging.HangingBreakEvent;
+import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.player.PlayerInteractAtEntityEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.scoreboard.Team;
 import org.bukkit.scoreboard.Team.Option;
 import org.bukkit.scoreboard.Team.OptionStatus;
@@ -96,11 +99,11 @@ public class EventManager implements Listener{
 			t.addEntry(ap.getName());
 		}
 	}
-/*
+
 	@EventHandler
-	public void onMove(PlayerMoveEvent event) {
-		
+	public void onClick(InventoryClickEvent event) {
+		ConfigScreenManager.onClick(event);
 	}
-	*/
+
 
 }

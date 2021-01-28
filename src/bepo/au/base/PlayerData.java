@@ -49,7 +49,7 @@ public class PlayerData {
 		PLAYERDATA.clear();
 	}
 	
-	//ì„í¬ ì „ìš©
+	//ÀÓÆ÷ Àü¿ë
 	private int kill_remain_tick = 100;
 	private int emerg_remain_time = 1;
 	
@@ -89,7 +89,7 @@ public class PlayerData {
 	public UUID getUUID() { return this.uuid; }
 	public ColorUtil getColor() { return this.color; }
 	public boolean isAlive() { return this.survive; }
-	public ItemStack getHead(){return this.head.clone();}//í´ë¡  ë°˜í™˜
+	public ItemStack getHead(){return this.head.clone();}//Å¬·Ğ ¹İÈ¯
 	public ItemStack getHead(boolean clone){return (clone ? this.head.clone():this.head);}
 
 	public SaboType getSelectedSabo() { return this.sabo_selected; }
@@ -136,7 +136,7 @@ public class PlayerData {
 	
 	public void moveCCTV(Player p, boolean next) {
 
-		if (!CCTV.watchingCCTVset.contains(p)) CCTV.watchingCCTVset.add(p);//ë³´ê³ ìˆëŠ” í”Œë ˆì´ì–´ ì¶”ê°€
+		if (!CCTV.watchingCCTVset.contains(p)) CCTV.watchingCCTVset.add(p);//º¸°íÀÖ´Â ÇÃ·¹ÀÌ¾î Ãß°¡
 
 		if(!cctv_move) return;
 		
@@ -171,19 +171,19 @@ public class PlayerData {
 		String ac = "";
 		for(E_cctv c : E_cctv.values()) {
 			if(c.getName() == cctv.getName())
-				ac += "Â§a";
+				ac += "¡×a";
 			else
-				ac += "Â§7";
+				ac += "¡×7";
 			ac += c.getName() + " ";
 			
 		}
 		p.sendTitle("", " " + ac, 0, 20000, 0);
-		p.sendActionBar("Â§eShiftÂ§fë¥¼ ëˆŒëŸ¬ ìœ„ì¹˜ë¥¼ ë³€ê²½í•˜ê³ , Â§eì¸ë²¤í† ë¦¬ì˜ ì²  ë¬¸ ì•„ì´í…œÂ§fì„ ëˆŒëŸ¬ ì¤‘ë‹¨í•©ë‹ˆë‹¤.");
+		p.sendActionBar("¡×eShift¡×f¸¦ ´­·¯ À§Ä¡¸¦ º¯°æÇÏ°í, ¡×eÀÎº¥Åä¸®ÀÇ Ã¶ ¹® ¾ÆÀÌÅÛ¡×fÀ» ´­·¯ Áß´ÜÇÕ´Ï´Ù.");
 		
 	}
 	
 	public void exitCCTV(Player p) {
-		if (CCTV.watchingCCTVset.contains(p)) CCTV.watchingCCTVset.remove(p);//ë³´ê³ ìˆëŠ” ëª©ë¡ì—ì„œ ì œê±°
+		if (CCTV.watchingCCTVset.contains(p)) CCTV.watchingCCTVset.remove(p);//º¸°íÀÖ´Â ¸ñ·Ï¿¡¼­ Á¦°Å
 
 		now_cctv_loc = -1;
 		if(isAlive()) 
@@ -236,9 +236,9 @@ public class PlayerData {
 		p.teleport(loc.add(0.5D, 0.5D, 0.5D));
 	}
 	
-	// forceëŠ” íšŒì˜ë•Œë¬¸ì— ê°•ì œ íƒˆì¶œ
+	// force´Â È¸ÀÇ¶§¹®¿¡ °­Á¦ Å»Ãâ
 	public void confirmVent(Player p, boolean force) {
-		// ë²¤íŠ¸ ì¶œí˜„
+		// º¥Æ® ÃâÇö
 		if(now_vent == null) return;
 		
 		HashMap<Integer, ItemStack> hash = ItemList.getImposterSet();
@@ -286,16 +286,16 @@ public class PlayerData {
 			if(sabo_selected == SaboType.DOOR) sabo_selected_door_id++;
 			else sabo_selected = SaboType.DOOR;
 			if(sabo_selected_door_id > 7) sabo_selected_door_id = 1;
-			a_string = "Â§7Â§lë¬¸ ë‹«ê¸° Â§f(" + Sabotage.getRoomById(sabo_selected_door_id, false) + ")";
+			a_string = "¡×7¡×l¹® ´İ±â ¡×f(" + Sabotage.getRoomById(sabo_selected_door_id, false) + ")";
 		} else {
 			switch(sabo_selected) {
-			case COMM: sabo_selected = SaboType.ELEC; a_string = "Â§eÂ§lì „ë“± íŒŒê´´"; break;
-			case ELEC: sabo_selected = SaboType.NUCL; a_string = "Â§cÂ§lì›ìë¡œ ìš©í•´"; break;
-			case NUCL: sabo_selected = SaboType.OXYG; a_string = "Â§bÂ§lì‚°ì†Œ ê³ ê°ˆ"; break;
-			case DOOR: case OXYG: sabo_selected = SaboType.COMM; a_string = "Â§aÂ§lí†µì‹  ì œí•œ"; break;
+			case COMM: sabo_selected = SaboType.ELEC; a_string = "¡×e¡×lÀüµî ÆÄ±«"; break;
+			case ELEC: sabo_selected = SaboType.NUCL; a_string = "¡×c¡×l¿øÀÚ·Î ¿ëÇØ"; break;
+			case NUCL: sabo_selected = SaboType.OXYG; a_string = "¡×b¡×l»ê¼Ò °í°¥"; break;
+			case DOOR: case OXYG: sabo_selected = SaboType.COMM; a_string = "¡×a¡×lÅë½Å Á¦ÇÑ"; break;
 			}
 		}
-		PlayerUtil.sendActionBar(p, "Â§fÂ§lì„ íƒí•œ ì‚¬ë³´íƒ€ì§€ : " + a_string);
+		PlayerUtil.sendActionBar(p, "¡×f¡×l¼±ÅÃÇÑ »çº¸Å¸Áö : " + a_string);
 		updateItem(p, door ? ItemList.I_SABOTAGE_DOOR.getType() : ItemList.I_SABOTAGE_CRIT.getType());
 	}
 	

@@ -73,6 +73,9 @@ public class GameTimer extends BukkitRunnable {
 			return this.gameticker;
 		}
 
+		public GameType getNextType(){
+			return this == NORMAL ? CHASETAG : NORMAL;
+		}
 		static {
 			for (GameType type : GameType.values()){
 					TYPES.add(type.toString());

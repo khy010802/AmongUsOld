@@ -14,7 +14,7 @@ import bepo.au.Main.SETTING;
 public class ConfigManager {
 	
 	private Main main;
-	
+
 	public ConfigManager(Main main) {
 		this.main = main;
 	}
@@ -65,5 +65,6 @@ public class ConfigManager {
 		}
 		
 	}
+
 
 }
