@@ -227,7 +227,7 @@ public class Util implements Listener {
 		inv.setItem(slot, createItem(mat, amount, name, lore));
 	}
 
-	public static void Stack(Inventory inv, int slot, Material mat, int amount, String name, String lore) {
+	public static void Stack(Inventory inv, int slot, Material mat, int amount, String name, String... lore) {
 		inv.setItem(slot, createItem(mat, amount, name, Arrays.asList(lore)));
 	}
 

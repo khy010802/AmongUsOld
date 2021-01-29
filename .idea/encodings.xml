@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="Encoding">
+    <file url="file://$PROJECT_DIR$" charset="x-windows-949" />
+    <file url="file://$PROJECT_DIR$/plugin.yml" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/src/bepo/au/games/AGameTicker.java" charset="EUC-KR" />
+    <file url="file://$PROJECT_DIR$/src/bepo/au/games/ChaseTag.java" charset="EUC-KR" />
+    <file url="file://$PROJECT_DIR$/src/bepo/au/manager/ConfigScreenManager.java" charset="EUC-KR" />
+    <file url="file://$PROJECT_DIR$/src/bepo/au/missions/H_ActivatingReactor.java" charset="windows-1252" />
+    <file url="file://$PROJECT_DIR$/src/bepo/au/utils/SettingUtil.java" charset="EUC-KR" />
+    <file url="file://$PROJECT_DIR$/src/bepo/au/utils/Util.java" charset="EUC-KR" />
+  </component>
+</project>

@@ -1,9 +1,10 @@
 package bepo.au.utils;
 
 
-import java.util.ArrayList;
-import java.util.List;
-
+import bepo.au.GameTimer.GameType;
+import bepo.au.Main.SETTING;
+import bepo.au.manager.LocManager;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
@@ -15,9 +16,8 @@ import org.bukkit.entity.ItemFrame;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.MapMeta;
 
-import bepo.au.GameTimer.GameType;
-import bepo.au.Main.SETTING;
-import bepo.au.manager.LocManager;
+import java.util.ArrayList;
+import java.util.List;
 
 public class SettingUtil {
 	
@@ -69,13 +69,14 @@ public class SettingUtil {
 	}
 	
 	private static void updateDescription() {
-		
-		
+
+
 		
 		GameType gt = SETTING.GAMEMODE.getAsGameType();
 		String[] des = gt.getGameTicker().getDescriptions();
 		for(int i=0;i<des.length;i++) {
 			final int index = i;
+
 			ARMORSTANDS.values()[i].getArmorStands().forEach(a -> {
 				a.setCustomName(des[index]);
 			});

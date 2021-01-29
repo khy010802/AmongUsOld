@@ -94,7 +94,7 @@ public abstract class AGameTicker {
 			Player p = Bukkit.getPlayer(name);
 			PlayerData pd = PlayerData.getPlayerData(p.getName());
 			
-			//p.getInventory().clear();
+			p.getInventory().clear();
 			p.setPlayerListName(pd.getColor().getChatColor() + p.getName());
 			
 			ItemStack[] ac = PlayerUtil.getColoredArmorContent(pd.getColor());

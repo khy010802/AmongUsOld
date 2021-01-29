@@ -1,0 +1,9 @@
+<component name="ArtifactManager">
+  <artifact type="jar" build-on-make="true" name="AmongUs:jar">
+    <output-path>$PROJECT_DIR$/classes/artifacts/AmongUs_jar</output-path>
+    <root id="archive" name="AmongUs.jar">
+      <element id="module-output" name="AmongUs" />
+      <element id="file-copy" path="$PROJECT_DIR$/plugin.yml" />
+    </root>
+  </artifact>
+</component>

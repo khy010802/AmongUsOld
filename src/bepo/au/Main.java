@@ -1,9 +1,16 @@
 package bepo.au;
 
-import java.util.ArrayList;
-import java.util.List;
-
+import bepo.au.GameTimer.GameType;
+import bepo.au.base.Mission;
+import bepo.au.function.MissionList;
+import bepo.au.function.SoundRemover;
+import bepo.au.function.Vent;
+import bepo.au.games.ChaseTag;
+import bepo.au.games.Normal;
 import bepo.au.manager.*;
+import bepo.au.utils.ColorUtil;
+import bepo.au.utils.PlayerUtil;
+import bepo.au.utils.SettingUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -15,17 +22,8 @@ import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scoreboard.Scoreboard;
 
-import bepo.au.GameTimer.GameType;
-import bepo.au.base.Mission;
-import bepo.au.function.MissionList;
-import bepo.au.function.SoundRemover;
-import bepo.au.function.Vent;
-import bepo.au.games.ChaseTag;
-import bepo.au.games.Normal;
-import bepo.au.utils.ColorUtil;
-import bepo.au.utils.PlayerUtil;
-import bepo.au.utils.SettingUtil;
-import bepo.au.utils.SettingUtil.ARMORSTANDS;
+import java.util.ArrayList;
+import java.util.List;
 
 public class Main extends JavaPlugin implements Listener{
 
@@ -57,7 +55,7 @@ public class Main extends JavaPlugin implements Listener{
 		
 		IMPOSTER_ALWAYS_BLIND("(술래잡기) 임포스터 실명 부여", true, Boolean.class),
 		IMPOSTER_MOVEMENT_SPEED("(술래잡기) 임포스터 이동속도", 0.2D, Double.class);
-		
+
 		private Object obj;
 		private String name;
 		private Class<?> type;
@@ -65,7 +63,7 @@ public class Main extends JavaPlugin implements Listener{
 		public static ArrayList<String> SETTING_LIST = new ArrayList<String>();
 
 		SETTING(String name, Object obj, Class<?> type) {
-			this.obj = obj.toString();
+			this.obj = obj;
 			this.type = type;
 			this.name = name;
 			this.min = 0;
@@ -73,7 +71,7 @@ public class Main extends JavaPlugin implements Listener{
 		}
 
 		SETTING(String name, Object obj, Class<?> type,int min,int max) {
-			this.obj = obj.toString();
+			this.obj = obj;
 			this.type = type;
 			this.name = name;
 			this.min = min;
@@ -84,10 +82,6 @@ public class Main extends JavaPlugin implements Listener{
 			return this.name;
 		}
 
-		public String getUnderscoreedName(){
-			return this.name.replace(' ','_');
-		}
-		
 		public Object get() {
 			return obj;
 		}
@@ -254,28 +248,31 @@ public class Main extends JavaPlugin implements Listener{
 			isProtocolHooked = true;
 			SoundRemover.addListener();
 		}
-		
-		for(World w : Bukkit.getWorlds()) {
-			for(Entity e : w.getEntities()) {
-				if(e.getScoreboardTags().contains("au_reset")) {
-					e.remove();
-				} else {
-					if(e instanceof ArmorStand) {
-						for(ARMORSTANDS ass : ARMORSTANDS.values()) {
-							if(e.getScoreboardTags().contains(ass.getTag())) {
-								Bukkit.getConsoleSender().sendMessage("added " + ass.getTag());
-								ass.addArmorStands((ArmorStand) e);
+
+		Mission.initMain(this);
+
+
+
+		new BukkitRunnable() {
+			public void run() {
+
+				for(World w : Bukkit.getWorlds()) {
+					for(Entity e : w.getEntities()) {
+						if(e.getScoreboardTags().contains("au_reset")) {
+							e.remove();
+						} else {
+							if(e instanceof ArmorStand) {
+								for(SettingUtil.ARMORSTANDS ass : SettingUtil.ARMORSTANDS.values()) {
+									if(e.getScoreboardTags().contains(ass.getTag())) {
+										Bukkit.getConsoleSender().sendMessage("added " + ass.getTag());
+										ass.addArmorStands((ArmorStand) e);
+									}
+								}
 							}
 						}
 					}
 				}
-			}
-		}
-		
-		Mission.initMain(this);
-		
-		new BukkitRunnable() {
-			public void run() {
+
 				SettingUtil.startSetting();
 				//SettingUtil.logo_Frames();
 			}
