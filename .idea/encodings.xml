@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="Encoding">
+    <file url="file://$PROJECT_DIR$/src/main/java/bepo/au/GameTimer.java" charset="EUC-KR" />
+    <file url="file://$PROJECT_DIR$/src/main/java/bepo/au/Main.java" charset="EUC-KR" />
+    <file url="file://$PROJECT_DIR$/src/main/java/bepo/au/base/Sabotage.java" charset="EUC-KR" />
+    <file url="file://$PROJECT_DIR$/src/main/java/bepo/au/function/SightTimer.java" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/src/main/java/bepo/au/function/VoteSystem.java" charset="EUC-KR" />
+    <file url="file://$PROJECT_DIR$/src/main/java/bepo/au/games/AGameTicker.java" charset="EUC-KR" />
+    <file url="file://$PROJECT_DIR$/src/main/java/bepo/au/games/ChaseTag.java" charset="EUC-KR" />
+    <file url="file://$PROJECT_DIR$/src/main/java/bepo/au/games/Normal.java" charset="EUC-KR" />
+    <file url="file://$PROJECT_DIR$/src/main/java/bepo/au/manager/CommandManager.java" charset="EUC-KR" />
+    <file url="file://$PROJECT_DIR$/src/main/java/bepo/au/manager/GameEventManager.java" charset="EUC-KR" />
+    <file url="file://$PROJECT_DIR$/src/main/java/bepo/au/manager/LocManager.java" charset="EUC-KR" />
+    <file url="file://$PROJECT_DIR$/src/main/java/bepo/au/manager/ScoreboardManager.java" charset="EUC-KR" />
+    <file url="file://$PROJECT_DIR$/src/main/java/bepo/au/manager/TabCompleteManager.java" charset="EUC-KR" />
+    <file url="file://$PROJECT_DIR$/src/main/java/bepo/au/missions/C_Card.java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/src/main/java/bepo/au/missions/C_FixWriting.java" charset="EUC-KR" />
+    <file url="file://$PROJECT_DIR$/src/main/java/bepo/au/missions/E_ActivatingShield.java" charset="EUC-KR" />
+    <file url="file://$PROJECT_DIR$/src/main/java/bepo/au/missions/E_ChartCourse.java" charset="EUC-KR" />
+    <file url="file://$PROJECT_DIR$/src/main/java/bepo/au/missions/E_Data.java" charset="EUC-KR" />
+    <file url="file://$PROJECT_DIR$/src/main/java/bepo/au/missions/E_DistributePower.java" charset="EUC-KR" />
+    <file url="file://$PROJECT_DIR$/src/main/java/bepo/au/missions/E_DivertPower.java" charset="EUC-KR" />
+    <file url="file://$PROJECT_DIR$/src/main/java/bepo/au/missions/E_EmptyChute.java" charset="EUC-KR" />
+    <file url="file://$PROJECT_DIR$/src/main/java/bepo/au/missions/H_ActivatingReactor.java" charset="windows-1252" />
+    <file url="file://$PROJECT_DIR$/src/main/java/bepo/au/missions/H_AlignEngine.java" charset="EUC-KR" />
+    <file url="file://$PROJECT_DIR$/src/main/java/bepo/au/missions/H_Gas.java" charset="EUC-KR" />
+    <file url="file://$PROJECT_DIR$/src/main/java/bepo/au/missions/H_InspectSample.java" charset="EUC-KR" />
+    <file url="file://$PROJECT_DIR$/src/main/java/bepo/au/missions/H_Scanning.java" charset="EUC-KR" />
+    <file url="file://$PROJECT_DIR$/src/main/java/bepo/au/missions/H_Shooting.java" charset="EUC-KR" />
+    <file url="file://$PROJECT_DIR$/src/main/java/bepo/au/sabo/S_Communication.java" charset="EUC-KR" />
+    <file url="file://$PROJECT_DIR$/src/main/java/bepo/au/sabo/S_Fingerprint.java" charset="EUC-KR" />
+    <file url="file://$PROJECT_DIR$/src/main/java/bepo/au/sabo/S_FixLights.java" charset="EUC-KR" />
+    <file url="file://$PROJECT_DIR$/src/main/java/bepo/au/sabo/S_Oxygen.java" charset="EUC-KR" />
+    <file url="file://$PROJECT_DIR$/src/main/java/bepo/au/utils/PlayerUtil.java" charset="EUC-KR" />
+    <file url="file://$PROJECT_DIR$/src/main/java/bepo/au/utils/SettingUtil.java" charset="EUC-KR" />
+    <file url="file://$PROJECT_DIR$/src/main/java/bepo/au/utils/Util.java" charset="EUC-KR" />
+  </component>
+</project>
