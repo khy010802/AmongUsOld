@@ -1,0 +1,7 @@
+name: AmongUs
+version: @version@
+main: bepo.au.Main
+api-version: 1.16
+commands:
+  au:
+    description: AmongUs Commands.
